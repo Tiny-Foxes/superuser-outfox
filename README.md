@@ -1,2 +1,2 @@
-# superuser-outfox
+# Superuser
 Superuser Theme for Project OutFox
