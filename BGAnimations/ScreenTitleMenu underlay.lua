@@ -2,10 +2,12 @@ local scx, scy = SCREEN_CENTER_X, SCREEN_CENTER_Y
 local sw, sh = SCREEN_WIDTH, SCREEN_HEIGHT
 local scale = sh / 480
 
+local ThemeColor = LoadModule('Theme.Colors.lua')
+
 local t = Def.ActorFrame {
 	InitCommand = function(self)
 		self:Center()
-	end
+	end,
 }
 
 -- Mascot
@@ -47,7 +49,7 @@ t[#t + 1] = Def.ActorFrame {
 		InitCommand = function(self)
 			self
 				:SetSize(sw, 264)
-				:diffuse(color('#000000'))
+				:diffuse(ThemeColor.Black)
 				:diffusealpha(0.75)
 				:fadetop(0.01)
 				:fadebottom(0.01)
@@ -57,7 +59,7 @@ t[#t + 1] = Def.ActorFrame {
 		InitCommand = function(self)
 			self
 				:SetSize(sw, 256)
-				:diffuse(color('#9D276C'))
+				:diffuse(ThemeColor.Elements)
 				:diffusealpha(0.5)
 		end,
 	},
@@ -75,33 +77,30 @@ t[#t + 1] = Def.ActorFrame {
 				self
 					:xy(-360, -32)
 					:horizalign('right')
-					:shadowlengthy(2)
-					:diffuse(color('#FFFF00'))
-					:diffusebottomedge(color('#FF8000'))
+					:shadowlengthy(4)
+					:diffuse(ThemeColor.Yellow)
+					:diffusebottomedge(ThemeColor.Orange)
 					:cropright(1)
 					:linear(0.1)
 					:cropright(0)
 			end,
 		},
-		Def.BitmapText {
-			Font = '_xiaxide 80px',
-			Text = 'Superuser',
+		Def.Sprite {
+			Texture = THEME:GetPathG('ScreenTitleMenu', 'supertext'),
 			InitCommand = function(self)
 				self
-					:xy(-180, 32)
+					:xy(-180, 28)
+					:zoom(0.45)
 					:shadowlengthy(4)
-					:diffuse(color('#CF3A98'))
-					:diffusebottomedge(color('#A33179'))
 					:cropright(1)
 					:sleep(0.1)
 					:linear(0.2)
 					:cropright(0)
-	
 			end,
 		},
 		Def.BitmapText {
 			Font = 'Common Normal',
-			Text = 'Theme by Sudospective\nPowered by Konko',
+			Text = 'Theme by Sudospective\nPowered by Konko Module System',
 			InitCommand = function(self)
 				self
 					:zoom(0.5)

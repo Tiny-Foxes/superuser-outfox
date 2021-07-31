@@ -2,8 +2,8 @@ collectgarbage()
 
 local function aft(self)
 	self
-		:SetWidth(sw)
-		:SetHeight(sh)
+		:SetWidth(SCREEN_WIDTH)
+		:SetHeight(SCREEN_HEIGHT)
 		:EnableFloat(false)
 		:EnableDepthBuffer(true)
 		:EnableAlphaBuffer(true)
@@ -12,8 +12,8 @@ local function aft(self)
 end
 local function aftrecursive(self)
 	self
-		:SetWidth(sw)
-		:SetHeight(sh)
+		:SetWidth(SCREEN_WIDTH)
+		:SetHeight(SCREEN_HEIGHT)
 		:EnableDepthBuffer(true)
 		:EnableAlphaBuffer(false)
 		:EnableFloat(false)
@@ -27,22 +27,69 @@ function aftsprite(aft, sprite)
 	sprite:SetTexture(aft:GetTexture())
 end
 
+local t = Def.ActorFrame {
+	Def.ActorFrameTexture {
+		Name = 'InitAFT',
+		InitCommand = aft,
+		loadfile(THEME:GetPathB('ScreenWithMenuElements', 'background'))(),
+		Def.Sprite {
+			Name = 'InitSprite',
+			InitCommand = sprite,
+			OnCommand = function(self)
+				local aft = self:GetParent():GetParent():GetChild('InitAFTR')
+				aftsprite(aft, self)
+				self
+					:zoom(1.05)
+					:diffusealpha(0)
+			end,
+		},
+		LoadModule('Konko.Core.lua'),
+	},
+	Def.Sprite {
+		Name = 'InitShowActors',
+		InitCommand = sprite,
+		OnCommand = function(self)
+			local aft = self:GetParent():GetChild('InitAFT')
+			aftsprite(aft, self)
+		end,
+	},
+	Def.ActorFrameTexture {
+		Name = 'InitAFTR',
+		InitCommand = aftrecursive,
+		Def.Sprite {
+			Name = 'InitSpriteR',
+			InitCommand = sprite,
+			OnCommand = function(self)
+				local aft = self:GetParent():GetParent():GetChild('InitAFT')
+				aftsprite(aft, self)
+			end,
+		},
+	},
+}
 
-local t = Def.ActorFrame { LoadModule('Konko.Core.lua') }
+t[#t + 1] = Def.ActorFrame {
+	InitCommand = function(self)
+		self:Center()
+	end,
+	OnCommand = function(self)
+		SOUND:PlayMusicPart(THEME:GetPathB('ScreenInit', 'overlay/insane.ogg'), 0, 24)
+	end
+}
 
+
+---------------- Animations Here ----------------
 sudo()
 
 OFFSET = 0.15
 BPM = 146
 
----[[
 local InsaneQuads = {}
 
 for i = 1, 16 do
 	InsaneQuads[i] = Node.new('Quad')
 	InsaneQuads[i]
 		:SetReady(function(self)
-			local length = math.random(16, 64)
+			local length = math.random(8, 32)
 			self:xy(math.random(120, SW - 120), math.random(120, SH - 120))
 			self:SetSize(length, length)
 			self:zoom(0)
@@ -57,15 +104,14 @@ for i = 1, 16 do
 		end
 	InsaneQuads[i]:AddToNodeTree()
 end
---]]
 
-t[#t + 1] = Def.ActorFrame {
-	InitCommand = function(self)
-		self:Center()
-	end,
-	OnCommand = function(self)
-		SOUND:PlayMusicPart(THEME:GetPathB('ScreenInit', 'overlay/insane.ogg'), 0, 24, 0, 0, false, true)
-	end
-}
+function ready()
+	local InitSprite = SCREENMAN:GetTopScreen():GetChild('Overlay'):GetChild('InitAFT'):GetChild('InitSprite')
+	Node.tween
+		{InitSprite, 8, 6, Tweens.outquad, 0, 0.85, 'diffusealpha'}
+		{InitSprite, 12, 4, Tweens.inoutquad, 0.85, 0, 'diffusealpha'}
+end
+-------------------------------------------------
+
 
 return t

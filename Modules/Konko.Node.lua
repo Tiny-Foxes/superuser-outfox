@@ -13,7 +13,12 @@ local function UpdateTweens(self)
 		OFFSET = 0
 	end
 	for i, v in ipairs(func_table) do
-		local actor = self:GetChild(v[7])
+		local actor
+		if type(v[7]) == 'string' then
+			actor = self:GetChild(v[7])
+		else
+			actor = v[7]
+		end
 		local func = v[6]
 		if beat >= v[1] and beat < (v[1] + v[2]) then
 			local ease = v[3]((beat - v[1]) / v[2]) - v[4]
@@ -85,6 +90,14 @@ local function GetNodeTree()
 	--lua.Trace('Node.GetNodeTree')
 	return Nodes
 end
+
+local function tween(t)
+	local actor = t[1]
+	table.remove(t, 1)
+	table.insert(t, actor)
+	table.insert(func_table, t)
+	return tween
+end
 -- Node:AddTween {beat, len, ease, startAmp, endAmp, func}
 local function AddTween(self, t)
 	--lua.Trace('Node:AddTween')
@@ -101,10 +114,11 @@ Node = {
 	SetUpdate = SetUpdate,
 	SetInput = SetInput,
 	SetName = SetName,
-	AddTween = AddTween,
 	AddToNodeTree = AddToNodeTree,
 	SetSRTStyle = SetSRTStyle,
 	GetNodeTree = GetNodeTree,
+	tween = tween,
+	AddTween = AddTween,
 }
 Node.__index = Node
 

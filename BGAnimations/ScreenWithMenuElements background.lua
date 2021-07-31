@@ -2,20 +2,32 @@ local scx, scy = SCREEN_CENTER_X, SCREEN_CENTER_Y
 local sw, sh = SCREEN_WIDTH, SCREEN_HEIGHT
 local scale = sh / 480
 
+local ThemeColor = LoadModule('Theme.Colors.lua')
+
 return Def.ActorFrame {
 	-- Starfield
+	Def.Sprite {
+		Texture = THEME:GetPathG('ScreenWithMenuElements', 'nebula'),
+		OnCommand = function(self)
+			self
+				:Center()
+				:zoom((sh / 1080) * 1.1)
+		end,
+	},
 	Def.ActorFrame {
 		Name = 'Starfield',
 		OnCommand = function(self)
 			self
 				:Center()
-				:fov(150)
+				:fov(105)
 				:fardistz(1000 * scale)
-				:spin()
-				:effectmagnitude(0, 0, 5)
+				:diffusealpha(0.5)
+				:wag()
+				:effectperiod(16)
+				:effectmagnitude(0, 0, 0.1)
 		end,
 		Def.Sprite {
-			Texture = THEME:GetPathG('ScreenTitleMenu', 'starfield'),
+			Texture = THEME:GetPathG('ScreenWithMenuElements', 'starfield'),
 			OnCommand = function(self)
 				self
 					:xy(-scx, 0)
@@ -28,7 +40,7 @@ return Def.ActorFrame {
 			end
 		},
 		Def.Sprite {
-			Texture = THEME:GetPathG('ScreenTitleMenu', 'starfield'),
+			Texture = THEME:GetPathG('ScreenWithMenuElements', 'starfield'),
 			OnCommand = function(self)
 				self
 					:xy(scx, 0)
@@ -41,7 +53,7 @@ return Def.ActorFrame {
 			end
 		},
 		Def.Sprite {
-			Texture = THEME:GetPathG('ScreenTitleMenu', 'starfield'),
+			Texture = THEME:GetPathG('ScreenWithMenuElements', 'starfield'),
 			OnCommand = function(self)
 				self
 					:xy(0, -scx)
@@ -54,7 +66,7 @@ return Def.ActorFrame {
 			end
 		},
 		Def.Sprite {
-			Texture = THEME:GetPathG('ScreenTitleMenu', 'starfield'),
+			Texture = THEME:GetPathG('ScreenWithMenuElements', 'starfield'),
 			OnCommand = function(self)
 				self
 					:xy(0, scx)
@@ -72,9 +84,9 @@ return Def.ActorFrame {
 		OnCommand = function(self)
 			self
 				:FullScreen()
-				:diffuse(color('#4F263D'))
-				:diffusebottomedge(color('#5E2645'))
-				:diffusealpha(0.25)
+				:diffuse(ThemeColor.Primary)
+				:diffusebottomedge(ThemeColor.Secondary)
+				:diffusealpha(0.5)
 		end,
 	}
 }

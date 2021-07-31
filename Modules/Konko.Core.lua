@@ -58,6 +58,7 @@ end
 
 return Def.ActorFrame {
 	InitCommand = function(self)
+		sudo.fg = self
 		self:sleep(9e9)
 	end,
 	OnCommand = function(self)
@@ -90,5 +91,5 @@ return Def.ActorFrame {
 			self:queuecommand('BeginFrame')
 		end,
 	},
-	LoadModule('Konko.Node.lua')
+	LoadModule('Konko.Node.lua') or nil
 }
