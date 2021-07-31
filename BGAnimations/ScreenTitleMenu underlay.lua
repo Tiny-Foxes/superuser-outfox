@@ -75,7 +75,7 @@ t[#t + 1] = Def.ActorFrame {
 			Text = 'Project\nOutfox',
 			InitCommand = function(self)
 				self
-					:xy(-360, -32)
+					:xy(-370, -32)
 					:horizalign('right')
 					:shadowlengthy(4)
 					:diffuse(ThemeColor.Yellow)
@@ -89,7 +89,7 @@ t[#t + 1] = Def.ActorFrame {
 			Texture = THEME:GetPathG('ScreenTitleMenu', 'supertext'),
 			InitCommand = function(self)
 				self
-					:xy(-180, 28)
+					:xy(-220, 28)
 					:zoom(0.45)
 					:shadowlengthy(4)
 					:cropright(1)
@@ -104,8 +104,8 @@ t[#t + 1] = Def.ActorFrame {
 			InitCommand = function(self)
 				self
 					:zoom(0.5)
-					:xy(-120, 56)
-					:horizalign('left')
+					:xy(40, 56)
+					:horizalign('right')
 					:vertalign('top')
 					:cropright(1)
 					:sleep(0.3)

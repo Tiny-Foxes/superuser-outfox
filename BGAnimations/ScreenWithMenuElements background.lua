@@ -20,6 +20,7 @@ return Def.ActorFrame {
 			self
 				:Center()
 				:fov(105)
+				:zoom(1.2)
 				:fardistz(1000 * scale)
 				:diffusealpha(0.5)
 				:wag()
