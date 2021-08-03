@@ -7,6 +7,7 @@ return Def.ActorFrame {
 				:SetSize(320, 48)
 				:diffuse(ThemeColor.Primary)
 				:skewx(-0.5)
+				:shadowlength(2, 2)
 		end,
 	}
 }

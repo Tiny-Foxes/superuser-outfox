@@ -11,46 +11,6 @@ return Def.ActorFrame {
 		self
 			:xy(SCREEN_CENTER_X, SCREEN_CENTER_Y + 120)
 	end,
-	--[[
-	Def.Quad {
-		InitCommand = function(self)
-			self
-				:y(-(SCREEN_CENTER_Y + 120) + 82+68)
-				:skewx(-0.5)
-				:SetSize(SCREEN_WIDTH * 1.5, 170 + 48)
-				:diffuse(ThemeColor.Black)
-				:fadetop(0.02)
-				:fadebottom(0.02)
-				:diffusealpha(0.75)
-				:faderight(0.1)
-				:cropright(1)
-		end,
-		OnCommand = function(self)
-			self
-				:easeinoutexpo(0.25)
-				:faderight(0)
-				:cropright(0)
-		end,
-	},
-	Def.Quad {
-		InitCommand = function(self)
-			self
-				:y(-(SCREEN_CENTER_Y + 120)  + 82+68)
-				:skewx(-0.5)
-				:SetSize(SCREEN_WIDTH * 1.5, 164 + 48)
-				:diffuse(ThemeColor.Primary)
-				:diffusealpha(0.5)
-				:faderight(0.1)
-				:cropright(1)
-		end,
-		OnCommand = function(self)
-			self
-				:easeinoutexpo(0.25)
-				:faderight(0)
-				:cropright(0)
-		end,
-	},
-	--]]
 	Def.Quad {
 		InitCommand = function(self)
 			self
@@ -69,6 +29,13 @@ return Def.ActorFrame {
 				:fadeleft(0)
 				:cropleft(0)
 		end,
+		OffCommand = function(self)
+			self
+				:sleep(0.25)
+				:easeoutexpo(0.25)
+				:fadeleft(0.1)
+				:cropleft(1)
+		end,
 	},
 	Def.Quad {
 		InitCommand = function(self)
@@ -86,6 +53,13 @@ return Def.ActorFrame {
 				:fadeleft(0)
 				:cropleft(0)
 		end,
+		OffCommand = function(self)
+			self
+				:sleep(0.25)
+				:easeinexpo(0.25)
+				:fadeleft(0.1)
+				:cropleft(1)
+		end,
 	},
 	Def.ActorFrame {
 		InitCommand = function(self)
@@ -98,6 +72,7 @@ return Def.ActorFrame {
 					:skewx(-0.5)
 					:SetSize(SCREEN_WIDTH * 0.5, 320)
 					:diffuse(ThemeColor.Elements)
+					:shadowlength(2, 2)
 					:diffusealpha(0.5)
 					:faderight(0.1)
 					:cropright(1)
@@ -109,22 +84,11 @@ return Def.ActorFrame {
 					:faderight(0)
 					:cropright(0)
 			end,
-		},
-		Def.BitmapText {
-			Font = 'Common Normal',
-			Text = 'TITLE\n\nARTIST\n\n\nNotes\nHolds\nRolls\nHands\nMines\nFakes',
-			InitCommand = function(self)
+			OffCommand = function(self)
 				self
-					:x(32)
-					:y(-120)
-					:horizalign('left')
-					:vertalign('top')
-					:addx(-SCREEN_CENTER_X)
-			end,
-			OnCommand = function(self)
-				self
-					:easeinoutexpo(0.5)
-					:addx(SCREEN_CENTER_X)
+					:easeinexpo(0.25)
+					:faderight(0.1)
+					:cropright(1)
 			end,
 		},
 		-- Song Info
@@ -132,9 +96,10 @@ return Def.ActorFrame {
 			Name = 'SongInfo',
 			InitCommand = function(self)
 				self
-					:x(32 + 120)
-					:y(-120)
-					:addx(-SCREEN_CENTER_X)
+					:x(152)
+					:y(10)
+					--:y(-120)
+					:addx(-SCREEN_CENTER_X + ((SCREEN_WIDTH / SCREEN_HEIGHT) - (640 / 480)) * 100)
 			end,
 			OnCommand = function(self)
 				self
@@ -142,69 +107,118 @@ return Def.ActorFrame {
 					:easeoutexpo(0.25)
 					:addx(SCREEN_CENTER_X)
 			end,
+			OffCommand = function(self)
+				self
+					:easeinexpo(0.25)
+					:addx(-SCREEN_CENTER_X)
+			end,
 			Def.BitmapText {
-				Name = 'Title',
+				Name = 'InfoLabels',
 				Font = 'Common Normal',
-				Text = '--',
+				Text = 'Notes\nHolds\nRolls\nJumps\nHands\n\nMines\nLifts\nFakes',
 				InitCommand = function(self)
 					self
+						:x(-140)
+						:addy(-10)
 						:horizalign('left')
-						:vertalign('top')
-						:maxwidth(160)
-				end,
-				GetInfoCommand = function(self)
-					self:settext(CallSongFunc('GetDisplayMainTitle'))
+						:addx(-SCREEN_CENTER_X)
+						:maxwidth(60)
 				end,
 				OnCommand = function(self)
-					self:playcommand('GetInfo')
+					self
+						:sleep(0.25)
+						:easeoutexpo(0.25)
+						:addx(SCREEN_CENTER_X)
 				end,
-				CurrentSongChangedMessageCommand = function(self)
-					self:playcommand('GetInfo')
+				OffCommand = function(self)
+					self
+						:easeinexpo(0.25)
+						:addx(-SCREEN_CENTER_X)
 				end,
 			},
 			Def.BitmapText {
-				Name = 'Subtitle',
+				Name = 'StepInfoP1',
 				Font = 'Common Normal',
-				Text = '--',
+				Text = '--\n--\n--\n--\n--\n\n--\n--\n--',
 				InitCommand = function(self)
 					self
-						:addy(24)
+						:addx(-60)
 						:horizalign('left')
-						:vertalign('top')
-						:maxwidth(160)
+						:maxwidth(40)
+						:visible(GAMESTATE:IsSideJoined(PLAYER_1))
+						:diffuse(ColorLightTone(PlayerColor(PLAYER_1)))
 				end,
-				GetInfoCommand = function(self)
-					self:settext(CallSongFunc('GetDisplaySubTitle'))
+				PlayerJoinedMessageCommand = function(self, param)
+					self:visible(GAMESTATE:IsSideJoined(PLAYER_1))
 				end,
-				OnCommand = function(self)
-					self:playcommand('GetInfo')
-				end,
-				CurrentSongChangedMessageCommand = function(self)
-					self:playcommand('GetInfo')
+				CurrentStepsP1ChangedMessageCommand = function(self)
+					local song = GAMESTATE:GetCurrentSong()
+					local course = GAMESTATE:GetCurrentCourse()
+					if not song and not course then
+						self:settext('--\n--\n--\n--\n--\n\n--\n--\n--')
+					else
+						local steps = GAMESTATE:GetCurrentSteps(PLAYER_1)
+						local ret = ''
+						for i, v in ipairs({
+							'TapsAndHolds',
+							'Holds',
+							'Rolls',
+							'Jumps',
+							'Hands',
+							'Mines',
+							'Lifts',
+							'Fakes'
+						}) do
+							local num = steps:GetRadarValues(PLAYER_1):GetValue('RadarCategory_'..v)
+							ret = ret..num ..'\n'
+							if v == 'Hands' then ret = ret..'\n' end
+						end
+						self:settext(ret)
+					end
 				end,
 			},
 			Def.BitmapText {
-				Name = 'Artist',
+				Name = 'StepInfoP2',
 				Font = 'Common Normal',
-				Text = '--',
+				Text = '--\n--\n--\n--\n--\n\n--\n--\n--',
 				InitCommand = function(self)
 					self
-						:addy(48)
+						:addx(0)
 						:horizalign('left')
-						:vertalign('top')
-						:maxwidth(160)
+						:maxwidth(40)
+						:visible(GAMESTATE:IsSideJoined(PLAYER_2))
+						:diffuse(ColorLightTone(PlayerColor(PLAYER_2)))
 				end,
-				GetInfoCommand = function(self)
-					self:settext(CallSongFunc('GetDisplayArtist'))
+				PlayerJoinedMessageCommand = function(self, param)
+					self:visible(GAMESTATE:IsSideJoined(PLAYER_2))
 				end,
-				OnCommand = function(self)
-					self:playcommand('GetInfo')
+				CurrentStepsP2ChangedMessageCommand = function(self)
+					local song = GAMESTATE:GetCurrentSong()
+					local course = GAMESTATE:GetCurrentCourse()
+					if not song and not course then
+						self:settext('--\n--\n--\n--\n--\n\n--\n--\n--')
+					else
+						local steps = GAMESTATE:GetCurrentSteps(PLAYER_2)
+						local ret = ''
+						for i, v in ipairs({
+							'TapsAndHolds',
+							'Holds',
+							'Rolls',
+							'Jumps',
+							'Hands',
+							'Mines',
+							'Lifts',
+							'Fakes'
+						}) do
+							local num = steps:GetRadarValues(PLAYER_2):GetValue('RadarCategory_'..v)
+							ret = ret..num ..'\n'
+							if v == 'Hands' then ret = ret..'\n' end
+						end
+						self:settext(ret)
+					end
 				end,
-				CurrentSongChangedMessageCommand = function(self)
-					self:playcommand('GetInfo')
-				end,
-			},
-			LoadActor(THEME:GetPathG('ScreenSelectMusic', 'Difficulties')),
+			}
 		},
 	},
+	LoadActor(THEME:GetPathG('ScreenSelectMusic', 'DifficultyList')),
 }

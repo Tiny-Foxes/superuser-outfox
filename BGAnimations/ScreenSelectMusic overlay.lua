@@ -26,5 +26,14 @@ return Def.ActorFrame {
 				:diffuse(ThemeColor.Primary)
 				:diffusealpha(0.5)
 		end,
+	},
+	Def.BitmapText {
+		Font = 'Common Normal',
+		Text = 'Select Music',
+		InitCommand = function(self)
+			self
+				:horizalign('left')
+				:x(-SCREEN_CENTER_X + 16)
+		end
 	}
 }

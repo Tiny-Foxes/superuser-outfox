@@ -4,12 +4,17 @@ local Colors = {
 	Secondary = color('#4E2635'),
 	Elements = color('#9D276C'),
 
+	-- Player Colors
+	P1 = color('#F04D7B'),
+	P2 = color('#5292EB'),
+
 	-- Difficulty Colors
 	Beginner = color('#59365A'),
 	Easy = color('#699429'),
 	Medium = color('#B4943F'),
 	Hard = color('#AB3541'),
 	Challenge = color('#618FB0'),
+	Edit = color('#808080'),
 
 	-- General Colors
 	Black = color('#000000'),

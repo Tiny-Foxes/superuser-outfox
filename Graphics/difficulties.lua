@@ -41,6 +41,7 @@ for i, v in ipairs({
 					:SetSize(64, 56)
 					:skewx(-0.5)
 					:diffuse(ThemeColor[v])
+					:shadowlength(2, 2)
 			end,
 		},
 		Def.BitmapText {
@@ -66,7 +67,7 @@ for i, v in ipairs({
 	}
 end
 
-return Def.ActorFrame {
+return Def.StepsDisplayList {
 	Name = 'Difficulties',
 	InitCommand = function(self)
 		self
