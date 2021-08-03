@@ -12,12 +12,10 @@ return Def.ActorFrame {
 				:easeoutexpo(0.25)
 				:addx(SCREEN_CENTER_X)
 		end,
-		OffCommand = function(Self)
-			if self then -- ??????????
-				self
-					:easeinexpo(0.25)
-					:addx(-SCREEN_CENTER_X)
-			end
+		OffCommand = function(self)
+			self
+				:easeinexpo(0.25)
+				:addx(-SCREEN_CENTER_X)
 		end,
 		CursorP1 = Def.ActorFrame {
 			InitCommand = function(self)

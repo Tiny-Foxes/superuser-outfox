@@ -93,7 +93,7 @@ return Def.ActorFrame {
 		},
 		-- Song Info
 		Def.ActorFrame {
-			Name = 'SongInfo',
+			Name = 'SongStats',
 			InitCommand = function(self)
 				self
 					:x(152)
@@ -113,13 +113,65 @@ return Def.ActorFrame {
 					:addx(-SCREEN_CENTER_X)
 			end,
 			Def.BitmapText {
-				Name = 'InfoLabels',
+				Name = 'SongLabels',
+				Font = 'Common Normal',
+				Text = 'SONG\nARTIST',
+				InitCommand = function(self)
+					self
+						:x(-140)
+						:addy(-120)
+						:horizalign('left')
+						:maxwidth(60)
+				end,
+			},
+			Def.ActorFrame {
+				Name = 'SongInfo',
+				InitCommand = function(self)
+					self
+						:addx(-60)
+						:addy(-120)
+				end,
+				Def.BitmapText {
+					Name = 'Title',
+					Font = 'Common Normal',
+					Text = '--',
+					InitCommand = function(self)
+						self
+							:addy(-12)
+							:horizalign('left')
+							:maxwidth(160)
+					end,
+					CurrentSongChangedMessageCommand = function(self)
+						local song = GAMESTATE:GetCurrentSong()
+						if not song then self:settext('--') return end
+						self:settext(song:GetDisplayFullTitle())
+					end,
+				},
+				Def.BitmapText {
+					Name = 'Artist',
+					Font = 'Common Normal',
+					Text = '--',
+					InitCommand = function(self)
+						self
+							:addy(12)
+							:horizalign('left')
+							:maxwidth(160)
+					end,
+					CurrentSongChangedMessageCommand = function(self)
+						local song = GAMESTATE:GetCurrentSong()
+						if not song then self:settext('--') return end
+						self:settext(song:GetDisplayArtist())
+					end,
+				},
+			},
+			Def.BitmapText {
+				Name = 'StepLabels',
 				Font = 'Common Normal',
 				Text = 'Notes\nHolds\nRolls\nJumps\nHands\n\nMines\nLifts\nFakes',
 				InitCommand = function(self)
 					self
 						:x(-140)
-						:addy(-10)
+						:addy(22)
 						:horizalign('left')
 						:addx(-SCREEN_CENTER_X)
 						:maxwidth(60)
@@ -137,12 +189,13 @@ return Def.ActorFrame {
 				end,
 			},
 			Def.BitmapText {
-				Name = 'StepInfoP1',
+				Name = 'ChartInfoP1',
 				Font = 'Common Normal',
 				Text = '--\n--\n--\n--\n--\n\n--\n--\n--',
 				InitCommand = function(self)
 					self
 						:addx(-60)
+						:addy(34)
 						:horizalign('left')
 						:maxwidth(40)
 						:visible(GAMESTATE:IsSideJoined(PLAYER_1))
@@ -157,7 +210,7 @@ return Def.ActorFrame {
 					if not song and not course then
 						self:settext('--\n--\n--\n--\n--\n\n--\n--\n--')
 					else
-						local steps = GAMESTATE:GetCurrentSteps(PLAYER_1)
+						local cur_diff = GAMESTATE:GetCurrentSteps(PLAYER_1)
 						local ret = ''
 						for i, v in ipairs({
 							'TapsAndHolds',
@@ -169,7 +222,7 @@ return Def.ActorFrame {
 							'Lifts',
 							'Fakes'
 						}) do
-							local num = steps:GetRadarValues(PLAYER_1):GetValue('RadarCategory_'..v)
+							local num = cur_diff:GetRadarValues(PLAYER_1):GetValue('RadarCategory_'..v)
 							ret = ret..num ..'\n'
 							if v == 'Hands' then ret = ret..'\n' end
 						end
@@ -178,12 +231,13 @@ return Def.ActorFrame {
 				end,
 			},
 			Def.BitmapText {
-				Name = 'StepInfoP2',
+				Name = 'ChartInfoP2',
 				Font = 'Common Normal',
 				Text = '--\n--\n--\n--\n--\n\n--\n--\n--',
 				InitCommand = function(self)
 					self
 						:addx(0)
+						:addy(34)
 						:horizalign('left')
 						:maxwidth(40)
 						:visible(GAMESTATE:IsSideJoined(PLAYER_2))
@@ -198,7 +252,7 @@ return Def.ActorFrame {
 					if not song and not course then
 						self:settext('--\n--\n--\n--\n--\n\n--\n--\n--')
 					else
-						local steps = GAMESTATE:GetCurrentSteps(PLAYER_2)
+						local cur_diff = GAMESTATE:GetCurrentSteps(PLAYER_2)
 						local ret = ''
 						for i, v in ipairs({
 							'TapsAndHolds',
@@ -210,7 +264,7 @@ return Def.ActorFrame {
 							'Lifts',
 							'Fakes'
 						}) do
-							local num = steps:GetRadarValues(PLAYER_2):GetValue('RadarCategory_'..v)
+							local num = cur_diff:GetRadarValues(PLAYER_2):GetValue('RadarCategory_'..v)
 							ret = ret..num ..'\n'
 							if v == 'Hands' then ret = ret..'\n' end
 						end

@@ -10,8 +10,8 @@ return Def.ActorFrame {
 		end,
 		SetMessageCommand = function(self, param)
 			if not param then return end
-			local stepstype = THEME:GetString('StepsType', ToEnumShortString(param.StepsType))
-			self:settext(stepstype)
+			local ret = THEME:GetString('StepsType', ToEnumShortString(param.StepsType))
+			self:settext(ret)
 		end,
 	},
 }
