@@ -63,6 +63,7 @@ t[#t + 1] = Def.ActorFrame {
 				:bob()
 				:effectmagnitude(0, 4, 0)
 				:effectperiod(4)
+				:visible(LoadModule("Config.Load.lua")("ShowMascotCharacter","Save/OutFoxPrefs.ini"))
 		end,
 		OnCommand = function(self)
 			self
@@ -213,6 +214,7 @@ t[#t + 1] = Def.ActorFrame {
 						'Your presence is invaluable.',
 						'Shoot the moon and you\'ll hit it.',
 						'Faith can be the greatest logic of all.',
+
 					},
 					ja = {},
 				}
@@ -281,10 +283,22 @@ return Def.ActorFrame {
 					:easeoutquad(0.5)
 					:diffusealpha(0.65)
 					:zoom(1.005)
+					:queuecommand('Breathe')
+			end,
+			BreatheCommand = function(self)
+				self
+					:easeinoutsine(3.5)
+					:diffusealpha(0.75)
+					:zoom(1.01)
+					:easeinoutsine(3.5)
+					:diffusealpha(0.65)
+					:zoom(1.005)
+					:queuecommand('Breathe')
 			end,
 			OffCommand = function(self)
 				self
-					:easeinquad(0.5)
+					:stoptweening(0)
+					:easeinquad(0.49)
 					:diffusealpha(0)
 					:zoom(1)
 			end,
