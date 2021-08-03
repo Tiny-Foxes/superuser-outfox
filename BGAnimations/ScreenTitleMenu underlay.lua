@@ -212,9 +212,9 @@ t[#t + 1] = Def.ActorFrame {
 						'80% of the work takes 20% of the effort.',
 						'Only you can limit your creativity.',
 						'Your presence is invaluable.',
-						'Shoot the moon and you\'ll hit it.',
+						'Shoot the moon and you will hit it.',
 						'Faith can be the greatest logic of all.',
-
+						'Take your time.',
 					},
 					ja = {},
 				}
@@ -224,13 +224,13 @@ t[#t + 1] = Def.ActorFrame {
 		},
 		Def.BitmapText {
 			Font = 'Common Normal',
-			Text = 'Theme by Sudospective\nPowered by Konko Module System',
+			Text = 'Theme by Sudospective',
 			InitCommand = function(self)
 				self
 					:zoom(0.5)
-					:xy(40, -24)
+					:xy(40, 0)
 					:horizalign('right')
-					:vertalign('top')
+					:vertalign('bottom')
 					:cropright(1)
 			end,
 			OnCommand = function(self)
