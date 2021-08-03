@@ -70,7 +70,7 @@ return Def.ActorFrame {
 			InitCommand = function(self)
 				self
 					:skewx(-0.5)
-					:SetSize(SCREEN_WIDTH * 0.5, 320)
+					:SetSize(SCREEN_WIDTH * 0.5 + 24, 320)
 					:diffuse(ThemeColor.Elements)
 					:shadowlength(2, 2)
 					:diffusealpha(0.5)
@@ -197,7 +197,7 @@ return Def.ActorFrame {
 						:addx(-60)
 						:addy(34)
 						:horizalign('left')
-						:maxwidth(40)
+						:maxwidth(36)
 						:visible(GAMESTATE:IsSideJoined(PLAYER_1))
 						:diffuse(ColorLightTone(PlayerColor(PLAYER_1)))
 				end,
@@ -236,10 +236,10 @@ return Def.ActorFrame {
 				Text = '--\n--\n--\n--\n--\n\n--\n--\n--',
 				InitCommand = function(self)
 					self
-						:addx(0)
+						:addx(-10)
 						:addy(34)
 						:horizalign('left')
-						:maxwidth(40)
+						:maxwidth(36)
 						:visible(GAMESTATE:IsSideJoined(PLAYER_2))
 						:diffuse(ColorLightTone(PlayerColor(PLAYER_2)))
 				end,

@@ -9,6 +9,11 @@ return Def.ActorFrame {
 			:easeoutexpo(0.5)
 			:addy(32)
 	end,
+	OffCommand = function(self)
+		self
+			:easeinexpo(0.5)
+			:addy(-32)
+	end,
 	Def.Quad {
 		InitCommand = function(self)
 			self

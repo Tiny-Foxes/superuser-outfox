@@ -89,5 +89,5 @@ return Def.ActorFrame {
 				:diffusebottomedge(ThemeColor.Secondary)
 				:diffusealpha(0.5)
 		end,
-	}
+	},
 }

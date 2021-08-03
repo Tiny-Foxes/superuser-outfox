@@ -6,7 +6,7 @@ return Def.ActorFrame {
 		Name = 'StepsDisplayListRow',
 		OnCommand = function(self)
 			self
-				:xy(-(SCREEN_CENTER_X * 0.5) + 42, -132)
+				:xy(-(SCREEN_CENTER_X * 0.5) + 56, -132)
 				:addx(-SCREEN_CENTER_X)
 				:sleep(0.25)
 				:easeoutexpo(0.25)

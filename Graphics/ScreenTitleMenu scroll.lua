@@ -19,7 +19,7 @@ return Def.ActorFrame {
 	end,
 	OffCommand = function(self)
 		self
-			:easeoutexpo(0.5)
+			:easeinoutexpo(0.5)
 			:diffusealpha(0)
 	end,
 	Def.ActorFrame {
