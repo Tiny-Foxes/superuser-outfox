@@ -115,7 +115,6 @@ Node = {
 	SetInput = SetInput,
 	SetName = SetName,
 	AddToNodeTree = AddToNodeTree,
-	SetSRTStyle = SetSRTStyle,
 	GetNodeTree = GetNodeTree,
 	tween = tween,
 	AddTween = AddTween,

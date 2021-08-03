@@ -4,6 +4,13 @@ local Colors = {
 	Secondary = color('#4E2635'),
 	Elements = color('#9D276C'),
 
+	-- Difficulty Colors
+	Beginner = color('#59365A'),
+	Easy = color('#699429'),
+	Medium = color('#B4943F'),
+	Hard = color('#AB3541'),
+	Challenge = color('#618FB0'),
+
 	-- General Colors
 	Black = color('#000000'),
 	Gray = color('#808080'),
