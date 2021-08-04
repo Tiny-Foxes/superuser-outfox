@@ -44,7 +44,7 @@ function LoadCard(cColor)
 		Def.Quad {
 			InitCommand=function(self) self:vertalign(middle):zoomto(270,0):diffuse(cColor):diffusealpha(0.75) end;
 			OnCommand=function(self) self:easeinoutexpo(0.25):zoomto(270,400) end;
-			OffCommand=function(self) self:easeinoutexpo(0.25):zoomto(270,0):sleep(0.5):diffusealpha(0) end;
+			OffCommand=function(self) self:easeinoutexpo(0.5):zoomto(270,0):sleep(0.5):diffusealpha(0) end;
 		};
 	};
 	return t
@@ -268,13 +268,13 @@ local t = Def.ActorFrame {
 		Def.ActorFrame {
 			Name = 'P1Frame';
 			InitCommand=function(self) self:xy(SCREEN_CENTER_X-160,SCREEN_CENTER_Y):skewx(-0.5) end;
-			OffCommand=function(self) self:easeinoutexpo(0.25):diffusealpha(0) end;
+			OffCommand=function(self) self:easeinoutexpo(0.5):diffusealpha(0) end;
 			children = LoadPlayerStuff(PLAYER_1);
 		};
 		Def.ActorFrame {
 			Name = 'P2Frame';
 			InitCommand=function(self) self:xy(SCREEN_CENTER_X+160,SCREEN_CENTER_Y):skewx(-0.5) end;
-			OffCommand=function(self) self:easeinoutexpo(0.25):diffusealpha(0) end;
+			OffCommand=function(self) self:easeinoutexpo(0.5):diffusealpha(0) end;
 			children = LoadPlayerStuff(PLAYER_2);
 		};
 		-- sounds

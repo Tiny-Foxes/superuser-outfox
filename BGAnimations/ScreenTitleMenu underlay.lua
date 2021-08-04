@@ -8,28 +8,40 @@ local ThemeColor = LoadModule('Theme.Colors.lua')
 
 local function aft(self)
 	self
-		:SetWidth(SCREEN_WIDTH)
-		:SetHeight(SCREEN_HEIGHT)
+		:SetSize(SCREEN_WIDTH, SCREEN_HEIGHT)
 		:EnableFloat(false)
 		:EnableDepthBuffer(true)
 		:EnableAlphaBuffer(true)
 		:EnablePreserveTexture(false)
 		:Create()
 end
-local function aftrecursive(self)
+local function aftR(self)
 	self
-		:SetWidth(SCREEN_WIDTH)
-		:SetHeight(SCREEN_HEIGHT)
+		:SetSize(SCREEN_WIDTH, SCREEN_HEIGHT)
+		:EnableFloat(false)
 		:EnableDepthBuffer(true)
 		:EnableAlphaBuffer(false)
-		:EnableFloat(false)
 		:EnablePreserveTexture(true)
 		:Create()
 end
-function sprite(self)
+local function aftblur(self, scale)
+	self
+		:SetSize(SCREEN_WIDTH / scale, SCREEN_HEIGHT / scale)
+		:EnableFloat(false)
+		:EnableDepthBuffer(true)
+		:EnableAlphaBuffer(true)
+		:EnablePreserveTexture(false)
+		:Create()
+end
+local function sprite(self)
 	self:Center()
 end
-function aftsprite(aft, sprite)
+local function spriteblur(self, scale)
+	self
+		:Center()
+		:basezoom(scale)
+end
+local function aftsprite(aft, sprite)
 	sprite:SetTexture(aft:GetTexture())
 end
 
@@ -87,7 +99,8 @@ t[#t + 1] = Def.ActorFrame {
 	Def.Quad {
 		InitCommand = function(self)
 			self
-				:SetSize(sw, 264)
+				:skewx(-0.5)
+				:SetSize(sw * 1.5, 264)
 				:diffuse(ThemeColor.Black)
 				:diffusealpha(0.75)
 				:fadetop(0.01)
@@ -96,33 +109,34 @@ t[#t + 1] = Def.ActorFrame {
 		end,
 		OnCommand = function(self)
 			self
-				:easeinoutexpo(0.25)
+				:easeoutexpo(0.5)
 				:cropleft(0)
 		end,
 		OffCommand = function(self)
 			self
 				:sleep(0.5)
-				:easeinoutexpo(0.25)
+				:easeoutexpo(0.5)
 				:cropleft(1)
 		end,
 	},
 	Def.Quad {
 		InitCommand = function(self)
 			self
-				:SetSize(sw, 256)
+				:skewx(-0.5)
+				:SetSize(sw * 1.5, 256)
 				:diffuse(ThemeColor.Elements)
 				:diffusealpha(0.5)
 				:cropleft(1)
 		end,
 		OnCommand = function(self)
 			self
-				:easeinoutexpo(0.25)
+				:easeoutexpo(0.5)
 				:cropleft(0)
 		end,
 		OffCommand = function(self)
 			self
 				:sleep(0.5)
-				:easeinoutexpo(0.25)
+				:easeoutexpo(0.5)
 				:cropleft(1)
 		end,
 	},
@@ -146,7 +160,8 @@ t[#t + 1] = Def.ActorFrame {
 			end,
 			OnCommand = function(self)
 				self
-					:linear(0.1)
+					:sleep(0.2)
+					:linear(0.05)
 					:cropright(0)
 			end,
 			OffCommand = function(self)
@@ -167,8 +182,8 @@ t[#t + 1] = Def.ActorFrame {
 			end,
 			OnCommand = function(self)
 				self
-					:sleep(0.1)
-					:linear(0.2)
+					:sleep(0.25)
+					:linear(0.1)
 					:cropright(0)
 			end,
 			OffCommand = function(self)
@@ -180,7 +195,6 @@ t[#t + 1] = Def.ActorFrame {
 		},
 		Def.BitmapText {
 			Font = 'Common Normal',
-			Text = '"This is who we are."',
 			InitCommand = function(self)
 				self
 					:playcommand('Tagline')
@@ -192,7 +206,7 @@ t[#t + 1] = Def.ActorFrame {
 			end,
 			OnCommand = function(self)
 				self
-					:sleep(0.3)
+					:sleep(0.5)
 					:linear(0.1)
 					:cropright(0)
 			end,
@@ -209,17 +223,24 @@ t[#t + 1] = Def.ActorFrame {
 						'This is who we are.',
 						'Let\'s get technical.',
 						'You ARE the elevated privilege.',
-						'80% of the work takes 20% of the effort.',
+						--'80% of the work takes 20% of the effort.',
 						'Only you can limit your creativity.',
-						'Your presence is invaluable.',
 						'Shoot the moon and you will hit it.',
 						'Faith can be the greatest logic of all.',
-						'Take your time.',
+						'Take your time to find your inner peace.',
+						'Here lies a tranquil void.',
+						'Love could be two conversations away.',
+						
+						'Thank you for being here.',
+						'Your existence is appreciated.',
+						'Your presence is invaluable.',
 					},
 					ja = {},
 				}
-				local rng = math.random(1, #taglines.en)
-				self:settext('"'..taglines.en[rng]..'"')
+				local langtags = taglines[THEME:GetCurLanguage()]
+				if not langtags then langtags = taglines.en end
+				local rng = MersenneTwister.Random(1, #langtags)
+				self:settext('"'..langtags[rng]..'"')
 			end,
 		},
 		Def.BitmapText {
@@ -235,8 +256,8 @@ t[#t + 1] = Def.ActorFrame {
 			end,
 			OnCommand = function(self)
 				self
-					:sleep(0.35)
-					:linear(0.1)
+					:sleep(0.3)
+					:linear(0.05)
 					:cropright(0)
 			end,
 			OffCommand = function(self)
@@ -248,10 +269,13 @@ t[#t + 1] = Def.ActorFrame {
 	}
 }
 
+-- The title menu gets to look extra pretty.
 return Def.ActorFrame {
 	Def.ActorFrameTexture {
 		Name = 'TitleAFT',
-		InitCommand = aft,
+		InitCommand = function(self)
+			aft(self)
+		end,
 		LoadActor(THEME:GetPathB('ScreenWithMenuElements', 'background')),
 		Def.Quad {
 			InitCommand = function(self)
@@ -262,67 +286,75 @@ return Def.ActorFrame {
 			end,
 			OnCommand = function(self)
 				self
-					:easeoutquad(0.5)
+					:easeoutexpo(0.5)
 					:diffusealpha(0.75)
 			end,
 			OffCommand = function(self)
 				self
-					:easeinquad(0.5)
+					:linear(0.5)
 					:diffusealpha(0)
 			end,
 		},
 		Def.Sprite {
 			Name = 'TitleSprite',
-			InitCommand = sprite,
+			InitCommand = function(self)
+				sprite(self)
+			end,
 			OnCommand = function(self)
 				local aft = self:GetParent():GetParent():GetChild('TitleAFTR')
 				aftsprite(aft, self)
 				self
 					:blend('BlendMode_Add')
 					:diffusealpha(0)
-					:easeoutquad(0.5)
-					:diffusealpha(0.65)
+					:easeoutexpo(0.5)
+					:diffusealpha(0.75)
 					:zoom(1.005)
 					:queuecommand('Breathe')
 			end,
 			BreatheCommand = function(self)
 				self
 					:easeinoutsine(3.5)
-					:diffusealpha(0.75)
+					:diffusealpha(0.8)
 					:zoom(1.01)
 					:easeinoutsine(3.5)
-					:diffusealpha(0.65)
+					:diffusealpha(0.75)
 					:zoom(1.005)
 					:queuecommand('Breathe')
 			end,
 			OffCommand = function(self)
 				self
 					:stoptweening(0)
-					:easeinquad(0.49)
+					:linear(0.5)
 					:diffusealpha(0)
 					:zoom(1)
 			end,
 		},
 		t,
 	},
-	Def.Sprite {
-		Name = 'ShowTitle',
-		InitCommand = sprite,
-		OnCommand = function(self)
-			local aft = self:GetParent():GetChild('TitleAFT')
-			aftsprite(aft, self)
-		end,
-	},
 	Def.ActorFrameTexture {
 		Name = 'TitleAFTR',
-		InitCommand = aftrecursive,
+		InitCommand = function(self)
+			aftR(self)
+		end,
 		Def.Sprite {
 			Name = 'TitleSpriteR',
-			InitCommand = sprite,
+			InitCommand = function(self)
+				sprite(self)
+			end,
 			OnCommand = function(self)
 				local aft = self:GetParent():GetParent():GetChild('TitleAFT')
 				aftsprite(aft, self)
 			end,
 		}
-	}
+	},
+	Def.Sprite {
+		Name = 'ShowTitle',
+		InitCommand = function(self)
+			sprite(self)
+		end,
+		OnCommand = function(self)
+			local aft = self:GetParent():GetChild('TitleAFT')
+			aftsprite(aft, self)
+		end,
+	},
 }
