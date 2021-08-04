@@ -52,8 +52,9 @@ local t = Def.ActorFrame {
 }
 
 -- Mascot
-t[#t + 1] = Def.ActorFrame {
+local mascot = Def.ActorFrame {
 	InitCommand = function(self)
+		self:Center()
 		self:diffusealpha(0)
 	end,
 	OnCommand = function(self)
@@ -230,6 +231,7 @@ t[#t + 1] = Def.ActorFrame {
 						'Take your time to find your inner peace.',
 						'Here lies a tranquil void.',
 						'Love could be two conversations away.',
+						'Boundless potential is at your will.',
 						
 						'Thank you for being here.',
 						'Your existence is appreciated.',
@@ -287,7 +289,7 @@ return Def.ActorFrame {
 			OnCommand = function(self)
 				self
 					:easeoutexpo(0.5)
-					:diffusealpha(0.75)
+					:diffusealpha(0.5)
 			end,
 			OffCommand = function(self)
 				self
@@ -314,10 +316,8 @@ return Def.ActorFrame {
 			BreatheCommand = function(self)
 				self
 					:easeinoutsine(3.5)
-					:diffusealpha(0.8)
 					:zoom(1.01)
 					:easeinoutsine(3.5)
-					:diffusealpha(0.75)
 					:zoom(1.005)
 					:queuecommand('Breathe')
 			end,
@@ -329,7 +329,7 @@ return Def.ActorFrame {
 					:zoom(1)
 			end,
 		},
-		t,
+		mascot,
 	},
 	Def.ActorFrameTexture {
 		Name = 'TitleAFTR',
@@ -357,4 +357,5 @@ return Def.ActorFrame {
 			aftsprite(aft, self)
 		end,
 	},
+	t,
 }

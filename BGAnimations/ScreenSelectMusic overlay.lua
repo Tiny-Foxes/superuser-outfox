@@ -68,7 +68,7 @@ return Def.ActorFrame {
 				local bpmstr = 'BPM: '
 				local song = GAMESTATE:GetCurrentSong()
 				if song then
-					bpmstr = bpmstr .. song:GetDisplayBpms()[1]
+					bpmstr = bpmstr .. math.floor(song:GetDisplayBpms()[1])
 					self:settext(bpmstr)
 				end
 			end,
@@ -76,7 +76,7 @@ return Def.ActorFrame {
 				local bpmstr = 'BPM: '
 				local song = GAMESTATE:GetCurrentSong()
 				if song then
-					bpmstr = bpmstr .. song:GetDisplayBpms()[1]
+					bpmstr = bpmstr .. math.floor(song:GetDisplayBpms()[1])
 					self:settext(bpmstr)
 				end
 			end,

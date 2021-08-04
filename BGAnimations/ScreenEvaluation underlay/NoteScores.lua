@@ -47,8 +47,8 @@ t[#t + 1] = Def.ActorFrame {
 	Def.Quad {
 		InitCommand = function(self)
 			self
-				:addy(-60)
-				:SetSize(SCREEN_CENTER_X * 0.75, 160)
+				:addy(-80)
+				:SetSize(SCREEN_CENTER_X * 0.75, 140)
 				:diffuse(color('#000000'))
 				:diffusealpha(0.25)
 				:cropright(1)
@@ -66,21 +66,22 @@ t[#t + 1] = Def.ActorFrame {
 				:cropright(1)
 		end,
 	},
-	Def.BitmapText {
+	GAMESTATE:IsSideJoined(plr) and Def.BitmapText {
 		Font = '_xiaxide 80px',
 		Text = GetPlrGrade(),
 		InitCommand = function(self)
 			self
 				:skewx(0.25)
 				:addx(10)
-				:addy(-40)
-				:zoom(1.75)
+				:addy(-58)
+				:zoom(2)
 				:diffuse(ColorLightTone(PlayerColor(plr)))
 				:addx(40)
 				:diffusealpha(0)
 		end,
 		OnCommand = function(self)
 			self
+				:queuecommand('Bob')
 				:sleep(0.5)
 				:easeoutexpo(0.5)
 				:addx(-40)
@@ -92,10 +93,16 @@ t[#t + 1] = Def.ActorFrame {
 				:addx(40)
 				:diffusealpha(0)
 		end,
+		BobCommand=function(self)
+			self
+				:bob()
+				:effectperiod(8)
+				:effectmagnitude(-4, 0, 0)
+		end,
 	},
-	Def.ActorFrame {
+	GAMESTATE:IsSideJoined(plr) and Def.ActorFrame {
 		InitCommand = function(self)
-			self:xy(SCREEN_CENTER_X * 0.165, 60)
+			self:xy(SCREEN_CENTER_X * 0.3, 30)
 		end,
 		Def.BitmapText {
 			Font = '_xide/40px',
@@ -107,27 +114,61 @@ t[#t + 1] = Def.ActorFrame {
 					:x(20)
 					:zoom(1.5)
 					:diffuse(ColorLightTone(PlayerColor(plr)))
-					:addx(40)
+					:addx(-40)
 					:diffusealpha(0)
 			end,
 			OnCommand = function(self)
 				self
+					:queuecommand('Bob')
 					:sleep(0.55)
 					:easeoutexpo(0.5)
-					:addx(-40)
+					:addx(40)
 					:diffusealpha(1)
 			end,
 			OffCommand = function(self)
 				self
 					:sleep(0.05)
 					:easeinexpo(0.25)
-					:addx(40)
+					:addx(-40)
 					:diffusealpha(0)
+			end,
+			BobCommand=function(self)
+				self
+					:bob()
+					:effectperiod(8)
+					:effectmagnitude(4, 0, 0)
 			end,
 		},
 	},
 }
 
-t[#t + 1] = loadfile(THEME:GetPathB('ScreenEvaluation', 'underlay/Page1.lua'))(plr)
+t[#t + 1] = Def.ActorFrame {
+	InitCommand = function(self)
+		self:y(180)
+	end,
+	Def.Quad {
+		InitCommand = function(self)
+			self
+				:addy(35)
+				:SetSize(SCREEN_CENTER_X * 0.75, 275)
+				:diffuse(color('#000000'))
+				:diffusealpha(0.25)
+				:cropright(1)
+		end,
+		OnCommand = function(self)
+			self
+				:sleep(0.15)
+				:easeinoutexpo(0.25)
+				:cropright(0)
+		end,
+		OffCommand = function(self)
+			self
+				:sleep(0.15)
+				:easeinoutexpo(0.25)
+				:cropright(1)
+		end,
+	},
+	GAMESTATE:IsSideJoined(plr) and loadfile(THEME:GetPathB('ScreenEvaluation', 'underlay/Page1.lua'))(plr)
+}
 
 return t

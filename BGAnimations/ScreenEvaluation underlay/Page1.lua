@@ -1,9 +1,5 @@
 -- Orignal code by Team OutFox, used in Soundwaves theme
-local t = Def.ActorFrame{
-	InitCommand = function(self)
-		self:y(190)
-	end,
-}
+local t = Def.ActorFrame {}
 local p = ...
 local fade_out_speed = 0.2
 local fade_out_pause = 0.1
@@ -54,7 +50,7 @@ t[#t+1] = Def.BitmapText {
         self:diffuse(color('#FFFF80')):diffusebottomedge(color('#FF8000')):diffusealpha(0)
     end;
 	OnCommand=function(self)
-		self:sleep(0.25):queuecommand('Bob'):diffusealpha(1)
+		self:sleep(0.6):queuecommand('Bob'):diffusealpha(1)
 	end,
     OffCommand=function(self)
         self:linear(0.2):diffusealpha(0)
@@ -88,7 +84,7 @@ for i,v in ipairs( Name ) do
 	        	self:xy(eval_part_offs+70,-80+((44-(Length*2))*i)):halign(0):zoom(1.475-(Length*0.075)):halign(1)
 			end,
 			OnCommand=function(self)
-				self:diffusealpha(0):sleep(0.1 * i):queuecommand('Bob'):decelerate(0.6):diffusealpha(1)
+				self:diffusealpha(0):sleep(0.6 + 0.01 * i):queuecommand('Bob'):decelerate(0.6):diffusealpha(1)
 				if DLW then
 					for i=0,1 do
 						if (v == 'W'..(5-i) and tonumber(DLW) >= (i+1)) then self:diffusealpha( 0.4 ) end
@@ -108,7 +104,7 @@ for i,v in ipairs( Name ) do
 			self:xy((eval_part_offs-150),-80+((44-(Length*2))*i)):zoom(1.475-(Length*0.075)):halign(0)
 		end,
 		OnCommand=function(self)
-			self:diffusealpha(0):sleep(0.1 * i):queuecommand('Bob'):decelerate(0.6):diffusealpha(0.86)
+			self:diffusealpha(0):sleep(0.6 + 0.01 * i):queuecommand('Bob'):decelerate(0.6):diffusealpha(0.86)
 			if DLW then
 				for i=0,1 do
 					if (v == 'W'..(5-i) and tonumber(DLW) >= (i+1)) then self:diffusealpha( 0.4 ) end
@@ -130,7 +126,7 @@ for i, rc_type in ipairs(eval_radar.Types) do
 	t[#t+1] = Def.ActorFrame {
 		InitCommand=function(self) 	self:x(eval_part_offs+90):y((-103)+(spacing)) end;
 		OnCommand=function(self)
-			self:diffusealpha(0):sleep(0.1 * i):queuecommand('Bob'):decelerate(0.5):diffusealpha(1)
+			self:diffusealpha(0):sleep(0.6 + 0.01 * i):queuecommand('Bob'):decelerate(0.5):diffusealpha(1)
 		end;
 		OffCommand=function(self)
 			self:sleep(fade_out_pause):decelerate(fade_out_speed):diffusealpha(0)
