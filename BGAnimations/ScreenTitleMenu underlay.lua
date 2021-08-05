@@ -260,6 +260,9 @@ t[#t + 1] = Def.ActorFrame {
 					:horizalign('right')
 					:vertalign('bottom')
 					:cropright(1)
+				if LoadModule("Config.Load.lua")("ShowMascotCharacter","Save/OutFoxPrefs.ini") then
+					self:settext('Theme by Sudospective\nArt by PrincessRaevinFlash')
+				end
 			end,
 			OnCommand = function(self)
 				self

@@ -32,7 +32,8 @@ function SPOChoices( itemSet )
 	local TimingMode = GAMESTATE:GetCurrentGame():GetName() ~= "para" and "Timing," or ""
 	local GHMode = GAMESTATE:GetCurrentGame():GetName() == "gh" and "GH," or ""
 	local Items = {
-		["Main"] = "SPM,SPV,NS,14,Mini,SF,FilterColor,".. TimingMode .."Judg,13,LuaRate,LuaHaste,LuaSoundEffect,18",
+		--["Main"] = "SPM,SPV,NS,14,Mini,SF,FilterColor,".. TimingMode .."Judg,13,LuaRate,LuaHaste,LuaSoundEffect,18",
+		["Main"] = "1,NS,14,Mini,SF,FilterColor,".. TimingMode .."Judg,13,LuaRate,LuaHaste,LuaSoundEffect,18",
 		["Special"] = "RotateFieldX,RotateFieldZ,MC,MCD,MCB,DLW,JudgImg,Combo,Toasty,ToastDraw,SP,OVG,OB,12",
 		["Effects"] = "2,3A,3B,4,5,6,7,9,R1,"..GHMode.."10,11"
 	}

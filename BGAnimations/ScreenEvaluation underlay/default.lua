@@ -225,8 +225,10 @@ return Def.ActorFrame {
 					self:settext(target:GetDisplayMainTitle())
 				end,
 				OnCommand = function(self)
-					self
-						:addx((self:GetParent():GetChild('SongTitleS'):GetWidth() + 10) * -1.5)
+					if self:GetParent():GetChild('SongTitleS'):GetWidth() > 0 then
+						self
+							:addx((self:GetParent():GetChild('SongTitleS'):GetWidth() + 10) * -1.5)
+					end
 				end,
 			},
 			Def.BitmapText {
