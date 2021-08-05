@@ -2,6 +2,10 @@ local ThemeColor = LoadModule('Theme.Colors.lua')
 
 return Def.ActorFrame {
 	InitCommand = function(self) self:skewx(-0.5) end,
+	CurrentSongChangedMessageCommand = function(self)
+		local bShow = GAMESTATE:GetCurrentSong() ~= nil or GAMESTATE:GetCurrentCourse() ~= nil
+		self:visible(bShow)
+	end,
 	Def.StepsDisplayList {
 		Name = 'StepsDisplayListRow',
 		OnCommand = function(self)

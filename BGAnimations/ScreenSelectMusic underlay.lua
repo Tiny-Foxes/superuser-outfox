@@ -95,22 +95,26 @@ return Def.ActorFrame {
 		Def.ActorFrame {
 			InitCommand = function(self)
 				self
-					:xy(-SCREEN_CENTER_X + 480, 200)
+					:xy(480, -SCREEN_CENTER_Y + 100)
 					:diffusealpha(0)
+					:addx(-24)
 			end,
 			OnCommand = function(self)
 				self
-					:linear(0.5)
+					:sleep(0.25)
+					:easeoutexpo(0.5)
+					:addx(24)
 					:diffusealpha(1)
 			end,
 			OffCommand = function(self)
 				self
-					:linear(0.5)
+					:sleep(0.25)
+					:easeinexpo(0.5)
+					:addx(-24)
 					:diffusealpha(0)
 			end,
 			Def.BitmapText {
 				Font = 'Common Normal',
-				Text = 'BPM: --',
 				InitCommand = function(self)
 					self
 						:horizalign('left')
@@ -119,17 +123,49 @@ return Def.ActorFrame {
 					local bpmstr = 'BPM: '
 					local song = GAMESTATE:GetCurrentSong()
 					if song then
-						bpmstr = bpmstr .. math.floor(song:GetDisplayBpms()[1])
-						self:settext(bpmstr)
+						bpmstr = bpmstr .. math.floor(song:GetDisplayBpms()[2])
+					else
+						bpmstr = bpmstr .. '--'
 					end
+					self:settext(bpmstr)
 				end,
 				CurrentSongChangedMessageCommand = function(self)
 					local bpmstr = 'BPM: '
 					local song = GAMESTATE:GetCurrentSong()
 					if song then
-						bpmstr = bpmstr .. math.floor(song:GetDisplayBpms()[1])
-						self:settext(bpmstr)
+						bpmstr = bpmstr .. math.floor(song:GetDisplayBpms()[2])
+					else
+						bpmstr = bpmstr .. '--'
 					end
+					self:settext(bpmstr)
+				end,
+			},
+			Def.BitmapText {
+				Font = 'Common Normal',
+				InitCommand = function(self)
+					self
+						:addy(-24)
+						:horizalign('left')
+				end,
+				OnCommand = function(self)
+					local lenstr = 'Length: '
+					local song = GAMESTATE:GetCurrentSong()
+					if song then
+						lenstr = lenstr .. math.floor(song:GetLastSecond() / 60)..':'..string.format('%02d',math.floor(song:GetLastSecond() % 60))
+					else
+						lenstr = lenstr .. '--'
+					end
+					self:settext(lenstr)
+				end,
+				CurrentSongChangedMessageCommand = function(self)
+					local lenstr = 'Length: '
+					local song = GAMESTATE:GetCurrentSong()
+					if song then
+						lenstr = lenstr .. math.floor(song:GetLastSecond() / 60)..':'..string.format('%02d',math.floor(song:GetLastSecond() % 60))
+					else
+						lenstr = lenstr .. '-:--'
+					end
+					self:settext(lenstr)
 				end,
 			}
 		},
@@ -233,7 +269,6 @@ return Def.ActorFrame {
 			Def.BitmapText {
 				Name = 'ChartInfoP1',
 				Font = 'Common Normal',
-				Text = '--\n--\n--\n--\n--\n\n--\n--\n--',
 				InitCommand = function(self)
 					self
 						:addx(-60)
@@ -250,9 +285,13 @@ return Def.ActorFrame {
 					local song = GAMESTATE:GetCurrentSong()
 					local course = GAMESTATE:GetCurrentCourse()
 					if not song and not course then
+						self:y(22)
 						self:settext('--\n--\n--\n--\n--\n\n--\n--\n--')
 					else
+						self:y(34)
+						lua.Trace(song:GetDisplayMainTitle())
 						local cur_diff = GAMESTATE:GetCurrentSteps(PLAYER_1)
+						if not cur_diff then return end
 						local ret = ''
 						for i, v in ipairs({
 							'TapsAndHolds',
@@ -271,11 +310,13 @@ return Def.ActorFrame {
 						self:settext(ret)
 					end
 				end,
+				CurrentSongChangedMessageCommand = function(self)
+					MESSAGEMAN:Broadcast('CurrentStepsP1Changed')
+				end,
 			},
 			Def.BitmapText {
 				Name = 'ChartInfoP2',
 				Font = 'Common Normal',
-				Text = '--\n--\n--\n--\n--\n\n--\n--\n--',
 				InitCommand = function(self)
 					self
 						:addx(-10)
@@ -292,9 +333,12 @@ return Def.ActorFrame {
 					local song = GAMESTATE:GetCurrentSong()
 					local course = GAMESTATE:GetCurrentCourse()
 					if not song and not course then
+						self:y(22)
 						self:settext('--\n--\n--\n--\n--\n\n--\n--\n--')
 					else
+						self:y(34)
 						local cur_diff = GAMESTATE:GetCurrentSteps(PLAYER_2)
+						if not cur_diff then return end
 						local ret = ''
 						for i, v in ipairs({
 							'TapsAndHolds',
@@ -312,6 +356,9 @@ return Def.ActorFrame {
 						end
 						self:settext(ret)
 					end
+				end,
+				CurrentSongChangedMessageCommand = function(self)
+					MESSAGEMAN:Broadcast('CurrentStepsP2Changed')
 				end,
 			}
 		},
