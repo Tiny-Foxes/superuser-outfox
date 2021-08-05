@@ -11,6 +11,7 @@ return Def.ActorFrame {
 			self
 				:easeoutexpo(0.5)
 				:addy(120)
+				:luaeffect('ReportCursor')
 		end,
 		OffCommand = function(self)
 			self

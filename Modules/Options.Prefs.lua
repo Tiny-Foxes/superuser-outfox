@@ -346,6 +346,7 @@ return {
 					end
 				end
 			end
+			lua.Trace(GAMESTATE:Env()["PlayerOptionsNextScreen"])
 		end,
 	},
 	SpeedModType =

@@ -1,6 +1,8 @@
 local Paused = false
 local CurSel = 1
 
+local cursor_on_window = false
+
 local Choices = {
 	{
 		Name = "continue_playing",
@@ -56,6 +58,8 @@ local Selections = Def.ActorFrame{
 	InitCommand=function(self)
 		-- As this process is starting, we'll already highlight the first option with the color.
 		self:GetChild(1):playcommand("GainFocus")
+	end,
+	OnCommand=function(self)
 	end,
 	PlayerHitPauseMessageCommand=function(self, param)
 		if not Paused then
@@ -129,45 +133,61 @@ for i,v in ipairs(Choices) do
 	}
 end
 
-return Def.ActorFrame{
-	OnCommand=function(self)
-		SCREENMAN:GetTopScreen():AddInputCallback(LoadModule("Lua.InputSystem.lua")(self))
-		self:visible(false):Center()
+return Def.ActorFrame {
+	OnCommand = function(self)
+		self:queuecommand('ReportCursor')
 	end,
-	CurrentSongChangedMessageCommand=function(self)
-		SCREENMAN:GetTopScreen():PauseGame(false)
-	end,
-	NonGameBackCommand=function(self)
-		if not Paused then 
-			SCREENMAN:GetTopScreen():PauseGame(true)
-			ChangeSel(self,0)
-			MESSAGEMAN:Broadcast("PlayerHitPause", {pn = self.pn})
-			self:visible(true)
-			self:GetChild("Dim"):playcommand("ShowOrHide",{state="show"})
+	ReportCursorCommand = function(self)
+		if not Paused then
+			local mousex, mousey = INPUTFILTER:GetMouseX(), INPUTFILTER:GetMouseY()
+			if not cursor_on_window and (mousex > SCREEN_LEFT and mousex < SCREEN_RIGHT) and (mousey > SCREEN_TOP and mousey < SCREEN_BOTTOM) then
+				cursor_on_window = true
+				SCREENMAN:SystemMessage("If you're recording, you might want to move your cursor.")
+			elseif (mousex <= SCREEN_LEFT or mousex >= SCREEN_RIGHT) or (mousey <= SCREEN_TOP or mousey >= SCREEN_BOTTOM) then
+				cursor_on_window = false
+			end
 		end
-		Paused = true
 	end,
-	StartCommand=function(self)
-		if Paused then 
-			Choices[CurSel].Action( SCREENMAN:GetTopScreen() )
-			self:visible(false)
-			self:GetChild("Dim"):playcommand("ShowOrHide",{state="hide"})
-		end
-		Paused = false
-	end,
-	MenuLeftCommand=function(self) if Paused then ChangeSel(self,-1) end end,
-	MenuRightCommand=function(self) if Paused then ChangeSel(self,1) end end,
-	MenuUpCommand=function(self) if Paused then ChangeSel(self,-1) end end,
-	MenuDownCommand=function(self) if Paused then ChangeSel(self,1) end end,
-	Def.Quad{
-		Name="Dim",
-		InitCommand=function(self)
-			self:stretchto(SCREEN_WIDTH*-1,SCREEN_HEIGHT*-1,SCREEN_WIDTH,SCREEN_HEIGHT):diffuse( Color.Black ):diffusealpha(0)
+	Def.ActorFrame{
+		OnCommand=function(self)
+			SCREENMAN:GetTopScreen():AddInputCallback(LoadModule("Lua.InputSystem.lua")(self))
+			self:visible(false):Center()
 		end,
-		ShowOrHideCommand=function(self,param)
-			MESSAGEMAN:Broadcast('PauseMenu')
-			self:stoptweening():linear(0.2):diffusealpha( param.state == "show" and 0.5 or 0 )
-		end
+		CurrentSongChangedMessageCommand=function(self)
+			SCREENMAN:GetTopScreen():PauseGame(false)
+		end,
+		NonGameBackCommand=function(self)
+			if not Paused then 
+				SCREENMAN:GetTopScreen():PauseGame(true)
+				ChangeSel(self,0)
+				MESSAGEMAN:Broadcast("PlayerHitPause", {pn = self.pn})
+				self:visible(true)
+				self:GetChild("Dim"):playcommand("ShowOrHide",{state="show"})
+			end
+			Paused = true
+		end,
+		StartCommand=function(self)
+			if Paused then 
+				Choices[CurSel].Action( SCREENMAN:GetTopScreen() )
+				self:visible(false)
+				self:GetChild("Dim"):playcommand("ShowOrHide",{state="hide"})
+			end
+			Paused = false
+		end,
+		MenuLeftCommand=function(self) if Paused then ChangeSel(self,-1) end end,
+		MenuRightCommand=function(self) if Paused then ChangeSel(self,1) end end,
+		MenuUpCommand=function(self) if Paused then ChangeSel(self,-1) end end,
+		MenuDownCommand=function(self) if Paused then ChangeSel(self,1) end end,
+		Def.Quad{
+			Name="Dim",
+			InitCommand=function(self)
+				self:stretchto(SCREEN_WIDTH*-1,SCREEN_HEIGHT*-1,SCREEN_WIDTH,SCREEN_HEIGHT):diffuse( Color.Black ):diffusealpha(0)
+			end,
+			ShowOrHideCommand=function(self,param)
+				MESSAGEMAN:Broadcast('PauseMenu')
+				self:stoptweening():linear(0.2):diffusealpha( param.state == "show" and 0.5 or 0 )
+			end
+		},
+		Selections
 	},
-	Selections
 }
