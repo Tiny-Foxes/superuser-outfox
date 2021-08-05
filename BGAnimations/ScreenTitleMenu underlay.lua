@@ -91,12 +91,13 @@ local mascot = Def.ActorFrame {
 	},
 }
 
--- Logo
+-- UI
 t[#t + 1] = Def.ActorFrame {
 	InitCommand = function(self)
 		self
 			:y(scy - 192)
 	end,
+	-- Panel
 	Def.Quad {
 		InitCommand = function(self)
 			self
@@ -126,6 +127,8 @@ t[#t + 1] = Def.ActorFrame {
 				:skewx(-0.5)
 				:SetSize(sw * 1.5, 256)
 				:diffuse(ThemeColor.Elements)
+				:diffusebottomedge(ThemeColor.Secondary)
+				:diffuserightedge(ThemeColor.Elements)
 				:diffusealpha(0.5)
 				:cropleft(1)
 		end,

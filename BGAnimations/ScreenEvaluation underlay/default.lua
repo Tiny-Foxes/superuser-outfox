@@ -213,16 +213,34 @@ return Def.ActorFrame {
 					:addx(300)
 			end,
 			Def.BitmapText {
-				Name = 'SongTitle',
+				Name = 'SongTitleM',
 				Font = '_xide/40px',
 				InitCommand = function(self)
 					self
 						:horizalign('right')
 						:vertalign('bottom')
 						:addy(-10)
-						:maxwidth(360)
+						:maxwidth(SCREEN_WIDTH * 0.35)
 					local target = GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentCourse() or GAMESTATE:GetCurrentSong()
-					self:settext(target:GetDisplayFullTitle())
+					self:settext(target:GetDisplayMainTitle())
+				end,
+				OnCommand = function(self)
+					self
+						:addx((self:GetParent():GetChild('SongTitleS'):GetWidth() + 10) * -1.5)
+				end,
+			},
+			Def.BitmapText {
+				Name = 'SongTitleS',
+				Font = '_xide/20px',
+				InitCommand = function(self)
+					self
+						:zoom(1.5)
+						:horizalign('right')
+						:vertalign('bottom')
+						:addy(-10)
+						:maxwidth((SCREEN_WIDTH * 0.35) * 0.75)
+					local target = GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentCourse() or GAMESTATE:GetCurrentSong()
+					self:settext(target:GetDisplaySubTitle())
 				end,
 			},
 			Def.BitmapText {
@@ -233,7 +251,7 @@ return Def.ActorFrame {
 						:horizalign('right')
 						:vertalign('top')
 						:addy(10)
-						:maxwidth(360)
+						:maxwidth(SCREEN_WIDTH * 0.75)
 					local target = GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentCourse() or GAMESTATE:GetCurrentSong()
 					self:settext(target:GetDisplayArtist())
 				end,
