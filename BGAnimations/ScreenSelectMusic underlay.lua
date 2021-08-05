@@ -91,6 +91,48 @@ return Def.ActorFrame {
 					:cropright(1)
 			end,
 		},
+		-- BPM
+		Def.ActorFrame {
+			InitCommand = function(self)
+				self
+					:xy(-SCREEN_CENTER_X + 480, 200)
+					:diffusealpha(0)
+			end,
+			OnCommand = function(self)
+				self
+					:linear(0.5)
+					:diffusealpha(1)
+			end,
+			OffCommand = function(self)
+				self
+					:linear(0.5)
+					:diffusealpha(0)
+			end,
+			Def.BitmapText {
+				Font = 'Common Normal',
+				Text = 'BPM: --',
+				InitCommand = function(self)
+					self
+						:horizalign('left')
+				end,
+				OnCommand = function(self)
+					local bpmstr = 'BPM: '
+					local song = GAMESTATE:GetCurrentSong()
+					if song then
+						bpmstr = bpmstr .. math.floor(song:GetDisplayBpms()[1])
+						self:settext(bpmstr)
+					end
+				end,
+				CurrentSongChangedMessageCommand = function(self)
+					local bpmstr = 'BPM: '
+					local song = GAMESTATE:GetCurrentSong()
+					if song then
+						bpmstr = bpmstr .. math.floor(song:GetDisplayBpms()[1])
+						self:settext(bpmstr)
+					end
+				end,
+			}
+		},
 		-- Song Info
 		Def.ActorFrame {
 			Name = 'SongStats',

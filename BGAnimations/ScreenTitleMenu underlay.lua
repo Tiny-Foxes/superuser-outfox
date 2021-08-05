@@ -240,7 +240,9 @@ t[#t + 1] = Def.ActorFrame {
 						'Your existence is appreciated.',
 						'Your presence is invaluable.',
 					},
-					ja = {},
+					ja = {
+						'こんにちは、世界。',
+					},
 				}
 				local langtags = taglines[THEME:GetCurLanguage()]
 				if not langtags then langtags = taglines.en end

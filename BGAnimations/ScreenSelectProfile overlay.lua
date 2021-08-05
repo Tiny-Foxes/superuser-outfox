@@ -1,4 +1,5 @@
 -- This was shamelessly stolen from the default Soundwaves theme.
+local ThemeColor = LoadModule('Theme.Colors.lua')
 
 function GetLocalProfiles()
 	local t = {};
@@ -265,6 +266,7 @@ local t = Def.ActorFrame {
 	end;
 
 	children = {
+		loadfile(THEME:GetPathG('', 'screenheader'))(),
 		Def.ActorFrame {
 			Name = 'P1Frame';
 			InitCommand=function(self) self:xy(SCREEN_CENTER_X-160,SCREEN_CENTER_Y):skewx(-0.5) end;
