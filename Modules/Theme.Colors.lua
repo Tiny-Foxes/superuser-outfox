@@ -13,7 +13,9 @@ local Colors = {
 	Easy = color('#699429'),
 	Medium = color('#B4943F'),
 	Hard = color('#AB3541'),
+	Crazy = color('#AB3541'),
 	Challenge = color('#618FB0'),
+	Nightmare = color('#618FB0'),
 	Edit = color('#808080'),
 
 	-- General Colors

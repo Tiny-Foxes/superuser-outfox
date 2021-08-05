@@ -10,6 +10,10 @@ return Def.ActorFrame {
 		end,
 		SetCommand = function(self, param)
 			if not param then return end
+			if not ThemeColor[param.CustomDifficulty] then
+				lua.Trace('No color for difficulty "'..param.CustomDifficulty..'".')
+				return
+			end
 			self:diffuse(ThemeColor[param.CustomDifficulty])
 		end,
 	},
