@@ -142,7 +142,9 @@ return Def.ActorFrame {
 			local mousex, mousey = INPUTFILTER:GetMouseX(), INPUTFILTER:GetMouseY()
 			if not cursor_on_window and (mousex > SCREEN_LEFT and mousex < SCREEN_RIGHT) and (mousey > SCREEN_TOP and mousey < SCREEN_BOTTOM) then
 				cursor_on_window = true
-				SCREENMAN:SystemMessage("If you're recording, you might want to move your cursor.")
+				if PREFSMAN:GetPreference('ShowMouseCursor') then
+					SCREENMAN:SystemMessage("If you're recording, you might want to move your cursor.")
+				end
 			elseif (mousex <= SCREEN_LEFT or mousex >= SCREEN_RIGHT) or (mousey <= SCREEN_TOP or mousey >= SCREEN_BOTTOM) then
 				cursor_on_window = false
 			end

@@ -35,7 +35,7 @@ end
 local NodeTree = Def.ActorFrame {
 	UpdateMessageCommand = function(self)
 		UpdateTweens(self)
-	end,
+	end
 }
 
 -- This would be used for extending the metatable of the node, I hope? For whatever reason...
@@ -109,7 +109,6 @@ end
 Node = {
 	extends = extends,
 	new = new,
-	AttachScript = AttachScript,
 	SetReady = SetReady,
 	SetUpdate = SetUpdate,
 	SetInput = SetInput,

@@ -37,7 +37,12 @@ local function GetPlrGrade()
 	return grade
 end
 
-lua.Trace(grades[playerstats:GetGrade()]) 
+local function GetPlrDiff()
+	local diff = GAMESTATE:GetCurrentSteps(plr):GetDifficulty()
+	local cdiff = THEME:GetString("CustomDifficulty",ToEnumShortString(diff))
+	local meter = GAMESTATE:GetCurrentSteps(plr):GetMeter()
+	return cdiff..'  '..meter
+end
 
 
 
@@ -105,13 +110,51 @@ t[#t + 1] = Def.ActorFrame {
 			self:xy(SCREEN_CENTER_X * 0.3, 30)
 		end,
 		Def.BitmapText {
+			Font = 'Common Normal',
+			Text = GetPlrDiff(),
+			InitCommand = function(self)
+				self
+					:skewafterzoomrot(true)
+					:skewx(0.25)
+					:horizalign('left')
+					:vertalign('bottom')
+					:xy(-SCREEN_CENTER_X * 0.6, 24)
+					:maxwidth(80)
+					:zoom(1.25)
+					:diffuse(ColorLightTone(PlayerColor(plr)))
+					:addx(40)
+					:diffusealpha(0)
+			end,
+			OnCommand = function(self)
+				self
+					:sleep(0.1)
+					:queuecommand('Bob')
+					:sleep(0.55)
+					:easeoutexpo(0.5)
+					:addx(-40)
+					:diffusealpha(1)
+			end,
+			OffCommand = function(self)
+				self
+					:sleep(0.15)
+					:easeinexpo(0.25)
+					:addx(40)
+					:diffusealpha(0)
+			end,
+			BobCommand=function(self)
+				self
+					:bob()
+					:effectperiod(8)
+					:effectmagnitude(4, 0, 0)
+			end,
+		},
+		Def.BitmapText {
 			Font = '_xide/40px',
 			Text = GetPlrScore(),
 			InitCommand = function(self)
 				self
 					:skewx(0.25)
 					:horizalign('right')
-					:x(20)
 					:zoom(1.5)
 					:diffuse(ColorLightTone(PlayerColor(plr)))
 					:addx(-40)
