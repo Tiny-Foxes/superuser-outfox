@@ -44,7 +44,6 @@ t[#t+1] = Def.ActorFrame {
 			Font = 'Common Normal',
 			InitCommand = function(self)
 				if not selection then return end
-				--self:addx(-8)
 				local bpmtext
 				if bpm2 and bpm1 ~= bpm2 then
 					bpmtext = math.floor(bpm1)..' - '..math.floor(bpm2)
@@ -55,6 +54,7 @@ t[#t+1] = Def.ActorFrame {
 			end,
 		},
 	},
+	-- TODO: Join this in a for loop. ~Sudo
 	Def.ActorFrame {
 		InitCommand = function(self)
 			self:addx(224)
@@ -81,9 +81,14 @@ t[#t+1] = Def.ActorFrame {
 				elseif poptions:CMod() then
 					bpm1 = poptions:CMod()
 					bpm2 = poptions:CMod()
-				-- TODO: Fix these to be proper indication of M and A. ~Sudo
 				elseif poptions:MMod() then
+					bpm1 = (bpm1 * poptions:MMod()) / bpm2 -- gamer moment
+					bpm2 = poptions:MMod()
 				elseif poptions:AMod() then
+					local baseAvg = (bpm1 + bpm2) * 0.5
+					local mult = poptions:AMod() / baseAvg -- mega gamer moment
+					bpm1 = bpm1 * mult
+					bpm2 = bpm2 * mult
 				end
 				local bpmtext = ''
 				if bpm2 and bpm1 ~= bpm2 then
@@ -103,9 +108,14 @@ t[#t+1] = Def.ActorFrame {
 				elseif param.mode == 'c' then
 					bpm1 = param.speed
 					bpm2 = param.speed
-				-- TODO: Fix these to be proper indication of M and A. ~Sudo
 				elseif param.mode == 'm' then
+					bpm1 = (bpm1 * param.speed) / bpm2
+					bpm2 = param.speed
 				elseif param.mode == 'a' then
+					local baseAvg = (bpm1 + bpm2) * 0.5
+					local mult = param.speed / baseAvg
+					bpm1 = bpm1 * mult
+					bpm2 = bpm2 * mult
 				end
 				local bpmtext = ''
 				if bpm2 and bpm1 ~= bpm2 then
@@ -143,9 +153,14 @@ t[#t+1] = Def.ActorFrame {
 				elseif poptions:CMod() then
 					bpm1 = poptions:CMod()
 					bpm2 = poptions:CMod()
-				-- TODO: Fix these to be proper indication of M and A. ~Sudo
 				elseif poptions:MMod() then
+					bpm1 = (bpm1 * poptions:MMod()) / bpm2
+					bpm2 = poptions:MMod()
 				elseif poptions:AMod() then
+					local baseAvg = (bpm1 + bpm2) * 0.5
+					local mult = poptions:AMod() / baseAvg
+					bpm1 = bpm1 * mult
+					bpm2 = bpm2 * mult
 				end
 				local bpmtext = ''
 				if bpm2 and bpm1 ~= bpm2 then
@@ -165,9 +180,14 @@ t[#t+1] = Def.ActorFrame {
 				elseif param.mode == 'c' then
 					bpm1 = param.speed
 					bpm2 = param.speed
-				-- TODO: Fix these to be proper indication of M and A. ~Sudo
 				elseif param.mode == 'm' then
+					bpm1 = (bpm1 * param.speed) / bpm2
+					bpm2 = param.speed
 				elseif param.mode == 'a' then
+					local baseAvg = (bpm1 + bpm2) * 0.5
+					local mult = param.speed / baseAvg
+					bpm1 = bpm1 * mult
+					bpm2 = bpm2 * mult
 				end
 				local bpmtext = ''
 				if bpm2 and bpm1 ~= bpm2 then
@@ -190,7 +210,6 @@ local column = GAMESTATE:GetCurrentStyle():GetColumnInfo( GAMESTATE:GetMasterPla
 if getenv("NewOptions") == "Main" or getenv("NewOptions") == nil then
 	for _,v in pairs(NOTESKIN:GetNoteSkinNames()) do
 		local noteskinset = NOTESKIN:LoadActorForNoteSkin( column["Name"] , "Tap Note", v )
-
 		if noteskinset then
 			t[#t+1] = noteskinset..{
 				Name="NS"..string.lower(v), InitCommand=function(s) s:visible(false) end,
