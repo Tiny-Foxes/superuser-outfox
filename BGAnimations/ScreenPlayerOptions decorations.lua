@@ -6,6 +6,11 @@ local t = LoadFallbackB()
 local song = GAMESTATE:GetCurrentSong()
 local course = GAMESTATE:GetCurrentCourse()
 local selection = song or course
+local bpm1, bpm2
+if selection then
+	bpm1 = math.floor(selection:GetDisplayBpms()[1])
+	bpm2 = math.floor(selection:GetDisplayBpms()[2])
+end
 
 t[#t+1] = Def.ActorFrame {
 	InitCommand = function(self)
@@ -40,13 +45,11 @@ t[#t+1] = Def.ActorFrame {
 			InitCommand = function(self)
 				if not selection then return end
 				--self:addx(-8)
-				local bpm1 = selection:GetDisplayBpms()[1]
-				local bpm2 = selection:GetDisplayBpms()[1]
 				local bpmtext
 				if bpm2 and bpm1 ~= bpm2 then
-					bpmtext = bpm1..' - '..bpm2
+					bpmtext = math.floor(bpm1)..' - '..math.floor(bpm2)
 				else
-					bpmtext = bpm1
+					bpmtext = math.floor(bpm1)
 				end
 				self:settext(bpmtext)
 			end,
@@ -71,54 +74,44 @@ t[#t+1] = Def.ActorFrame {
 				if not GAMESTATE:IsPlayerEnabled(PLAYER_1) then self:visible(false) return end
 				self:diffuse(ColorLightTone(PlayerColor(PLAYER_1)))
 				local poptions = GAMESTATE:GetPlayerState(PLAYER_1):GetPlayerOptions('ModsLevel_Preferred')
-				local bpm1 = selection:GetDisplayBpms()[1]
-				local bpm2 = selection:GetDisplayBpms()[2]
+				local bpm1, bpm2 = bpm1, bpm2
 				if poptions:XMod() then
-					bpm1 = selection:GetDisplayBpms()[1] * poptions:XMod()
-					bpm2 = selection:GetDisplayBpms()[2] * poptions:XMod()
+					bpm1 = bpm1 * poptions:XMod()
+					bpm2 = bpm2 * poptions:XMod()
 				elseif poptions:CMod() then
 					bpm1 = poptions:CMod()
 					bpm2 = poptions:CMod()
 				-- TODO: Fix these to be proper indication of M and A. ~Sudo
 				elseif poptions:MMod() then
-					bpm1 = selection:GetDisplayBpms()[1]
-					bpm2 = selection:GetDisplayBpms()[2]
 				elseif poptions:AMod() then
-					bpm1 = selection:GetDisplayBpms()[1]
-					bpm2 = selection:GetDisplayBpms()[2]
 				end
 				local bpmtext = ''
 				if bpm2 and bpm1 ~= bpm2 then
-					bpmtext = bpm1..' - '..bpm2
+					bpmtext = math.floor(bpm1)..' - '..math.floor(bpm2)
 				else
-					bpmtext = bpm1
+					bpmtext = math.floor(bpm1)
 				end
 				self:settext(bpmtext)
 			end,
 			SpeedChoiceChangedMessageCommand = function(self, param)
 				if not selection then return end
 				if param.pn ~= num_players[1] then return end
-				local bpm1 = selection:GetDisplayBpms()[1]
-				local bpm2 = selection:GetDisplayBpms()[2]
+				local bpm1, bpm2 = bpm1, bpm2
 				if param.mode == 'x' then
-					bpm1 = selection:GetDisplayBpms()[1] * (param.speed * 0.01)
-					bpm2 = selection:GetDisplayBpms()[2] * (param.speed * 0.01)
+					bpm1 = bpm1 * (param.speed * 0.01)
+					bpm2 = bpm2 * (param.speed * 0.01)
 				elseif param.mode == 'c' then
 					bpm1 = param.speed
 					bpm2 = param.speed
 				-- TODO: Fix these to be proper indication of M and A. ~Sudo
 				elseif param.mode == 'm' then
-					bpm1 = selection:GetDisplayBpms()[1]
-					bpm2 = selection:GetDisplayBpms()[2]
 				elseif param.mode == 'a' then
-					bpm1 = selection:GetDisplayBpms()[1]
-					bpm2 = selection:GetDisplayBpms()[2]
 				end
 				local bpmtext = ''
 				if bpm2 and bpm1 ~= bpm2 then
-					bpmtext = bpm1..' - '..bpm2
+					bpmtext = math.floor(bpm1)..' - '..math.floor(bpm2)
 				else
-					bpmtext = bpm1
+					bpmtext = math.floor(bpm1)
 				end
 				self:settext(bpmtext)
 			end,
@@ -143,54 +136,44 @@ t[#t+1] = Def.ActorFrame {
 				if not GAMESTATE:IsPlayerEnabled(PLAYER_2) then self:visible(false) return end
 				self:diffuse(ColorLightTone(PlayerColor(PLAYER_2)))
 				local poptions = GAMESTATE:GetPlayerState(PLAYER_2):GetPlayerOptions('ModsLevel_Preferred')
-				local bpm1 = selection:GetDisplayBpms()[1]
-				local bpm2 = selection:GetDisplayBpms()[2]
+				local bpm1, bpm2 = bpm1, bpm2
 				if poptions:XMod() then
-					bpm1 = selection:GetDisplayBpms()[1] * poptions:XMod()
-					bpm2 = selection:GetDisplayBpms()[2] * poptions:XMod()
+					bpm1 = bpm1 * poptions:XMod()
+					bpm2 = bpm2 * poptions:XMod()
 				elseif poptions:CMod() then
 					bpm1 = poptions:CMod()
 					bpm2 = poptions:CMod()
 				-- TODO: Fix these to be proper indication of M and A. ~Sudo
 				elseif poptions:MMod() then
-					bpm1 = selection:GetDisplayBpms()[1]
-					bpm2 = selection:GetDisplayBpms()[2]
 				elseif poptions:AMod() then
-					bpm1 = selection:GetDisplayBpms()[1]
-					bpm2 = selection:GetDisplayBpms()[2]
 				end
 				local bpmtext = ''
 				if bpm2 and bpm1 ~= bpm2 then
-					bpmtext = bpm1..' - '..bpm2
+					bpmtext = math.floor(bpm1)..' - '..math.floor(bpm2)
 				else
-					bpmtext = bpm1
+					bpmtext = math.floor(bpm1)
 				end
 				self:settext(bpmtext)
 			end,
 			SpeedChoiceChangedMessageCommand = function(self, param)
 				if not selection then return end
 				if param.pn ~= num_players[2] then return end
-				local bpm1 = selection:GetDisplayBpms()[1]
-				local bpm2 = selection:GetDisplayBpms()[2]
+				local bpm1, bpm2 = bpm1, bpm2
 				if param.mode == 'x' then
-					bpm1 = selection:GetDisplayBpms()[1] * (param.speed * 0.01)
-					bpm2 = selection:GetDisplayBpms()[2] * (param.speed * 0.01)
+					bpm1 = bpm1 * (param.speed * 0.01)
+					bpm2 = bpm2 * (param.speed * 0.01)
 				elseif param.mode == 'c' then
 					bpm1 = param.speed
 					bpm2 = param.speed
 				-- TODO: Fix these to be proper indication of M and A. ~Sudo
 				elseif param.mode == 'm' then
-					bpm1 = selection:GetDisplayBpms()[1]
-					bpm2 = selection:GetDisplayBpms()[2]
 				elseif param.mode == 'a' then
-					bpm1 = selection:GetDisplayBpms()[1]
-					bpm2 = selection:GetDisplayBpms()[2]
 				end
 				local bpmtext = ''
 				if bpm2 and bpm1 ~= bpm2 then
-					bpmtext = bpm1..' - '..bpm2
+					bpmtext = math.floor(bpm1)..' - '..math.floor(bpm2)
 				else
-					bpmtext = bpm1
+					bpmtext = math.floor(bpm1)
 				end
 				self:settext(bpmtext)
 			end,

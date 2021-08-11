@@ -1,3 +1,5 @@
+local ThemeColor = LoadModule('Theme.Colors.lua')
+
 local t = Def.ActorFrame {
 }
 
@@ -44,8 +46,6 @@ local function GetPlrDiff()
 	return cdiff..'  '..meter
 end
 
-
-
 t[#t + 1] = Def.ActorFrame {
 	InitCommand = function(self)
 	end,
@@ -75,6 +75,8 @@ t[#t + 1] = Def.ActorFrame {
 		Font = '_xiaxide 80px',
 		Text = GetPlrGrade(),
 		InitCommand = function(self)
+			local diff = GAMESTATE:GetCurrentSteps(plr):GetDifficulty()
+			local cdiff = THEME:GetString("CustomDifficulty",ToEnumShortString(diff))
 			self
 				:skewx(0.25)
 				:addx(10)
@@ -113,6 +115,8 @@ t[#t + 1] = Def.ActorFrame {
 			Font = 'Common Normal',
 			Text = GetPlrDiff(),
 			InitCommand = function(self)
+				local diff = tostring(GAMESTATE:GetCurrentSteps(plr):GetDifficulty())
+				local diff = diff:sub(diff:find('_') + 1, -1)
 				self
 					:skewafterzoomrot(true)
 					:skewx(0.25)
@@ -121,7 +125,7 @@ t[#t + 1] = Def.ActorFrame {
 					:xy(-SCREEN_CENTER_X * 0.6, 24)
 					:maxwidth(80)
 					:zoom(1.25)
-					:diffuse(ColorLightTone(PlayerColor(plr)))
+					:diffuse(ColorLightTone(ThemeColor[diff]))
 					:addx(40)
 					:diffusealpha(0)
 			end,
