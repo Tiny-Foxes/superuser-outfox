@@ -1,5 +1,5 @@
 # Superuser
-Superuser Theme for Project OutFox
+Theme for Project OutFox
 ---
 Title Menu
 ![2021-08-05_181307](https://user-images.githubusercontent.com/11000739/128432943-7db0d998-f4a6-47f8-8988-2fb9cc47ed84.png)
