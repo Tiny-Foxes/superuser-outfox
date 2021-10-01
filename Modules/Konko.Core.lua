@@ -1,8 +1,3 @@
---[[
-	This is a stripped down version of nodeloader.lua from Kitsu template.
-	allows Kitsu node system specifically OUTSIDE of modfiles.
---]]
-
 -- environment builder stolen this from xero thanks xero
 _G.sudo = {}
 local sudo = setmetatable(sudo, sudo)

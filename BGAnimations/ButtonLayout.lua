@@ -37,8 +37,8 @@ for pn = 1, 2 do
 			Name = 'BtnOverlayP'..pn,
 			InitCommand = function(self)
 				self
-					:zoom(0.5)
-					:xy(SCREEN_CENTER_X - (112 * (0.5 - (pn - 1))), 145)
+					:zoom(0.25)
+					:x(-((SCREEN_WIDTH - 120) * (0.5 - (pn - 1))))
 				if not GAMESTATE:IsSideJoined(PlayerNumber[pn]) then
 					self:visible(false)
 				end

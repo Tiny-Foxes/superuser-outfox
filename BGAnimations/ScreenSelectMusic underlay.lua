@@ -167,7 +167,47 @@ return Def.ActorFrame {
 					end
 					self:settext(lenstr)
 				end,
-			}
+			},
+			Def.ActorFrame {
+				Name = 'SongInfo',
+				InitCommand = function(self)
+					self
+						:zoom(1.5)
+						:addy(-120)
+				end,
+				Def.BitmapText {
+					Name = 'Title',
+					Font = 'Common Normal',
+					Text = '',
+					InitCommand = function(self)
+						self
+							:addy(-12)
+							:horizalign('left')
+							:maxwidth(180)
+					end,
+					CurrentSongChangedMessageCommand = function(self)
+						local song = GAMESTATE:GetCurrentSong()
+						if not song then self:settext('') return end
+						self:settext(song:GetDisplayFullTitle())
+					end,
+				},
+				Def.BitmapText {
+					Name = 'Artist',
+					Font = 'Common Normal',
+					Text = '',
+					InitCommand = function(self)
+						self
+							:addy(12)
+							:horizalign('left')
+							:maxwidth(180)
+					end,
+					CurrentSongChangedMessageCommand = function(self)
+						local song = GAMESTATE:GetCurrentSong()
+						if not song then self:settext('') return end
+						self:settext(song:GetDisplayArtist())
+					end,
+				},
+			},
 		},
 		-- Song Info
 		Def.ActorFrame {
@@ -191,56 +231,150 @@ return Def.ActorFrame {
 					:addx(-SCREEN_CENTER_X)
 			end,
 			Def.BitmapText {
-				Name = 'SongLabels',
+				Name = 'StepNameP1',
 				Font = 'Common Normal',
-				Text = 'SONG\nARTIST',
+				Text = '--',
 				InitCommand = function(self)
 					self
 						:x(-140)
-						:addy(-120)
+						:addy(-138)
 						:horizalign('left')
-						:maxwidth(60)
+						:maxwidth(80)
+						:visible(GAMESTATE:IsSideJoined(PLAYER_1))
+						:diffuse(ColorLightTone(ThemeColor.P1))
+						:diffusebottomedge(ThemeColor.P1)
+					if GAMESTATE:GetCurrentSteps(PLAYER_1) then
+						local diff = tostring(GAMESTATE:GetCurrentSteps(PLAYER_1):GetDifficulty())
+						local diff = diff:sub(diff:find('_') + 1, -1)
+						self
+							:diffuse(ColorLightTone(ThemeColor[diff]))
+							:diffusebottomedge(ThemeColor[diff])
+					end
+				end,
+				PlayerJoinedMessageCommand = function(self, param)
+					self:visible(GAMESTATE:IsSideJoined(PLAYER_1))
+				end,
+				CurrentStepsP1ChangedMessageCommand = function(self)
+					local song = GAMESTATE:GetCurrentSong()
+					local course = GAMESTATE:GetCurrentCourse()
+					if not song and not course then
+						self
+							:settext('--')
+							:diffuse(ColorLightTone(ThemeColor.P1))
+							:diffusebottomedge(ThemeColor.P1)
+						return
+					end
+					local diff = GAMESTATE:GetCurrentSteps(PLAYER_1)
+					if diff then
+						self:settext(THEME:GetString("CustomDifficulty",ToEnumShortString(diff:GetDifficulty())))
+						local diffname = diff:GetDifficulty()
+						local diffname = diffname:sub(diffname:find('_') + 1, -1)
+						self
+							:diffuse(ColorLightTone(ThemeColor[diffname]))
+							:diffusebottomedge(ThemeColor[diffname])
+					end
 				end,
 			},
-			Def.ActorFrame {
-				Name = 'SongInfo',
+			Def.BitmapText {
+				Name = 'StepArtistP1',
+				Font = 'Common Normal',
+				Text = '--',
 				InitCommand = function(self)
 					self
-						:addx(-60)
-						:addy(-120)
+						:x(-140)
+						:addy(-118)
+						:horizalign('left')
+						:maxwidth(80)
+						:diffuse(ColorLightTone(ThemeColor.P1))
+						:diffusebottomedge(ThemeColor.P1)
+						:visible(GAMESTATE:IsSideJoined(PLAYER_1))
 				end,
-				Def.BitmapText {
-					Name = 'Title',
-					Font = 'Common Normal',
-					Text = '--',
-					InitCommand = function(self)
+				PlayerJoinedMessageCommand = function(self, param)
+					self:visible(GAMESTATE:IsSideJoined(PLAYER_1))
+				end,
+				CurrentStepsP1ChangedMessageCommand = function(self)
+					local song = GAMESTATE:GetCurrentSong()
+					local course = GAMESTATE:GetCurrentCourse()
+					if not song and not course then
+						self:settext('--')
+						return
+					end
+					local diff = GAMESTATE:GetCurrentSteps(PLAYER_1)
+					if diff then self:settext(diff:GetAuthorCredit()) end
+				end,
+			},
+			Def.BitmapText {
+				Name = 'StepNameP2',
+				Font = 'Common Normal',
+				Text = '--',
+				InitCommand = function(self)
+					self
+						:x(-40)
+						:addy(-138)
+						:horizalign('left')
+						:maxwidth(80)
+						:diffuse(ColorLightTone(ThemeColor.P2))
+						:diffusebottomedge(ThemeColor.P2)
+						:visible(GAMESTATE:IsSideJoined(PLAYER_2))
+					if GAMESTATE:GetCurrentSteps(PLAYER_2) then
+						local diff = tostring(GAMESTATE:GetCurrentSteps(PLAYER_2):GetDifficulty())
+						local diff = diff:sub(diff:find('_') + 1, -1)
 						self
-							:addy(-12)
-							:horizalign('left')
-							:maxwidth(160)
-					end,
-					CurrentSongChangedMessageCommand = function(self)
-						local song = GAMESTATE:GetCurrentSong()
-						if not song then self:settext('--') return end
-						self:settext(song:GetDisplayFullTitle())
-					end,
-				},
-				Def.BitmapText {
-					Name = 'Artist',
-					Font = 'Common Normal',
-					Text = '--',
-					InitCommand = function(self)
+							:diffuse(ColorLightTone(ThemeColor[diff]))
+							:diffusebottomedge(ThemeColor[diff])
+					end
+				end,
+				PlayerJoinedMessageCommand = function(self, param)
+					self:visible(GAMESTATE:IsSideJoined(PLAYER_2))
+				end,
+				CurrentStepsP2ChangedMessageCommand = function(self)
+					local song = GAMESTATE:GetCurrentSong()
+					local course = GAMESTATE:GetCurrentCourse()
+					if not song and not course then
 						self
-							:addy(12)
-							:horizalign('left')
-							:maxwidth(160)
-					end,
-					CurrentSongChangedMessageCommand = function(self)
-						local song = GAMESTATE:GetCurrentSong()
-						if not song then self:settext('--') return end
-						self:settext(song:GetDisplayArtist())
-					end,
-				},
+							:settext('--')
+							:diffuse(ColorLightTone(ThemeColor.P2))
+							:diffusebottomedge(ThemeColor.P2)
+						return
+					end
+					local diff = GAMESTATE:GetCurrentSteps(PLAYER_2)
+					if diff then
+						self:settext(THEME:GetString("CustomDifficulty",ToEnumShortString(diff:GetDifficulty())))
+						local diffname = diff:GetDifficulty()
+						local diffname = diffname:sub(diffname:find('_') + 1, -1)
+						self
+							:diffuse(ColorLightTone(ThemeColor[diffname]))
+							:diffusebottomedge(ThemeColor[diffname])
+					end
+				end,
+			},
+			Def.BitmapText {
+				Name = 'StepArtistP2',
+				Font = 'Common Normal',
+				Text = '--',
+				InitCommand = function(self)
+					self
+						:x(-40)
+						:addy(-118)
+						:horizalign('left')
+						:maxwidth(80)
+						:diffuse(ColorLightTone(ThemeColor.P2))
+						:diffusebottomedge(ThemeColor.P2)
+						:visible(GAMESTATE:IsSideJoined(PLAYER_2))
+				end,
+				PlayerJoinedMessageCommand = function(self, param)
+					self:visible(GAMESTATE:IsSideJoined(PLAYER_2))
+				end,
+				CurrentStepsP2ChangedMessageCommand = function(self)
+					local song = GAMESTATE:GetCurrentSong()
+					local course = GAMESTATE:GetCurrentCourse()
+					if not song and not course then
+						self:settext('--')
+						return
+					end
+					local diff = GAMESTATE:GetCurrentSteps(PLAYER_2)
+					if diff then self:settext(diff:GetAuthorCredit()) end
+				end,
 			},
 			Def.BitmapText {
 				Name = 'StepLabels',
@@ -289,7 +423,6 @@ return Def.ActorFrame {
 						self:settext('--\n--\n--\n--\n--\n\n--\n--\n--')
 					else
 						self:y(34)
-						lua.Trace(song:GetDisplayMainTitle())
 						local cur_diff = GAMESTATE:GetCurrentSteps(PLAYER_1)
 						if not cur_diff then return end
 						local ret = ''

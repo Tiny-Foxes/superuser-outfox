@@ -6,9 +6,6 @@ local t = Def.ActorFrame {
 local plr = ...
 
 local playerstats = STATSMAN:GetCurStageStats():GetPlayerStageStats(plr)
-local notescores = {
-	--Taps = playerstats:GetTapNoteScores()
-}
 local grades = {
 	Grade_Tier01 = 'SSS',
 	Grade_Tier02 = 'SS+',
