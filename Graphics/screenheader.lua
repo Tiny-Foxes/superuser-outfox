@@ -9,14 +9,15 @@ return Def.ActorFrame {
 	end,
 	OnCommand = function(self)
 		self
-			:easeoutexpo(0.5)
+			:easeoutexpo(0.25)
 			:addy(40)
 	end,
 	OffCommand = function(self)
 		self
-			:easeinexpo(0.5)
+			:easeinexpo(0.25)
 			:addy(-40)
 	end,
+	-- its the fuckin song bullshit again
 	Def.Quad {
 		InitCommand = function(self)
 			self

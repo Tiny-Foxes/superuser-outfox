@@ -38,7 +38,7 @@ for pn = 1, 2 do
 			InitCommand = function(self)
 				self
 					:zoom(0.25)
-					:x(-((SCREEN_WIDTH - 120) * (0.5 - (pn - 1))))
+					:x(-((SCREEN_WIDTH - 80) * (0.5 - (pn - 1))))
 				if not GAMESTATE:IsSideJoined(PlayerNumber[pn]) then
 					self:visible(false)
 				end

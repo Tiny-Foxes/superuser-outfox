@@ -219,7 +219,7 @@ return Def.ActorFrame {
 					self
 						:horizalign('right')
 						:vertalign('bottom')
-						:addy(-10)
+						:addy(-15)
 						:maxwidth(SCREEN_WIDTH * 0.35)
 					local target = GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentCourse() or GAMESTATE:GetCurrentSong()
 					self:settext(target:GetDisplayMainTitle())
@@ -239,23 +239,39 @@ return Def.ActorFrame {
 						:zoom(1.5)
 						:horizalign('right')
 						:vertalign('bottom')
-						:addy(-10)
+						:addy(-20)
 						:maxwidth((SCREEN_WIDTH * 0.35) * 0.75)
 					local target = GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentCourse() or GAMESTATE:GetCurrentSong()
 					self:settext(target:GetDisplaySubTitle())
 				end,
 			},
 			Def.BitmapText {
-				Name = 'SongTitle',
+				Name = 'SongArtist',
 				Font = '_xide/20px',
 				InitCommand = function(self)
 					self
 						:horizalign('right')
-						:vertalign('top')
-						:addy(10)
+						:vertalign('bottom')
+						:addy(12)
 						:maxwidth(SCREEN_WIDTH * 0.75)
 					local target = GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentCourse() or GAMESTATE:GetCurrentSong()
 					self:settext(target:GetDisplayArtist())
+				end,
+				OffCommand = function(self)
+					self:sleep(1.25)
+				end,
+			},
+			Def.BitmapText {
+				Name = 'SongPack',
+				Font = '_xide/20px',
+				InitCommand = function(self)
+					self
+						:horizalign('right')
+						:vertalign('bottom')
+						:addy(40)
+						:maxwidth(SCREEN_WIDTH * 0.75)
+					local target = GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentCourse() or GAMESTATE:GetCurrentSong()
+					self:settext(target:GetGroupName())
 				end,
 				OffCommand = function(self)
 					self:sleep(1.25)

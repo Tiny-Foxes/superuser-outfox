@@ -9,5 +9,5 @@ return Def.ActorFrame {
 				:skewx(-0.5)
 				:shadowlength(2, 2)
 		end,
-	}
+	},
 }

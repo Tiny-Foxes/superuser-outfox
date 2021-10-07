@@ -304,6 +304,45 @@ return Def.ActorFrame {
 				end,
 			},
 			Def.BitmapText {
+				Name = 'StepHighScoreP1',
+				Font = 'Common Normal',
+				Text = '--',
+				InitCommand = function(self)
+					self
+						:x(-140)
+						:addy(-98)
+						:horizalign('left')
+						:maxwidth(80)
+						:diffuse(ColorLightTone(ThemeColor.P1))
+						:diffusebottomedge(ThemeColor.P1)
+						:visible(GAMESTATE:IsSideJoined(PLAYER_1))
+				end,
+				PlayerJoinedMessageCommand = function(self, param)
+					self:visible(GAMESTATE:IsSideJoined(PLAYER_1))
+				end,
+				CurrentStepsP1ChangedMessageCommand = function(self)
+					local song = GAMESTATE:GetCurrentSong()
+					local course = GAMESTATE:GetCurrentCourse()
+					if not song and not course then
+						self:settext('--')
+						return
+					end
+					local diff = GAMESTATE:GetCurrentSteps(PLAYER_1)
+					if diff then
+						local scorelist = PROFILEMAN:GetProfile(PLAYER_1):GetHighScoreList(song, diff)
+						--self:settext(diff:GetAuthorCredit())
+						local highscore = scorelist:GetHighScores()[1]
+						if highscore then
+							local perc = highscore:GetPercentDP() * 100
+							--print()
+							self:settext(string.format('%.2f', perc) .. '%')
+						else
+							self:settext('--')
+						end
+					end
+				end,
+			},
+			Def.BitmapText {
 				Name = 'StepNameP2',
 				Font = 'Common Normal',
 				Text = '--',
@@ -374,6 +413,45 @@ return Def.ActorFrame {
 					end
 					local diff = GAMESTATE:GetCurrentSteps(PLAYER_2)
 					if diff then self:settext(diff:GetAuthorCredit()) end
+				end,
+			},
+			Def.BitmapText {
+				Name = 'StepHighScoreP2',
+				Font = 'Common Normal',
+				Text = '--',
+				InitCommand = function(self)
+					self
+						:x(-40)
+						:addy(-98)
+						:horizalign('left')
+						:maxwidth(80)
+						:diffuse(ColorLightTone(ThemeColor.P2))
+						:diffusebottomedge(ThemeColor.P2)
+						:visible(GAMESTATE:IsSideJoined(PLAYER_2))
+				end,
+				PlayerJoinedMessageCommand = function(self, param)
+					self:visible(GAMESTATE:IsSideJoined(PLAYER_2))
+				end,
+				CurrentStepsP2ChangedMessageCommand = function(self)
+					local song = GAMESTATE:GetCurrentSong()
+					local course = GAMESTATE:GetCurrentCourse()
+					if not song and not course then
+						self:settext('--')
+						return
+					end
+					local diff = GAMESTATE:GetCurrentSteps(PLAYER_2)
+					if diff then
+						local scorelist = PROFILEMAN:GetProfile(PLAYER_2):GetHighScoreList(song, diff)
+						--self:settext(diff:GetAuthorCredit())
+						local highscore = scorelist:GetHighScores()[1]
+						if highscore then
+							local perc = highscore:GetPercentDP() * 100
+							--print()
+							self:settext(string.format('%.2f', perc) .. '%')
+						else
+							self:settext('--')
+						end
+					end
 				end,
 			},
 			Def.BitmapText {
