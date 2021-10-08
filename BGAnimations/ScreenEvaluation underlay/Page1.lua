@@ -1,4 +1,7 @@
 -- Orignal code by Team OutFox, used in Soundwaves theme
+-- Edited by Sudospective for Superuser theme
+local ThemeColor = LoadModule('Theme.Colors.lua')
+
 local t = Def.ActorFrame {}
 local p = ...
 local fade_out_speed = 0.2
@@ -39,18 +42,62 @@ local function GetPlScore(pl, scoretype)
 	end
 end
 
+-- Aaaaand the difficulties. ~Sudo
+local function GetPlrDiff(plr)
+	local diff = GAMESTATE:GetCurrentSteps(plr):GetDifficulty()
+	local cdiff = THEME:GetString("CustomDifficulty",ToEnumShortString(diff))
+	local meter = GAMESTATE:GetCurrentSteps(plr):GetMeter()
+	return cdiff..'  '..meter
+end
+
 local eval_part_offs = 0
 local score_parts_offs = string.find(p, "P1") and -100 or 100
+
+t[#t+1] = Def.BitmapText {
+	Font = 'Common Normal',
+	Text = GetPlrDiff(p),
+	InitCommand = function(self)
+		local diff = tostring(GAMESTATE:GetCurrentSteps(p):GetDifficulty())
+		local diff = diff:sub(diff:find('_') + 1, -1)
+		self
+			:skewafterzoomrot(true)
+			:skewx(0.25)
+			:horizalign('left')
+			:xy(-150, -80)
+			:maxwidth(260)
+			:diffuse(ColorLightTone(ThemeColor[diff]))
+			:diffusebottomedge(ThemeColor[diff])
+			:diffusealpha(0)
+	end,
+	OnCommand = function(self)
+		self
+			:sleep(0.6)
+			:queuecommand('Bob')
+			:linear(0.2)
+			:diffusealpha(1)
+	end,
+	OffCommand = function(self)
+		self
+			:linear(0.2)
+			:diffusealpha(0)
+	end,
+	BobCommand=function(self)
+		self
+			:bob()
+			:effectperiod(8)
+			:effectmagnitude(4, 0, 0)
+	end,
+}
 
 -- Step counts.
 t[#t+1] = Def.BitmapText {
     Font = "Common Normal",
     InitCommand=function(self)
-        self:skewx(0.25):zoom(1):y(-80):maxwidth(260):horizalign(center)
+        self:skewx(0.25):zoom(1):xy(150, -80):maxwidth(260):horizalign('right')
         self:diffuse(color('#FFFF80')):diffusebottomedge(color('#FF8000')):diffusealpha(0)
     end;
 	OnCommand=function(self)
-		self:sleep(0.6):queuecommand('Bob'):diffusealpha(1)
+		self:sleep(0.6):queuecommand('Bob'):linear(0.2):diffusealpha(1)
 	end,
     OffCommand=function(self)
         self:linear(0.2):diffusealpha(0)

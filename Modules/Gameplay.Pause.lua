@@ -124,7 +124,8 @@ for i,v in ipairs(Choices) do
 			Font="Common Normal",
 			Text=THEME:GetString("PauseMenu", v.Name),
 			InitCommand= function(self)
-				self:skewx(0.5)
+				self:skewx(0.5 + ((self:GetWidth() - (menu_text_width * 0.5)) * 0.0025))
+				self:maxwidth(menu_text_width * 0.5)
 				self:diffuse( ColorTable.White ):playcommand("LoseFocus")
 			end,
 			LoseFocusCommand= function(self) self:diffusealpha(0.5) end,

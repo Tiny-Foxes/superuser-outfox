@@ -91,11 +91,11 @@ return Def.ActorFrame {
 					:cropright(1)
 			end,
 		},
-		-- BPM
+		-- Song Info
 		Def.ActorFrame {
 			InitCommand = function(self)
 				self
-					:xy(480, -SCREEN_CENTER_Y + 100)
+					:xy(48, -SCREEN_CENTER_Y + 100)
 					:diffusealpha(0)
 					:addx(-24)
 			end,
@@ -113,10 +113,69 @@ return Def.ActorFrame {
 					:addx(-24)
 					:diffusealpha(0)
 			end,
+			Def.Banner {
+				InitCommand = function(self)
+					self
+						:xy(208 - 16, -220 + 84 + 68)
+						:scaletoclipped(418, 164)
+				end,
+				OnCommand = function(self)
+					local song = GAMESTATE:GetCurrentSong()
+					local course = GAMESTATE:GetCurrentCourse()
+					local wheel = SCREENMAN:GetTopScreen():GetMusicWheel()
+					if song then
+						if song:HasBanner() then
+							self:LoadFromSong(song)
+						else
+							self:LoadFromSongGroup(song:GetGroupName())
+						end
+					elseif course then
+						if course:HasBanner() then
+							self:LoadFromCourse(course)
+						end
+					elseif FILEMAN:DoesFileExist(SOMGMAN:GetSongGroupBannerPath(wheel:GetSelectedSection())) then
+						self:LoadFromSongGroup(wheel:GetSelectedSection())
+					else
+						self:LoadFromCachedBanner(THEME:GetPathG('Common', 'fallback banner'))
+					end
+				end,
+				CurrentSongChangedMessageCommand = function(self)
+					local song = GAMESTATE:GetCurrentSong()
+					local course = GAMESTATE:GetCurrentCourse()
+					local wheel = SCREENMAN:GetTopScreen():GetMusicWheel()
+					print(wheel:GetSelectedSection())
+					if song then
+						if song:HasBanner() then
+							self:LoadFromSong(song)
+						else
+							self:LoadFromSongGroup(song:GetGroupName())
+						end
+					elseif course then
+						if course:HasBanner() then
+							self:LoadFromCourse(course)
+						end
+					elseif wheel:GetSelectedSection() then
+						self:LoadFromSongGroup(wheel:GetSelectedSection())
+					else
+						self:LoadFromCachedBanner(THEME:GetPathG('Common', 'fallback banner'))
+					end
+				end,
+			},
+			Def.Quad {
+				InitCommand = function(self)
+					self
+						:xy(208 - 16, -220 + 84 + 68)
+						:SetSize(418, 164)
+						:diffuse(ThemeColor.Primary)
+						:diffusealpha(0.75)
+						:faderight(0.75)
+				end,
+			},
 			Def.BitmapText {
 				Font = 'Common Normal',
 				InitCommand = function(self)
 					self
+						:addy(-8)
 						:horizalign('left')
 				end,
 				OnCommand = function(self)
@@ -125,7 +184,8 @@ return Def.ActorFrame {
 					if song then
 						bpmstr = bpmstr .. math.floor(song:GetDisplayBpms()[2])
 					else
-						bpmstr = bpmstr .. '--'
+						--bpmstr = bpmstr .. '--'
+						bpmstr = ''
 					end
 					self:settext(bpmstr)
 				end,
@@ -135,7 +195,8 @@ return Def.ActorFrame {
 					if song then
 						bpmstr = bpmstr .. math.floor(song:GetDisplayBpms()[2])
 					else
-						bpmstr = bpmstr .. '--'
+						--bpmstr = bpmstr .. '--'
+						bpmstr = ''
 					end
 					self:settext(bpmstr)
 				end,
@@ -144,7 +205,7 @@ return Def.ActorFrame {
 				Font = 'Common Normal',
 				InitCommand = function(self)
 					self
-						:addy(-24)
+						:addy(-32)
 						:horizalign('left')
 				end,
 				OnCommand = function(self)
@@ -153,7 +214,8 @@ return Def.ActorFrame {
 					if song then
 						lenstr = lenstr .. math.floor(song:GetLastSecond() / 60)..':'..string.format('%02d',math.floor(song:GetLastSecond() % 60))
 					else
-						lenstr = lenstr .. '--'
+						--lenstr = lenstr .. '--'
+						lenstr = ''
 					end
 					self:settext(lenstr)
 				end,
@@ -163,7 +225,8 @@ return Def.ActorFrame {
 					if song then
 						lenstr = lenstr .. math.floor(song:GetLastSecond() / 60)..':'..string.format('%02d',math.floor(song:GetLastSecond() % 60))
 					else
-						lenstr = lenstr .. '-:--'
+						--lenstr = lenstr .. '-:--'
+						lenstr = ''
 					end
 					self:settext(lenstr)
 				end,
@@ -173,7 +236,7 @@ return Def.ActorFrame {
 				InitCommand = function(self)
 					self
 						:zoom(1.5)
-						:addy(-120)
+						:addy(-120 + 16)
 				end,
 				Def.BitmapText {
 					Name = 'Title',
@@ -183,11 +246,15 @@ return Def.ActorFrame {
 						self
 							:addy(-12)
 							:horizalign('left')
-							:maxwidth(180)
+							:maxwidth(240)
 					end,
 					CurrentSongChangedMessageCommand = function(self)
 						local song = GAMESTATE:GetCurrentSong()
-						if not song then self:settext('') return end
+						if not song then
+							local wheel = SCREENMAN:GetTopScreen():GetMusicWheel()
+							self:settext(wheel:GetSelectedSection())
+							return
+						end
 						self:settext(song:GetDisplayFullTitle())
 					end,
 				},
@@ -199,7 +266,7 @@ return Def.ActorFrame {
 						self
 							:addy(12)
 							:horizalign('left')
-							:maxwidth(180)
+							:maxwidth(240)
 					end,
 					CurrentSongChangedMessageCommand = function(self)
 						local song = GAMESTATE:GetCurrentSong()
@@ -209,9 +276,9 @@ return Def.ActorFrame {
 				},
 			},
 		},
-		-- Song Info
+		-- Chart Info
 		Def.ActorFrame {
-			Name = 'SongStats',
+			Name = 'ChartInfo',
 			InitCommand = function(self)
 				self
 					:x(152)
@@ -348,9 +415,9 @@ return Def.ActorFrame {
 				Text = '--',
 				InitCommand = function(self)
 					self
-						:x(-40)
+						:x(-40 + 72)
 						:addy(-138)
-						:horizalign('left')
+						:horizalign('right')
 						:maxwidth(80)
 						:diffuse(ColorLightTone(ThemeColor.P2))
 						:diffusebottomedge(ThemeColor.P2)
@@ -393,9 +460,9 @@ return Def.ActorFrame {
 				Text = '--',
 				InitCommand = function(self)
 					self
-						:x(-40)
+						:x(-40 + 72)
 						:addy(-118)
-						:horizalign('left')
+						:horizalign('right')
 						:maxwidth(80)
 						:diffuse(ColorLightTone(ThemeColor.P2))
 						:diffusebottomedge(ThemeColor.P2)
@@ -421,9 +488,9 @@ return Def.ActorFrame {
 				Text = '--',
 				InitCommand = function(self)
 					self
-						:x(-40)
+						:x(-40 + 72)
 						:addy(-98)
-						:horizalign('left')
+						:horizalign('right')
 						:maxwidth(80)
 						:diffuse(ColorLightTone(ThemeColor.P2))
 						:diffusebottomedge(ThemeColor.P2)
@@ -530,9 +597,9 @@ return Def.ActorFrame {
 				Font = 'Common Normal',
 				InitCommand = function(self)
 					self
-						:addx(-10)
+						:addx(-10 + 36)
 						:addy(34)
-						:horizalign('left')
+						:horizalign('right')
 						:maxwidth(36)
 						:visible(GAMESTATE:IsSideJoined(PLAYER_2))
 						:diffuse(ColorLightTone(PlayerColor(PLAYER_2)))

@@ -219,7 +219,7 @@ return Def.ActorFrame {
 					self
 						:horizalign('right')
 						:vertalign('bottom')
-						:addy(-15)
+						:addy(-18)
 						:maxwidth(SCREEN_WIDTH * 0.35)
 					local target = GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentCourse() or GAMESTATE:GetCurrentSong()
 					self:settext(target:GetDisplayMainTitle())
@@ -239,7 +239,7 @@ return Def.ActorFrame {
 						:zoom(1.5)
 						:horizalign('right')
 						:vertalign('bottom')
-						:addy(-20)
+						:addy(-18)
 						:maxwidth((SCREEN_WIDTH * 0.35) * 0.75)
 					local target = GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentCourse() or GAMESTATE:GetCurrentSong()
 					self:settext(target:GetDisplaySubTitle())
