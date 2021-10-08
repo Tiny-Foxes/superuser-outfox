@@ -97,6 +97,10 @@ t[#t + 1] = Def.ActorFrame {
 		self
 			:y(scy - 192)
 	end,
+	OnCommand = function(self)
+		-- discord support UwU
+		GAMESTATE:UpdateDiscordScreenInfo("In Title Menu","",1)
+	end,
 	-- Panel
 	Def.Quad {
 		InitCommand = function(self)

@@ -12,6 +12,7 @@ return Def.ActorFrame {
 			:xy(SCREEN_CENTER_X, SCREEN_CENTER_Y + 120)
 	end,
 	OnCommand = function(self)
+		-- discord support UwU
 		local player = GAMESTATE:GetMasterPlayerNumber()
 		GAMESTATE:UpdateDiscordProfile(GAMESTATE:GetPlayerDisplayName(player))
 		if GAMESTATE:IsCourseMode() then
