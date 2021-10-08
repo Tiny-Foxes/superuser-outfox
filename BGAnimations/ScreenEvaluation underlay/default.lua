@@ -220,14 +220,15 @@ return Def.ActorFrame {
 						:horizalign('right')
 						:vertalign('bottom')
 						:addy(-18)
-						:maxwidth(SCREEN_WIDTH * 0.35)
+						:maxwidth(SCREEN_WIDTH - 360)
 					local target = GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentCourse() or GAMESTATE:GetCurrentSong()
 					self:settext(target:GetDisplayMainTitle())
 				end,
 				OnCommand = function(self)
 					if self:GetParent():GetChild('SongTitleS'):GetWidth() > 0 then
 						self
-							:addx((self:GetParent():GetChild('SongTitleS'):GetWidth() + 10) * -1.5)
+							:maxwidth((SCREEN_WIDTH - 400) * (2/3))
+							:addx(-(self:GetParent():GetChild('SongTitleS'):GetZoomedWidth() + 10))
 					end
 				end,
 			},
@@ -240,7 +241,7 @@ return Def.ActorFrame {
 						:horizalign('right')
 						:vertalign('bottom')
 						:addy(-18)
-						:maxwidth((SCREEN_WIDTH * 0.35) * 0.75)
+						:maxwidth((SCREEN_WIDTH - 400) * (1/3) * 0.75)
 					local target = GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentCourse() or GAMESTATE:GetCurrentSong()
 					self:settext(target:GetDisplaySubTitle())
 				end,
@@ -253,7 +254,7 @@ return Def.ActorFrame {
 						:horizalign('right')
 						:vertalign('bottom')
 						:addy(12)
-						:maxwidth(SCREEN_WIDTH * 0.75)
+						:maxwidth(SCREEN_WIDTH - 360)
 					local target = GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentCourse() or GAMESTATE:GetCurrentSong()
 					self:settext(target:GetDisplayArtist())
 				end,
@@ -269,7 +270,7 @@ return Def.ActorFrame {
 						:horizalign('right')
 						:vertalign('bottom')
 						:addy(40)
-						:maxwidth(SCREEN_WIDTH * 0.75)
+						:maxwidth(SCREEN_WIDTH - 320)
 					local target = GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentCourse() or GAMESTATE:GetCurrentSong()
 					self:settext(target:GetGroupName())
 				end,
