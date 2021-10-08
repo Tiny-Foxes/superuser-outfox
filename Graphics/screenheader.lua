@@ -58,4 +58,23 @@ return Def.ActorFrame {
 		OffCommand = function(self)
 		end,
 	},
+
+	-- ScreenSelectMusic specific stuff
+	Def.BitmapText {
+		Font = 'Common Normal',
+		InitCommand = function(self)
+			self
+				:x(SCREEN_CENTER_X / 2)
+				:skewx(0.5)
+		end,
+		CurrentSongChangedMessageCommand = function(self)
+			if SCREENMAN:GetTopScreen() and SCREENMAN:GetTopScreen():GetName() == "ScreenSelectMusic" then
+				self:settext(string.sub(GAMESTATE:GetSortOrder(), 11))
+			else
+				self:settext('')
+			end
+		end,
+	},
+
+	-- TODO: Show what Song number we're on ~ -YOSEFU-
 }
