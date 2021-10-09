@@ -12,7 +12,7 @@ return Def.ActorFrame {
 			:xy(SCREEN_CENTER_X, SCREEN_CENTER_Y + 120)
 	end,
 	OnCommand = function(self)
-		-- discord support UwU
+		-- discord support UwU -y0sefu
 		local player = GAMESTATE:GetMasterPlayerNumber()
 		GAMESTATE:UpdateDiscordProfile(GAMESTATE:GetPlayerDisplayName(player))
 		if GAMESTATE:IsCourseMode() then
@@ -106,7 +106,7 @@ return Def.ActorFrame {
 		Def.ActorFrame {
 			InitCommand = function(self)
 				self
-					:xy(48, -SCREEN_CENTER_Y + 100)
+					:xy(48, -SCREEN_CENTER_Y + 104)
 					:diffusealpha(0)
 					:addx(-24)
 					:addy(12)
@@ -174,53 +174,6 @@ return Def.ActorFrame {
 					end
 				end,
 			},
-			Def.Sprite {
-				InitCommand = function(self)
-					if IsWidescreen() then
-						self
-							:visible(true)
-							:addx(520)
-							:addy(-82)
-							:scaletoclipped(205, 205)
-					else
-						self:visible(false)
-					end
-				end,
-				OnCommand = function(self)
-					local song = GAMESTATE:GetCurrentSong()
-					local course = GAMESTATE:GetCurrentCourse()
-					local wheel = SCREENMAN:GetTopScreen():GetMusicWheel()
-					if song then
-						local jacketpath = ''
-
-						if song:HasJacket() then
-							jacketpath = song:GetJacketPath()
-						elseif song:HasBackground() then
-							jacketpath = song:GetBackgroundPath()
-						else
-							jacketpath = THEME:GetPathG('Common', 'fallback banner')
-						end
-
-						self:Load(jacketpath)
-					end
-				end,
-				CurrentSongChangedMessageCommand = function(self)
-					local song = GAMESTATE:GetCurrentSong()
-					local course = GAMESTATE:GetCurrentCourse()
-					local wheel = SCREENMAN:GetTopScreen():GetMusicWheel()
-					if song then
-						if song:HasJacket() then
-							self:Load(song:GetJacketPath())
-						elseif song:HasBackground() then
-							self:Load(song:GetBackgroundPath())
-						else
-							self:Load(THEME:GetPathG('Common', 'fallback banner'))
-						end
-					else
-						self:Load(THEME:GetPathG('Common', 'fallback banner'))
-					end
-				end,
-			},
 			Def.Quad {
 				InitCommand = function(self)
 					self
@@ -231,23 +184,26 @@ return Def.ActorFrame {
 						:faderight(0.75)
 						:addy(6)
 				end,
+				-- Hiding this is a good idea, but I'm using it for the select button action instead. ~Sudo
 				CurrentSongChangedMessageCommand = function(self)
 					local song = GAMESTATE:GetCurrentSong()
 					if not song then
-						self:visible(false)
+						self:diffusealpha(0.5)
+						--self:visible(false)
 					else
-						self:visible(true)
+						self:diffusealpha(0.75)
+						--self:visible(true)
 					end
 				end,
 			},
-			Def.BitmapText{
+			Def.BitmapText {
 				Name = 'Group',
 				Font = 'Common Normal',
 				InitCommand = function(self)
 					self
 						:zoom(1.5)
 						:addx(-15)
-						:addy(-172)
+						:addy(-168)
 						:horizalign('left')
 						:maxwidth(278)
 				end,
@@ -257,6 +213,8 @@ return Def.ActorFrame {
 
 					if song then
 						self:settext(song:GetGroupName())
+					elseif wheel:GetSelectedSection() then
+						self:settext(wheel:GetSelectedSection())
 					else
 						self:settext('')
 					end
@@ -273,10 +231,10 @@ return Def.ActorFrame {
 					local bpmstr = 'BPM: '
 					local song = GAMESTATE:GetCurrentSong()
 					if song then
-						-- check if the bpm is hidden
+						-- check if the bpm is hidden -y0sefu
 						if song:IsDisplayBpmRandom() then
-							self:settext('BPM: ? ? ?')
-							-- return early
+							self:settext('BPM: ???') -- The spaces seemed a bit unnecessary to me. ~Sudo
+							-- return early -y0sefu
 							return
 						end
 
@@ -298,10 +256,10 @@ return Def.ActorFrame {
 					local bpmstr = 'BPM: '
 					local song = GAMESTATE:GetCurrentSong()
 					if song then
-						-- check if the bpm is hidden
+						-- check if the bpm is hidden -y0sefu
 						if song:IsDisplayBpmRandom() then
-							self:settext('BPM: ? ? ?')
-							-- return early
+							self:settext('BPM: ???') -- The spaces seemed a bit unnecessary to me. ~Sudo
+							-- return early -y0sefu
 							return
 						end
 
@@ -394,6 +352,66 @@ return Def.ActorFrame {
 						self:settext(song:GetDisplayArtist())
 					end,
 				},
+			},
+			-- Let's move this down here uwu ~Sudo
+			Def.Sprite {
+				InitCommand = function(self)
+					-- Now that we moved and squished it, we can support fullscreen ^-^ ~Sudo
+					self
+						:visible(true)
+						:addx(360)
+						:addy(-20)
+						:scaletoclipped(48, 48)
+				end,
+				OnCommand = function(self)
+					local song = GAMESTATE:GetCurrentSong()
+					-- I kinda don't want the jacket to show up if there isn't one.
+					--[[
+					if song then
+						local jacketpath = ''
+
+						if song:HasJacket() then
+							jacketpath = song:GetJacketPath()
+						elseif song:HasBackground() then
+							jacketpath = song:GetBackgroundPath()
+						else
+							jacketpath = THEME:GetPathG('Common', 'fallback jacket')
+						end
+						self:Load(jacketpath)
+					end
+					--]]
+					if song and song:HasJacket() then
+						self
+							:visible(true)
+							:Load(song:GetJacketPath())
+					else
+						self:visible(false)
+					end
+				end,
+				CurrentSongChangedMessageCommand = function(self)
+					local song = GAMESTATE:GetCurrentSong()
+					--[[
+					if song then
+						local jacketpath = ''
+
+						if song:HasJacket() then
+							jacketpath = song:GetJacketPath()
+						elseif song:HasBackground() then
+							jacketpath = song:GetBackgroundPath()
+						else
+							jacketpath = THEME:GetPathG('Common', 'fallback jacket')
+						end
+						self:Load(jacketpath)
+					end
+					--]]
+					if song and song:HasJacket() then
+						self
+							:visible(true)
+							:Load(song:GetJacketPath())
+					else
+						self:visible(false)
+					end
+				end,
 			},
 		},
 		-- Chart Info

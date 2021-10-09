@@ -293,4 +293,8 @@ local t = Def.ActorFrame {
 };
 
 
-return t;
+return t .. {
+	InitCommand = function(self)
+		GAMESTATE:UpdateDiscordScreenInfo('Selecting Profile', '', 1)
+	end
+};
