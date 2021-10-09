@@ -124,9 +124,9 @@ return Def.ActorFrame {
 						self:GetChild('Jacket'),
 					}
 					if event.button == 'Down' then
-						if event.type == 'InputEventType_Repeat' then
+						if event.type == 'InputEventType_FirstPress' then
 							for _, v in ipairs(children) do
-								v:linear(0.1):diffusealpha(0)
+								v:stoptweening():sleep(0.5):linear(0.1):diffusealpha(0)
 							end
 						elseif event.type == 'InputEventType_Release' then
 							for i, v in ipairs(children) do
@@ -142,13 +142,13 @@ return Def.ActorFrame {
 							end
 						end
 					elseif event.button == 'Up' then
-						if event.type == 'InputEventType_Repeat' then
+						if event.type == 'InputEventType_FirstPress' then
 							for _, v in ipairs(children) do
 								if v:GetName() ~= 'Jacket' then
-									v:linear(0.1):diffusealpha(0)
+									v:stoptweening():sleep(0.5):linear(0.1):diffusealpha(0)
 								end
 							end
-							self:GetChild('Jacket'):easeoutexpo(0.2):zoom(128 / 48)
+							self:GetChild('Jacket'):stoptweening():sleep(0.5):easeoutexpo(0.2):zoom(128 / 48)
 						elseif event.type == 'InputEventType_Release' then
 							for _, v in ipairs(children) do
 								if v:GetName() == 'BannerFade' then
