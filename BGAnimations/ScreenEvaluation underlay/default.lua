@@ -1,6 +1,9 @@
 local ThemeColor = LoadModule('Theme.Colors.lua')
 
 return Def.ActorFrame {
+	-- TODO: Fill this with Discord RCP including scores. ~Sudo
+	OnCommand = function(self)
+	end,
 	Def.ActorFrame {
 		Name = 'P1EvalFrame',
 		InitCommand = function(self)

@@ -721,6 +721,7 @@ return Def.ActorFrame {
 					end
 				end,
 			},
+			-- TODO: Stop doing this bullshit. ~Sudo
 			Def.BitmapText {
 				Name = 'StepLabels',
 				Font = 'Common Normal',
