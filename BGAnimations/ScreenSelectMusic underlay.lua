@@ -104,6 +104,7 @@ return Def.ActorFrame {
 		},
 		-- Song Info
 		Def.ActorFrame {
+			Name = 'BannerFrame',
 			InitCommand = function(self)
 				self
 					:xy(48, -SCREEN_CENTER_Y + 104)
@@ -112,6 +113,36 @@ return Def.ActorFrame {
 					:addy(12)
 			end,
 			OnCommand = function(self)
+				-- You may now admire your glorious artwork, Chegg. You better use my theme now. ~Sudo
+				local InputHandler = function(event)
+					if event.button ~= 'Up' and event.button ~= 'Down' then return end
+					local children = {
+						self:GetChild('BannerFade'),
+						self:GetChild('BPM'),
+						self:GetChild('Length'),
+						self:GetChild('SongInfo'),
+						self:GetChild('Jacket'),
+					}
+					if event.type == 'InputEventType_Repeat' then
+						for _, v in ipairs(children) do
+							v:linear(0.2):diffusealpha(0)
+						end
+					elseif event.type == 'InputEventType_Release' then
+						for i, v in ipairs(children) do
+							if v:GetName() == 'BannerFade' then
+								if GAMESTATE:GetCurrentSong() then
+									v:stoptweening():linear(0.2):diffusealpha(0.75)
+								else
+									v:stoptweening():linear(0.2):diffusealpha(0.5)
+								end
+							else
+								v:stoptweening():linear(0.2):diffusealpha(1)
+							end
+						end
+					end
+					return InputHander
+				end
+				SCREENMAN:GetTopScreen():AddInputCallback(InputHandler)
 				self
 					:sleep(0.25)
 					:easeoutexpo(0.5)
@@ -119,6 +150,7 @@ return Def.ActorFrame {
 					:diffusealpha(1)
 			end,
 			OffCommand = function(self)
+				--SCREENMAN:GetTopScreen():RemoveInputCallback(InputHandler)
 				self
 					:sleep(0.25)
 					:easeinexpo(0.5)
@@ -126,6 +158,7 @@ return Def.ActorFrame {
 					:diffusealpha(0)
 			end,
 			Def.Banner {
+				Name = 'Banner',
 				InitCommand = function(self)
 					self
 						:xy(208 - 16, -220 + 84 + 68)
@@ -175,6 +208,7 @@ return Def.ActorFrame {
 				end,
 			},
 			Def.Quad {
+				Name = 'BannerFade',
 				InitCommand = function(self)
 					self
 						:xy(208 - 16, -220 + 84 + 68)
@@ -221,6 +255,7 @@ return Def.ActorFrame {
 				end,
 			},
 			Def.BitmapText {
+				Name = 'BPM',
 				Font = 'Common Normal',
 				InitCommand = function(self)
 					self
@@ -279,6 +314,7 @@ return Def.ActorFrame {
 				end,
 			},
 			Def.BitmapText {
+				Name = 'Length',
 				Font = 'Common Normal',
 				InitCommand = function(self)
 					self
@@ -355,8 +391,9 @@ return Def.ActorFrame {
 			},
 			-- Let's move this down here uwu ~Sudo
 			Def.Sprite {
+				Name = 'Jacket',
 				InitCommand = function(self)
-					-- Now that we moved and squished it, we can support fullscreen ^-^ ~Sudo
+					-- Now that we moved and squished it, we can support non-widescreen ^-^ ~Sudo
 					self
 						:visible(true)
 						:addx(360)
@@ -365,7 +402,7 @@ return Def.ActorFrame {
 				end,
 				OnCommand = function(self)
 					local song = GAMESTATE:GetCurrentSong()
-					-- I kinda don't want the jacket to show up if there isn't one.
+					-- I kinda don't want the jacket to show up if there isn't one. ~Sudo
 					--[[
 					if song then
 						local jacketpath = ''
@@ -421,7 +458,6 @@ return Def.ActorFrame {
 				self
 					:x(152)
 					:y(10)
-					--:y(-120)
 					:addx(-SCREEN_CENTER_X + ((SCREEN_WIDTH / SCREEN_HEIGHT) - (640 / 480)) * 100)
 			end,
 			OnCommand = function(self)
