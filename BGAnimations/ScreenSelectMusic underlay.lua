@@ -123,21 +123,45 @@ return Def.ActorFrame {
 						self:GetChild('SongInfo'),
 						self:GetChild('Jacket'),
 					}
-					if event.type == 'InputEventType_Repeat' then
-						for _, v in ipairs(children) do
-							v:linear(0.2):diffusealpha(0)
-						end
-					elseif event.type == 'InputEventType_Release' then
-						for i, v in ipairs(children) do
-							if v:GetName() == 'BannerFade' then
-								if GAMESTATE:GetCurrentSong() then
-									v:stoptweening():linear(0.2):diffusealpha(0.75)
-								else
-									v:stoptweening():linear(0.2):diffusealpha(0.5)
-								end
-							else
-								v:stoptweening():linear(0.2):diffusealpha(1)
+					if event.button == 'Down' then
+						if event.type == 'InputEventType_Repeat' then
+							for _, v in ipairs(children) do
+								v:linear(0.1):diffusealpha(0)
 							end
+						elseif event.type == 'InputEventType_Release' then
+							for i, v in ipairs(children) do
+								if v:GetName() == 'BannerFade' then
+									if GAMESTATE:GetCurrentSong() then
+										v:stoptweening():linear(0.1):diffusealpha(0.75)
+									else
+										v:stoptweening():linear(0.1):diffusealpha(0.5)
+									end
+								else
+									v:stoptweening():linear(0.1):diffusealpha(1)
+								end
+							end
+						end
+					elseif event.button == 'Up' then
+						if event.type == 'InputEventType_Repeat' then
+							for _, v in ipairs(children) do
+								if v:GetName() ~= 'Jacket' then
+									v:linear(0.1):diffusealpha(0)
+								end
+							end
+							self:GetChild('Jacket'):easeoutexpo(0.2):zoom(128 / 48)
+						elseif event.type == 'InputEventType_Release' then
+							for _, v in ipairs(children) do
+								if v:GetName() == 'BannerFade' then
+									if GAMESTATE:GetCurrentSong() then
+										v:stoptweening():linear(0.1):diffusealpha(0.75)
+									else
+										v:stoptweening():linear(0.1):diffusealpha(0.5)
+									end
+								elseif v:GetName() ~= 'Jacket' then
+									v:stoptweening():linear(0.1):diffusealpha(1)
+								end
+							end
+							self:GetChild('Jacket'):stoptweening():easeoutexpo(0.2):zoom(1)
 						end
 					end
 					return InputHander
@@ -396,8 +420,10 @@ return Def.ActorFrame {
 					-- Now that we moved and squished it, we can support non-widescreen ^-^ ~Sudo
 					self
 						:visible(true)
-						:addx(360)
-						:addy(-20)
+						:horizalign('right')
+						:vertalign('bottom')
+						:addx(384)
+						:addy(4)
 						:scaletoclipped(48, 48)
 				end,
 				OnCommand = function(self)
