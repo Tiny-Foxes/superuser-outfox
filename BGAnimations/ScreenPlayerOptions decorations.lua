@@ -45,6 +45,14 @@ t[#t+1] = Def.ActorFrame {
 			InitCommand = function(self)
 				if not selection then return end
 				local bpmtext
+
+				-- check if the song has hidden bpm
+				if song:IsDisplayBpmRandom() then
+					self:settext('? ? ?')
+					-- return early
+					return
+				end
+
 				if bpm2 and bpm1 ~= bpm2 then
 					bpmtext = math.floor(bpm1)..' - '..math.floor(bpm2)
 				else
@@ -96,6 +104,22 @@ t[#t+1] = Def.ActorFrame {
 				else
 					bpmtext = math.floor(bpm1)
 				end
+
+
+				-- oh no the stepartist hid the display bpm D:
+				if song:IsDisplayBpmRandom() then
+					if poptions:XMod() then
+						bpmtext = poptions:XMod()
+					elseif poptions:CMod() then
+						bpmtext = poptions:CMod()
+					elseif poptions:MMod() then
+						bpmtext = poptions:MMod()
+					elseif poptions:AMod() then
+						bpmtext = poptions:AMod()
+					end
+				end
+
+
 				self:settext(bpmtext)
 			end,
 			SpeedChoiceChangedMessageCommand = function(self, param)
@@ -123,6 +147,18 @@ t[#t+1] = Def.ActorFrame {
 				else
 					bpmtext = math.floor(bpm1)
 				end
+
+
+				-- oh no the stepartist hid the display bpm D:
+				if song:IsDisplayBpmRandom() then
+					if param.mode == 'x' then
+						bpmtext = param.speed / 100
+					else
+						bpmtext = param.speed
+					end
+				end
+
+
 				self:settext(bpmtext)
 			end,
 		},
@@ -168,6 +204,22 @@ t[#t+1] = Def.ActorFrame {
 				else
 					bpmtext = math.floor(bpm1)
 				end
+
+
+				-- oh no the stepartist hid the display bpm D:
+				if song:IsDisplayBpmRandom() then
+					if poptions:XMod() then
+						bpmtext = poptions:XMod()
+					elseif poptions:CMod() then
+						bpmtext = poptions:CMod()
+					elseif poptions:MMod() then
+						bpmtext = poptions:MMod()
+					elseif poptions:AMod() then
+						bpmtext = poptions:AMod()
+					end
+				end
+
+
 				self:settext(bpmtext)
 			end,
 			SpeedChoiceChangedMessageCommand = function(self, param)
@@ -195,6 +247,18 @@ t[#t+1] = Def.ActorFrame {
 				else
 					bpmtext = math.floor(bpm1)
 				end
+
+
+				-- oh no the stepartist hid the display bpm D:
+				if song:IsDisplayBpmRandom() then
+					if param.mode == 'x' then
+						bpmtext = param.speed / 100
+					else
+						bpmtext = param.speed
+					end
+				end
+
+
 				self:settext(bpmtext)
 			end,
 		},

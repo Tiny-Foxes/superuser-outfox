@@ -11,6 +11,17 @@ return Def.ActorFrame {
 		self
 			:xy(SCREEN_CENTER_X, SCREEN_CENTER_Y + 120)
 	end,
+	OnCommand = function(self)
+		-- discord support UwU
+		local player = GAMESTATE:GetMasterPlayerNumber()
+		GAMESTATE:UpdateDiscordProfile(GAMESTATE:GetPlayerDisplayName(player))
+		if GAMESTATE:IsCourseMode() then
+			GAMESTATE:UpdateDiscordScreenInfo("Selecting Course","",1)
+		else
+			local StageIndex = GAMESTATE:GetCurrentStageIndex()
+			GAMESTATE:UpdateDiscordScreenInfo("Selecting a Song (Stage ".. StageIndex+1 .. ")	","",1)
+		end
+	end,
 	Def.Quad {
 		InitCommand = function(self)
 			self
@@ -98,6 +109,7 @@ return Def.ActorFrame {
 					:xy(48, -SCREEN_CENTER_Y + 100)
 					:diffusealpha(0)
 					:addx(-24)
+					:addy(12)
 			end,
 			OnCommand = function(self)
 				self
@@ -118,6 +130,7 @@ return Def.ActorFrame {
 					self
 						:xy(208 - 16, -220 + 84 + 68)
 						:scaletoclipped(418, 164)
+						:addy(6)
 				end,
 				OnCommand = function(self)
 					local song = GAMESTATE:GetCurrentSong()
@@ -161,6 +174,53 @@ return Def.ActorFrame {
 					end
 				end,
 			},
+			Def.Sprite {
+				InitCommand = function(self)
+					if IsWidescreen() then
+						self
+							:visible(true)
+							:addx(520)
+							:addy(-82)
+							:scaletoclipped(205, 205)
+					else
+						self:visible(false)
+					end
+				end,
+				OnCommand = function(self)
+					local song = GAMESTATE:GetCurrentSong()
+					local course = GAMESTATE:GetCurrentCourse()
+					local wheel = SCREENMAN:GetTopScreen():GetMusicWheel()
+					if song then
+						local jacketpath = ''
+
+						if song:HasJacket() then
+							jacketpath = song:GetJacketPath()
+						elseif song:HasBackground() then
+							jacketpath = song:GetBackgroundPath()
+						else
+							jacketpath = THEME:GetPathG('Common', 'fallback banner')
+						end
+
+						self:Load(jacketpath)
+					end
+				end,
+				CurrentSongChangedMessageCommand = function(self)
+					local song = GAMESTATE:GetCurrentSong()
+					local course = GAMESTATE:GetCurrentCourse()
+					local wheel = SCREENMAN:GetTopScreen():GetMusicWheel()
+					if song then
+						if song:HasJacket() then
+							self:Load(song:GetJacketPath())
+						elseif song:HasBackground() then
+							self:Load(song:GetBackgroundPath())
+						else
+							self:Load(THEME:GetPathG('Common', 'fallback banner'))
+						end
+					else
+						self:Load(THEME:GetPathG('Common', 'fallback banner'))
+					end
+				end,
+			},
 			Def.Quad {
 				InitCommand = function(self)
 					self
@@ -169,6 +229,37 @@ return Def.ActorFrame {
 						:diffuse(ThemeColor.Primary)
 						:diffusealpha(0.75)
 						:faderight(0.75)
+						:addy(6)
+				end,
+				CurrentSongChangedMessageCommand = function(self)
+					local song = GAMESTATE:GetCurrentSong()
+					if not song then
+						self:visible(false)
+					else
+						self:visible(true)
+					end
+				end,
+			},
+			Def.BitmapText{
+				Name = 'Group',
+				Font = 'Common Normal',
+				InitCommand = function(self)
+					self
+						:zoom(1.5)
+						:addx(-15)
+						:addy(-172)
+						:horizalign('left')
+						:maxwidth(278)
+				end,
+				CurrentSongChangedMessageCommand = function(self)
+					local song = GAMESTATE:GetCurrentSong()
+					local wheel = SCREENMAN:GetTopScreen():GetMusicWheel()
+
+					if song then
+						self:settext(song:GetGroupName())
+					else
+						self:settext('')
+					end
 				end,
 			},
 			Def.BitmapText {
@@ -182,7 +273,21 @@ return Def.ActorFrame {
 					local bpmstr = 'BPM: '
 					local song = GAMESTATE:GetCurrentSong()
 					if song then
-						bpmstr = bpmstr .. math.floor(song:GetDisplayBpms()[2])
+						-- check if the bpm is hidden
+						if song:IsDisplayBpmRandom() then
+							self:settext('BPM: ? ? ?')
+							-- return early
+							return
+						end
+
+						local minBPM = math.floor(song:GetDisplayBpms()[1])
+						local maxBPM = math.floor(song:GetDisplayBpms()[2])
+
+						if minBPM == maxBPM then
+							bpmstr = bpmstr .. math.floor(song:GetDisplayBpms()[2])
+						else
+							bpmstr = bpmstr .. minBPM .. ' - ' .. maxBPM
+						end
 					else
 						--bpmstr = bpmstr .. '--'
 						bpmstr = ''
@@ -193,7 +298,21 @@ return Def.ActorFrame {
 					local bpmstr = 'BPM: '
 					local song = GAMESTATE:GetCurrentSong()
 					if song then
-						bpmstr = bpmstr .. math.floor(song:GetDisplayBpms()[2])
+						-- check if the bpm is hidden
+						if song:IsDisplayBpmRandom() then
+							self:settext('BPM: ? ? ?')
+							-- return early
+							return
+						end
+
+						local minBPM = math.floor(song:GetDisplayBpms()[1])
+						local maxBPM = math.floor(song:GetDisplayBpms()[2])
+
+						if minBPM == maxBPM then
+							bpmstr = bpmstr .. math.floor(song:GetDisplayBpms()[2])
+						else
+							bpmstr = bpmstr .. minBPM .. ' - ' .. maxBPM
+						end
 					else
 						--bpmstr = bpmstr .. '--'
 						bpmstr = ''
@@ -237,6 +356,7 @@ return Def.ActorFrame {
 					self
 						:zoom(1.5)
 						:addy(-120 + 16)
+						:addy(6)
 				end,
 				Def.BitmapText {
 					Name = 'Title',
@@ -251,8 +371,8 @@ return Def.ActorFrame {
 					CurrentSongChangedMessageCommand = function(self)
 						local song = GAMESTATE:GetCurrentSong()
 						if not song then
-							local wheel = SCREENMAN:GetTopScreen():GetMusicWheel()
-							self:settext(wheel:GetSelectedSection())
+							-- local wheel = SCREENMAN:GetTopScreen():GetMusicWheel()
+							self:settext('')
 							return
 						end
 						self:settext(song:GetDisplayFullTitle())
