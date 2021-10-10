@@ -1,6 +1,7 @@
 local gc = Var("GameCommand");
 local item_width = 260;
 local item_height = 48;
+local splash = false;
 
 return Def.ActorFrame {
 	InitCommand = function(self)
@@ -23,6 +24,10 @@ return Def.ActorFrame {
 			:diffusealpha(0)
 	end,
 	Def.ActorFrame {
+		InitCommand = function(self)
+			self:visible(true)
+			if splash then self:visible(false) end
+		end,
 		GainFocusCommand = function(self)
 			self
 				:stoptweening()
