@@ -79,7 +79,6 @@ return Def.ActorFrame {
 							ThemeColor.Gray,
 						}
 					}
-					print(colors[c])
 					local a = LoadModule('Config.Load.lua')('ScreenFilter', PROFILEMAN:GetProfileDir(0)..'/OutFoxPrefs.ini')
 					if a then
 						self:diffuse(colors[c][1])
