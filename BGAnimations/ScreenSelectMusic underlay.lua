@@ -19,7 +19,7 @@ return Def.ActorFrame {
 			GAMESTATE:UpdateDiscordScreenInfo("Selecting Course","",1)
 		else
 			local StageIndex = GAMESTATE:GetCurrentStageIndex()
-			GAMESTATE:UpdateDiscordScreenInfo("Selecting a Song (Stage ".. StageIndex+1 .. ")	","",1)
+			GAMESTATE:UpdateDiscordScreenInfo("Selecting a Song (Stage ".. StageIndex + 1 .. ")	","",1)
 		end
 	end,
 	Def.Quad {
@@ -242,7 +242,7 @@ return Def.ActorFrame {
 						:faderight(0.75)
 						:addy(6)
 				end,
-				-- Hiding this is a good idea, but I'm using it for the select button action instead. ~Sudo
+				-- Hiding this is a good idea, but I'm using it for the immervise banner action instead. ~Sudo
 				CurrentSongChangedMessageCommand = function(self)
 					local song = GAMESTATE:GetCurrentSong()
 					if not song then

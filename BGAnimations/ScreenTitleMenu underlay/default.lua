@@ -1,7 +1,12 @@
 collectgarbage()
 
+su()
+
+local SuperActor = LoadModule('Konko.SuperActor.lua')
+
 local scx, scy = SCREEN_CENTER_X, SCREEN_CENTER_Y
 local sw, sh = SCREEN_WIDTH, SCREEN_HEIGHT
+
 local scale = sh / 480
 local splash = false
 
@@ -46,11 +51,45 @@ local function aftsprite(aft, sprite)
 	sprite:SetTexture(aft:GetTexture())
 end
 
-local t = Def.ActorFrame {
+-- Now she's *really* a Superuser.
+local t = Def.KonkoAF {
 	InitCommand = function(self)
 		self:Center()
 	end,
 }
+
+local MascotFrame = SuperActor.new('ActorFrame')
+	:SetCommand('Init', function(self)
+		self:Center():diffusealpha(0)
+	end)
+	:SetCommand('On', function(self)
+		self:linear(0.5):diffusealpha(1)
+	end)
+	:SetCommand('Off', function(self)
+		self:linear(0.5):diffusealpha(0)
+	end)
+
+local MascotSprite = SuperActor.new('Sprite')
+	:SetName('subo')
+	:SetAttribute('Texture', THEME:GetPathG('ScreenTitleMenu', 'mascot'))
+	:SetCommand('Init', function(self)
+		self
+			:zoom(1.2)
+			:xy(-180, 320)
+			:bob()
+			:effectmagnitude(0, 4, 0)
+			:effectperiod(4)
+			:visible(splash or LoadModule("Config.Load.lua")("ShowMascotCharacter","Save/OutFoxPrefs.ini"))
+	end)
+	:SetCommand('On', function(self)
+		self:easeoutexpo(0.5):addx(20)
+	end)
+	:SetCommand('Off', function(self)
+		self:easeinexpo(0.5):addx(-20)
+	end)
+
+MascotFrame:AddChild(MascotSprite)
+
 
 -- Mascot
 local mascot = Def.ActorFrame {
@@ -95,8 +134,7 @@ local mascot = Def.ActorFrame {
 -- UI
 t[#t + 1] = Def.ActorFrame {
 	InitCommand = function(self)
-		self
-			:y(scy - 192)
+		self:y(scy - 192)
 	end,
 	OnCommand = function(self)
 		-- discord support UwU
@@ -371,7 +409,8 @@ return Def.ActorFrame {
 					:zoom(1)
 			end,
 		},
-		mascot,
+		--mascot,
+		MascotFrame,
 	},
 	Def.ActorFrameTexture {
 		Name = 'TitleAFTR',

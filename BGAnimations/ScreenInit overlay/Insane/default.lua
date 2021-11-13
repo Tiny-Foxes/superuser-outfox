@@ -1,5 +1,9 @@
 collectgarbage()
 
+su()
+
+local SuperActor = LoadModule('Konko.SuperActor.lua')
+
 local function aft(self)
 	self
 		:SetWidth(SCREEN_WIDTH)
@@ -27,7 +31,7 @@ function aftsprite(aft, sprite)
 	sprite:SetTexture(aft:GetTexture())
 end
 
-local t = Def.ActorFrame {
+local t = Def.KonkoAF {
 	Def.ActorFrameTexture {
 		Name = 'InitAFT',
 		InitCommand = aft,
@@ -43,7 +47,7 @@ local t = Def.ActorFrame {
 					:diffusealpha(0)
 			end,
 		},
-		LoadModule('Konko.Core.lua'),
+		SuperActor.GetTree()
 	},
 	Def.Sprite {
 		Name = 'InitShowActors',
@@ -78,15 +82,14 @@ t[#t + 1] = Def.ActorFrame {
 
 
 ---------------- Animations Here ----------------
-sudo()
 
 OFFSET = 0.15
-BPM = 146
+local BPM = 146
 
 local InsaneQuads = {}
 
 for i = 1, 16 do
-	InsaneQuads[i] = Node.new('Quad')
+	InsaneQuads[i] = SuperActor.new('Quad')
 	InsaneQuads[i]
 		:SetReady(function(self)
 			local length = math.random(8, 32)
@@ -102,12 +105,12 @@ for i = 1, 16 do
 				:AddTween {start + 4, 0, Tweens.instant, 0, math.random(120, SW - 120), 'x'}
 				:AddTween {start + 4, 0, Tweens.instant, 0, math.random(120, SH - 120), 'y'}
 		end
-	InsaneQuads[i]:AddToNodeTree()
+	InsaneQuads[i]:AddToTree()
 end
 
 function ready()
 	local InitSprite = SCREENMAN:GetTopScreen():GetChild('Overlay'):GetChild('InitAFT'):GetChild('InitSprite')
-	Node.tween
+	SuperActor.tween
 		{InitSprite, 8, 6, Tweens.outquad, 0, 0.85, 'diffusealpha'}
 		{InitSprite, 12, 4, Tweens.inoutquad, 0.85, 0, 'diffusealpha'}
 end

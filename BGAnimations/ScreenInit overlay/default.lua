@@ -1,5 +1,6 @@
 local Intro = {
-	'Sudospective'
+	'Sudospective',
+	--'Insane',
 }
 
 return Def.ActorFrame {

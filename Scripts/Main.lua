@@ -1,3 +1,5 @@
+LoadModule('Konko.Core.lua')
+
 function OptionNameString(str)
 	return THEME:GetString('OptionNames',str)
 end
