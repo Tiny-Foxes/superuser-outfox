@@ -91,11 +91,9 @@ return Def.ActorFrame {
 					:y(plry)
 			end
 		end,
-		--[[
 		CurrentSongChangedMessageCommand = function(self)
-			self:queuecommand('CheckModfile')
+			--self:playcommand('CheckModfile')
 		end,
-		--]]
 		CheckModfileCommand = function(self)
 			if self:GetChild('Modfile') then
 				self:GetChild('Modfile'):SetUpdateFunction(function() end)

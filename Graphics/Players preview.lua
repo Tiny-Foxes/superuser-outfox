@@ -145,7 +145,7 @@ for i, v in ipairs(GAMESTATE:GetEnabledPlayers()) do
 					:SetFakeParent(plr)
 					:addx(-SCREEN_CENTER_X * 480 / SCREEN_HEIGHT)
 					:addy(-SCREEN_CENTER_Y * 480 / SCREEN_HEIGHT)
-					:vanishpoint(SCREEN_CENTER_X - self:GetX(), SCREEN_CENTER_Y - self:GetY())
+					:vanishpoint(SCREEN_CENTER_X, SCREEN_CENTER_Y)
 			else
 				self
 					:xy(metricN('ScreenGameplay', 'Player'..ToEnumShortString(v)..plrpos..'X') - SCREEN_CENTER_X, 0)
