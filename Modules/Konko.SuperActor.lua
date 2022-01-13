@@ -2,6 +2,7 @@
 	This is a stripped down version of SuperActorloader.lua from Kitsu template.
 	allows Kitsu SuperActor system specifically OUTSIDE of modfiles.
 --]]
+local su = LoadModule('Konko.Core.lua')
 
 su()
 
