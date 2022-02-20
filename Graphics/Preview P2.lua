@@ -13,12 +13,18 @@ local nf = {
 	dda = metricN('Player', 'DrawDistanceAfterTargetsPixels'),
 	ddb = metricN('Player', 'DrawDistanceBeforeTargetsPixels'),
 	yrevoff = metricN('Player', 'ReceptorArrowsYReverse') - metricN('Player', 'ReceptorArrowsYStandard'),
-	y = metricN('Player', 'ReceptorArrowsYStandard') + metricN('Player', 'ReceptorArrowsYReverse'),
+	ybase = metricN('Player', 'ReceptorArrowsYStandard') + metricN('Player', 'ReceptorArrowsYReverse'),
 }
 local plrpop = GAMESTATE:GetPlayerState(PlayerNumber[2]):GetPlayerOptions('ModsLevel_Preferred')
+local pref = GAMESTATE:GetPlayerState(PlayerNumber[2]):GetPlayerOptionsString('ModsLevel_Preferred')
+
+
 return Def.ActorFrame {
 	Name = 'PlayerP2',
 	FOV = 45,
+	OnCommand = function(self)
+		self:queuecommand('Setup')
+	end,
 	SetupCommand = function(self)
 		self:fardistz(10000):fov(45)
 		local notefield = self:GetChild('NoteField')
@@ -35,15 +41,16 @@ return Def.ActorFrame {
 			return vanishx(self, offset + n)
 		end
 		function self:vanishpointy(n)
-			local offset = SCREEN_CENTER_Y
+			local offset = self:GetY() + nf.ybase
 			return vanishy(self, offset + n)
 		end
-		function self:vanishpoint(x, y)
-			return self:vanishpointx(x):vanishpointy(y)
+		function self:GetNoteData(start_beat, end_beat)
+			return self:GetChild('NoteField'):GetNoteData(start_beat, end_beat)
 		end
 		self
 			:xy(metricN('ScreenGameplay', 'PlayerP2'..plrpos..'X'), SCREEN_CENTER_Y)
-			:vanishpoint(SCREEN_CENTER_X, SCREEN_CENTER_Y)
+			:vanishpointx(0)
+			:vanishpointy(0)
 			:zoom(SCREEN_HEIGHT / 480)
 			:visible(true)
 	end,
@@ -57,18 +64,89 @@ return Def.ActorFrame {
 			poptions[speedmod](poptions, param.speed)
 		end
 	end,
+	AppearanceChoiceChangedMessageCommand = function(self, param)
+		PrintTable(param)
+	end,
+	ResetCommand = function(self)
+		if self:GetNumWrapperStates() > 0 then
+			for i = 1, self:GetNumWrapperStates() do
+				self:GetWrapperState(i)
+					:xy(0, 0):z(0)
+					:rotationx(0)
+					:rotationy(0)
+					:rotationz(0)
+					:zoom(1)
+					:zoomx(1)
+					:zoomy(1)
+					:zoomz(1)
+					:skewx(0)
+					:skewy(0)
+					:stopeffect()
+					:fov(45)
+					:visible(true)
+				self:RemoveWrapperState(i)
+			end
+		end
+		self
+			:xy(metricN('ScreenGameplay', 'PlayerP2'..plrpos..'X'), SCREEN_CENTER_Y):z(0)
+			:vanishpointx(0)
+			:vanishpointy(0)
+			:rotationx(0)
+			:rotationy(0)
+			:rotationz(0)
+			:zoom(1)
+			:zoomx(1)
+			:zoomy(1)
+			:zoomz(1)
+			:skewx(0)
+			:skewy(0)
+			:stopeffect()
+			:fov(45)
+			:zoom(SCREEN_HEIGHT / 480)
+			:visible(true)
+	end,
 	Def.NoteField {
 		Name = 'NoteField',
 		Player = PlayerNumber[2],
 		FieldID = 2,
-		Autoplay = true,
+		AutoPlay = (PREFSMAN:GetPreference('AutoPlay') == 'Human' and false) or true,
 		NoteSkin = GAMESTATE:GetPlayerState(PlayerNumber[2]):GetPlayerOptions('ModsLevel_Preferred'):NoteSkin(),
 		DrawDistanceAfterTargetsPixels = nf.dda,
 		DrawDistanceBeforeTargetsPixels = nf.ddb,
 		YReverseOffsetPixels = nf.yrevoff,
+		OnCommand = function(self)
+			self:queuecommand('Setup')
+		end,
 		SetupCommand = function(self)
+			self:GetPlayerOptions('ModsLevel_Current'):FromString(pref)
 			self
-				:y(nf.y)
+				:y(nf.ybase)
+				:visible(true)
+				:luaeffect('UpdateTransform')
+		end,
+		UpdateTransformCommand = function(self)
+			local poptions = GAMESTATE:GetPlayerState(PlayerNumber[2]):GetPlayerOptions('ModsLevel_Song')
+			local mini = scale(poptions:Mini(), 0, 1, 1, 0.5)
+			local tilt = 1 - (0.1 * math.abs(poptions:Tilt()))
+			local rotx = -30 * poptions:Tilt()
+			self
+				:zoom(mini * tilt)
+				:zoomz(1 / (mini * tilt))
+				:rotationx(rotx)
+		end,
+		ResetCommand = function(self)
+				self
+				:xy(0, nf.ybase):z(0)
+				:rotationx(0)
+				:rotationy(0)
+				:rotationz(0)
+				:zoom(1)
+				:zoomx(1)
+				:zoomy(1)
+				:zoomz(1)
+				:skewx(0)
+				:skewy(0)
+				:stopeffect()
 				:visible(true)
 		end,
 		CurrentStepsP2ChangedMessageCommand = function(self)

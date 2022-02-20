@@ -6,37 +6,6 @@ local function CallSongFunc(func)
 	return ''
 end
 
--- Test 1:	0.01513671875   0.0068359375
--- Test 2:	0.01123046875   0.009765625
--- Test 3:	0.01123046875   0.009765625
--- Test 4:	0.0087890625    0.01025390625
--- Test 5:	0.0087890625    0.009765625
--- Test 6:	
--- Test 7:	
--- Test 8:	
--- Test 9:	
--- Test 10:	
-
-
--- OFMath benchmarking don't mind this ~ Sudo
---[[
-MersenneTwister.Seed(404)
-local time1 = GetTimeSinceStart()
-for i = 1, 100 do
-    print(math.sin(MersenneTwister.Random(0, 100000)))
-end
-local time2 = GetTimeSinceStart()
-
-MersenneTwister.Seed(404)
-local time3 = GetTimeSinceStart()
-for i = 1, 100 do
-    print(OFMath.sine(MersenneTwister.Random(0, 100000)))
-end
-local time4 = GetTimeSinceStart()
-
-print('end diffs: ', time2-time1, time4-time3)
---]]
-
 local PlrFrame
 
 return Def.ActorFrame {

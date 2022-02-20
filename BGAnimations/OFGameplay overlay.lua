@@ -21,13 +21,13 @@ return Def.ActorFrame {
 		local P1 = SCREENMAN:GetTopScreen():GetChild('PlayerP1')
 		local N1
 		if P1 then
-			P1:playcommand('Setup')
+			P1:queuecommand('Setup')
 			N1 = P1:GetChild('NoteField')
 		end
 		local P2 = SCREENMAN:GetTopScreen():GetChild('PlayerP2')
 		local N2
 		if P2 then
-			P2:playcommand('Setup')
+			P2:queuecommand('Setup')
 			N2 = P2:GetChild('NoteField')
 		end
 		if N1 and N2 then
@@ -82,10 +82,11 @@ return Def.ActorFrame {
 							for i, v in ipairs(GAMESTATE:GetEnabledPlayers()) do
 								local plr = SCREENMAN:GetTopScreen():GetChild('Player'..ToEnumShortString(v))
 								local mods = GAMESTATE:GetPlayerState(v):GetPlayerOptionsString('ModsLevel_Song')
-								plr:GetChild('NoteField'):GetPlayerOptions('ModsLevel_Current'):FromString('*-1 clearall,'..mods)
+								plr:GetChild('NoteField'):GetPlayerOptions('ModsLevel_Current'):FromString(mods)
 							end
 							SCREENMAN:GetTopScreen():GetChild('Overlay'):visible(true)
 						end)
+						:SetUpdateRate(v.rate or 1)
 						:playcommand('Init')
 					local offset = 2 + (v.start_beat * GAMESTATE:GetSongBPS())
 					self

@@ -103,9 +103,6 @@ for i, v in ipairs(GAMESTATE:GetEnabledPlayers()) do
 	plrs[#plrs + 1] = Def.ActorFrame {
 		Name = 'Player'..ToEnumShortString(v),
 		FOV = 45,
-		InitCommand = function(self)
-			self:fov(45)
-		end,
 		SetupMessageCommand = function(self)
 			local notefield = self:GetChild('NoteField')
 			-- vanish points...........
@@ -179,6 +176,16 @@ for i, v in ipairs(GAMESTATE:GetEnabledPlayers()) do
 				self:y(nf.y)
 				self:GetPlayerOptions('ModsLevel_Current')
 					:FromString(GAMESTATE:GetPlayerState(v):GetPlayerOptionsString('ModsLevel_Preferred'))
+				self:luaeffect('UpdateTransform')
+			end,
+			UpdateTransformCommand = function(self)
+				local poptions = GAMESTATE:GetPlayerState(v):GetPlayerOptions('ModsLevel_Song')
+				local mini = scale(poptions:Mini(), 0, 1, 1, 0.5)
+				local tilt = 1 - (0.1 * math.abs(poptions:Tilt()))
+				local rotx = -30 * poptions:Tilt()
+				self
+					:zoom(mini * tilt)
+					:rotationx(rotx)
 			end,
 			['CurrentSteps'..ToEnumShortString(v)..'ChangedMessageCommand'] = function(self)
 				self:queuecommand('SetPreviewChart')
