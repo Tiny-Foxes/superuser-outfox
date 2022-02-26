@@ -12,13 +12,12 @@ else
 end
 
 local profile = PROFILEMAN:GetProfile(GAMESTATE:GetMasterPlayerNumber())
-TF_CurrentSong = TF_CurrentSong or profile:GetLastPlayedSong()
-if not TF_CurrentSong then TF_CurrentSong = SONGMAN:GetAllSongs()[1] end
+TF_CurrentSong = TF_CurrentSong or profile:GetLastPlayedSong() or SONGMAN:GetAllSongs()[1]
 
 local Groups = SONGMAN:GetSongGroupNames()
 Groups.Index = 1
 for i = 1, #Groups do
-	if TF_CurrengSong and TF_CurrentSong:GetGroupName() == Groups[i] then
+	if TF_CurrentSong and TF_CurrentSong:GetGroupName() == Groups[i] then
 		Groups.Index = i
 		break
 	end
