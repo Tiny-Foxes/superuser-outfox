@@ -11,29 +11,29 @@ else
 	GAMESTATE:SetCurrentStyle('single')
 end
 
+local profile = PROFILEMAN:GetProfile(GAMESTATE:GetMasterPlayerNumber())
+TF_CurrentSong = TF_CurrentSong or profile:GetLastPlayedSong()
+if not TF_CurrentSong then TF_CurrentSong = SONGMAN:GetAllSongs()[1] end
+
 local Groups = SONGMAN:GetSongGroupNames()
 Groups.Index = 1
-if TF_CurrentSong then
-	for i = 1, #Groups do
-		if TF_CurrentSong:GetGroupName() == Groups[i] then
-			Groups.Index = i
-			break
-		end
+for i = 1, #Groups do
+	if TF_CurrengSong and TF_CurrentSong:GetGroupName() == Groups[i] then
+		Groups.Index = i
+		break
 	end
 end
 Groups.Active = 'Song'
 Groups.Loop = false
 local Songs = SONGMAN:GetSongsInGroup(Groups[Groups.Index])
 Songs.Index = 1
-if TF_CurrentSong then
-	for i = 1, #Songs do
-		if TF_CurrentSong == Songs[i] then
-			Songs.Index = i
-			break
-		end
+for i = 1, #Songs do
+	if TF_CurrentSong == Songs[i] then
+		print('Found a match at index '..i)
+		Songs.Index = i
+		break
 	end
 end
-TF_CurrentSong = Songs[Songs.Index]
 local Diffs = {}
 for _, d in ipairs(TF_CurrentSong:GetAllSteps()) do
 	if d:GetStepsType():lower():find(GAMESTATE:GetCurrentGame():GetName()) then
@@ -73,6 +73,9 @@ local folderList = Def.ActorScroller {
 		self:luaeffect('Update')
 	end,
 	UpdateCommand = function(self)
+		for i = 1, self:GetNumChildren() do
+			self:GetChildAt(i):GetWrapperState(1):x(0)
+		end
 		local idx = 1
 		if not Groups.Loop then
 			idx = Groups.Index
@@ -149,6 +152,9 @@ for i, group in ipairs(Groups) do
 			self:luaeffect('Update')
 		end,
 		UpdateCommand = function(self)
+			for i = 1, self:GetNumChildren() do
+				self:GetChildAt(i):GetWrapperState(1):x(0)
+			end
 			local idx = 1
 			if not Groups.Loop then
 				idx = Songs.Index
@@ -312,6 +318,19 @@ end
 
 wheel[#wheel + 1] = diffTab
 
+local popTab = Def.ActorFrame {
+	Name = 'OptionsTab',
+}
+
+for pn = 1, 2 do
+	local popt = Def.ActorFrame {
+		Name = 'OptionsP'..pn,
+
+	}
+end
+
+wheel[#wheel + 1] = popTab
+
 
 local function WheelSwap(self, input)
 	if Groups.Active == 'Group' then
@@ -319,6 +338,7 @@ local function WheelSwap(self, input)
 	elseif Groups.Active == 'Song' then
 		self:playcommand('ChangeFocus', {element = 'Group'})
 	end
+	if Groups.Active ~= 'Difficulty' then SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'collapse'), true) end
 end
 local function WheelUp(self, input)
 	if not Groups.Loop then
@@ -330,7 +350,7 @@ local function WheelUp(self, input)
 	end
 	local pn = PlayerNumber:Reverse()[input.PlayerNumber] + 1
 	self:playcommand('Change'..Groups.Active, {pn = PlayerNumber[pn], direction = -1, time = 0.25})
-	SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'change'), true)
+	if Groups.Active ~= 'Difficulty' then SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'change'), true) end
 end
 local function WheelDown(self, input)
 	if not Groups.Loop then
@@ -342,22 +362,30 @@ local function WheelDown(self, input)
 	end
 	local pn = PlayerNumber:Reverse()[input.PlayerNumber] + 1
 	self:playcommand('Change'..Groups.Active, {pn = PlayerNumber[pn], direction = 1, time = 0.25})
-	SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'change'), true)
+	if Groups.Active ~= 'Difficulty' then SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'change'), true) end
 end
 local function Confirm(self, input)
 	if Groups.Active == 'Group' then
+		SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'collapse'), true)
 		self:playcommand('ChangeFocus', {element = 'Song'})
 	elseif Groups.Active == 'Song' then
+		SOUND:PlayOnce(THEME:GetPathS('Common', 'Start'), true)
 		self:playcommand('ChangeFocus', {element = 'Difficulty'})
 	elseif Groups.Active == 'Difficulty' then
-		SOUND:PlayOnce(THEME:GetPathS('Common', 'Start'), true)
-		self:playcommand('EnterGameplay')
+		if #Diffs ~= 0 then
+			SOUND:PlayOnce(THEME:GetPathS('Common', 'Start'), true)
+			self:playcommand('EnterGameplay')
+		else
+			self:playcommand('ChartWarning')
+		end
 	end
 end
 local function Unconfirm(self, input)
 	if Groups.Active == 'Difficulty' then
+		SOUND:PlayOnce(THEME:GetPathS('Common', 'Cancel'), true)
 		self:playcommand('ChangeFocus', {element = 'Song'})
 	elseif Groups.Active == 'Group' then
+		SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'collapse'), true)
 		self:playcommand('ChangeFocus', {element = 'Song'})
 	elseif Groups.Active == 'Song' then
 		SOUND:PlayOnce(THEME:GetPathS('Common', 'Cancel'), true)
@@ -384,10 +412,11 @@ local ret = Def.ActorFrame {
 	Name = 'Overlay',
 	OnCommand = function(self)
 		SCREENMAN:GetTopScreen():AddInputCallback(InputHandler)
-		self:GetChild('Wheel'):GetChild('GroupTab'):xy(-630, -SCREEN_CENTER_Y + 82)
+		self:playcommand('ChangeFocus', {element = 'Group', time = 0})
 		local si = Songs.Index
 		self:playcommand('ChangeGroup', {direction = 1, time = 0})
 		self:playcommand('ChangeGroup', {direction = -1, time = 0})
+		self:playcommand('ChangeFocus', {element = 'Song', time = 0})
 		self:playcommand('ChangeSong', {direction = si, time = 0})
 		self:playcommand('ChangeSong', {direction = -1, time = 0})
 		for pn = 1, 2 do
@@ -417,6 +446,7 @@ local ret = Def.ActorFrame {
 		elseif Songs.Index < 1 then Songs.Index = Songs.Index + #Songs
 		end
 		TF_CurrentSong = Songs[Songs.Index]
+		GAMESTATE:SetCurrentSong(TF_CurrentSong)
 		Diffs = {}
 		for _, d in ipairs(TF_CurrentSong:GetAllSteps()) do
 			if d:GetStepsType():lower():find(GAMESTATE:GetCurrentGame():GetName()) then
@@ -438,8 +468,8 @@ local ret = Def.ActorFrame {
 	ChangeDifficultyCommand = function(self, params)
 		local diff = self:GetChild('Wheel'):GetChild('DifficultyTab'):GetChild('Difficulty'..ToEnumShortString(params.pn))
 		if #Diffs == 0 then
-			print('No compatible chart found.')
 			if diff:getaux() ~= 0 then
+				print('No compatible chart found.')
 				diff:playcommand('SetDifficulty', {
 					pn = params.pn,
 					difficulty = 'Black',
@@ -500,6 +530,7 @@ local ret = Def.ActorFrame {
 				time = params.time,
 				data = data
 			})
+			if Groups.Active == 'Difficulty' and diff:getaux() ~= 0 then SOUND:PlayOnce(THEME:GetPathS('Common', 'value'), true) end
 		end
 	end,
 	ChangeFocusCommand = function(self, params)
@@ -521,19 +552,16 @@ local ret = Def.ActorFrame {
 			Difficulty = 0,
 		}
 		if Groups.Active == 'Song' then
-			SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'collapse'), true)
 			x.Song, y.Song = 0, 0
 			x.Group, y.Group = -630, -SCREEN_CENTER_Y + 82
 			x.Difficulty, y.Difficulty = 0, SCREEN_HEIGHT
 			dim.Song, dim.Group, dim.Difficulty = 0, 0, 0
 		elseif Groups.Active == 'Group' then
-			SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'collapse'), true)
 			x.Song, y.Song = 0, 0
 			x.Group, y.Group = 0, 0
 			x.Difficulty, y.Difficulty = 0, SCREEN_HEIGHT
 			dim.Song, dim.Group, dim.Difficulty = 0, 0.5, 0
 		elseif Groups.Active == 'Difficulty' then
-			SOUND:PlayOnce(THEME:GetPathS('Common', 'value'), true)
 			x.Song, y.Song = 630, SCREEN_CENTER_Y - 82
 			x.Group, y.Group = -630, -SCREEN_CENTER_Y + 82
 			x.Difficulty, y.Difficulty = 0, 0
@@ -541,20 +569,20 @@ local ret = Def.ActorFrame {
 		end
 		for _, name in ipairs {'Song', 'Group', 'Difficulty'} do
 			local tab = self:GetChild('Wheel'):GetChild(name..'Tab')
-			if tab then tab:stoptweening():easeinoutexpo(0.4):xy(x[name], y[name]) end
+			if tab then tab:stoptweening():easeinoutexpo((params.time or 0.4)):xy(x[name], y[name]) end
 			local dimmer = self:GetChild('Wheel'):GetChild(name..'Dim')
-			if dimmer then dimmer:stoptweening():easeinoutexpo(0.4):diffusealpha(dim[name]) end
+			if dimmer then dimmer:stoptweening():easeinoutexpo((params.time or 0.4)):diffusealpha(dim[name]) end
 			if Groups.Active == 'Difficulty' and name == Groups.Active then
 				for pn = 1, 2 do
 					for i = 1, tab:GetChild('DifficultyP'..pn):GetChild('Data'):GetNumChildren() do
 						local v = tab:GetChild('DifficultyP'..pn):GetChild('Data'):GetChildAt(i)
-						v:stoptweening():cropright(1):sleep(0.4 + i * 0.01):linear(0.02):cropright(0)
+						v:stoptweening():cropright(1):sleep((params.time or 0.4) + i * 0.01):linear(0.02):cropright(0)
 					end
 					tab:GetChild('DifficultyP'..pn):GetChild('BackFrame')
 						:stoptweening()
 						:cropright(1)
 						:sleep(0.3)
-						:easeinoutexpo(0.2)
+						:easeinoutexpo((params.time or 0.4) * 0.5)
 						:cropright(0)
 				end
 			elseif name == 'Difficulty' then
@@ -573,8 +601,7 @@ local ret = Def.ActorFrame {
 		end
 	end,
 	EnterGameplayCommand = function(self)
-		GAMESTATE:SetCurrentSong(TF_CurrentSong)
-		SOUND:StopMusic()
+		--SOUND:StopMusic()
 		for _, pn in ipairs(GAMESTATE:GetHumanPlayers()) do
 			PROFILEMAN:SaveProfile(pn)
 			GAMESTATE:SetCurrentSteps(pn, Diffs[self:GetChild('Wheel'):GetChild('DifficultyTab'):GetChild('Difficulty'..ToEnumShortString(pn)):getaux()])
@@ -585,6 +612,17 @@ local ret = Def.ActorFrame {
 	end,
 	EnterTitleMenuCommand = function(self)
 		SCREENMAN:GetTopScreen():Cancel()
+	end,
+	ChartWarningCommand = function(self)
+		SCREENMAN:SystemMessage('Cannot play song with no compatible chart.')
+		self:GetChild('Wheel'):GetChild('DifficultyTab')
+			:stoptweening()
+			:vibrate()
+			:effectmagnitude(15, 0, 0)
+		self:sleep(0.25):queuecommand('ChartWarningEnd')
+	end,
+	ChartWarningEndCommand = function(self)
+		self:GetChild('Wheel'):GetChild('DifficultyTab'):stopeffect()
 	end,
 	wheel,
 	Def.Actor {
