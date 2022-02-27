@@ -17,7 +17,7 @@ return Def.ActorFrame {
 				:queuecommand('LoadBackground')
 		end,
 		LoadBackgroundCommand = function(self)
-			if TF_CurrentSong:GetPreviewVidPath() then
+			if not GAMESTATE:IsCourseMode() and TF_CurrentSong:GetPreviewVidPath() then
 				self:Load(TF_CurrentSong:GetPreviewVidPath())
 			else
 				self:LoadFromSongBackground(TF_CurrentSong)
@@ -80,12 +80,14 @@ return Def.ActorFrame {
 			end,
 			LoadTitleCommand = function(self)
 				local song = TF_CurrentSong
-				local title = song:GetDisplayMainTitle()
-				if song:GetDisplaySubTitle() and song:GetDisplaySubTitle() ~= '' then
-					title = title..'\n'..song:GetDisplaySubTitle()
+				local title = song:GetDisplayFullTitle()
+				if not GAMESTATE:IsCourseMode() then
+					if song:GetDisplaySubTitle() and song:GetDisplaySubTitle() ~= '' then
+						title = song:GetDisplayMainTitle()..'\n'..song:GetDisplaySubTitle()
+					end
 				end
 				self
-					:settext(song:GetDisplayMainTitle())
+					:settext(title)
 					:easeinoutsine(0.2)
 					:diffusealpha(1)
 			end,
@@ -128,8 +130,9 @@ return Def.ActorFrame {
 			end,
 			LoadArtistCommand = function(self)
 				local song = TF_CurrentSong
+				local artist = (GAMESTATE:IsCourseMode() and song:GetScripter()) or song:GetDisplayArtist()
 				self
-					:settext(song:GetDisplayArtist())
+					:settext(artist)
 					:easeinoutsine(0.2)
 					:diffusealpha(1)
 			end,

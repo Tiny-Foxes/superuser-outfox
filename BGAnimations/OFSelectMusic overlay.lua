@@ -2,22 +2,67 @@ local ThemeColor = LoadModule('Theme.Colors.lua')
 
 local wheel = Def.ActorFrame { Name = 'Wheel' }
 
+local Groups, Songs, Diffs = {}, {}, {}
+
 local function BothSidesJoined()
 	return (GAMESTATE:IsSideJoined(PLAYER_1) and GAMESTATE:IsSideJoined(PLAYER_2))
 end
 
-GAMESTATE:SetCurrentPlayMode('PlayMode_Regular')
+--GAMESTATE:SetCurrentPlayMode('PlayMode_Regular')
 if BothSidesJoined() then
 	GAMESTATE:SetCurrentStyle('versus')
 else
 	GAMESTATE:SetCurrentStyle('single')
 end
 local game, style = GAMESTATE:GetCurrentGame():GetName(), GAMESTATE:GetCurrentStyle():GetName()
-
 local profile = PROFILEMAN:GetProfile(GAMESTATE:GetMasterPlayerNumber())
-TF_CurrentSong = TF_CurrentSong or profile:GetLastPlayedSong() or SONGMAN:GetAllSongs()[1]
 
-local Groups = SONGMAN:GetSongGroupNames()
+if GAMESTATE:IsCourseMode() then
+	if tostring(TF_CurrentSong):find('Song') then TF_CurrentSong = nil end
+	TF_CurrentSong = TF_CurrentSong or profile:GetLastPlayedCourse() or SONGMAN:GetAllCourses(true)[1]
+else
+	if tostring(TF_CurrentSong):find('Course') then TF_CurrentSong = nil end
+	TF_CurrentSong = TF_CurrentSong or profile:GetLastPlayedSong() or SONGMAN:GetAllSongs()[1]
+end
+
+
+local function GrabGroups()
+	if GAMESTATE:IsCourseMode() then
+		return SONGMAN:GetCourseGroupNames()
+	else
+		return SONGMAN:GetSongGroupNames()
+	end
+end
+
+local function GrabSongs()
+	if GAMESTATE:IsCourseMode() then
+		return SONGMAN:GetCoursesInGroup(Groups[Groups.Index], true)
+	else
+		return SONGMAN:GetSongsInGroup(Groups[Groups.Index])
+	end
+end
+
+local function GrabDiffs()
+	local ret, charts = {}, {}
+	if GAMESTATE:IsCourseMode() then
+		charts = TF_CurrentSong:GetAllTrails()
+	else
+		charts = TF_CurrentSong:GetAllSteps()
+	end
+	for _, d in ipairs(charts) do
+		local match
+		match = d:GetStepsType()
+		match = match:lower()
+		if match:find(game) then
+			if not (match:find('double') and BothSidesJoined()) then
+				ret[#ret + 1] = d
+			end
+		end
+	end
+	return ret
+end
+
+Groups = GrabGroups()
 Groups.Index = 1
 for i = 1, #Groups do
 	if TF_CurrentSong:GetGroupName() == Groups[i] then
@@ -27,7 +72,7 @@ for i = 1, #Groups do
 end
 Groups.Active = 'Song'
 Groups.Loop = false
-local Songs = SONGMAN:GetSongsInGroup(Groups[Groups.Index])
+Songs = GrabSongs()
 Songs.Index = 1
 for i = 1, #Songs do
 	if TF_CurrentSong == Songs[i] then
@@ -35,15 +80,7 @@ for i = 1, #Songs do
 		break
 	end
 end
-local Diffs = {}
-for _, d in ipairs(TF_CurrentSong:GetAllSteps()) do
-	local match = d:GetStepsType():lower()
-	if match:find(game) then
-		if not (match:find('double') and BothSidesJoined()) then
-			Diffs[#Diffs + 1] = d
-		end
-	end
-end
+Diffs = GrabDiffs()
 
 
 local folderList = Def.ActorScroller {
@@ -98,7 +135,7 @@ local folderList = Def.ActorScroller {
 local folderSongs = {}
 
 for i, group in ipairs(Groups) do
-	local groupSongs = SONGMAN:GetSongsInGroup(group)
+	local groupSongs = GrabSongs()
 	local actor = loadfile(THEME:GetPathG('MusicWheelItem', 'SectionExpanded NormalPart'))() .. {
 		InitCommand = function(self)
 			for i = 1, self:GetNumWrapperStates() do
@@ -184,7 +221,7 @@ for i, group in ipairs(Groups) do
 		}
 		actor[#actor + 1] = Def.BitmapText {
 			Font = 'Common Normal',
-			Text = song:GetDisplayMainTitle(),
+			Text = song:GetDisplayFullTitle(),
 			InitCommand = function(self)
 				self:maxwidth(280)
 			end,
@@ -435,7 +472,7 @@ local ret = Def.ActorFrame {
 		if Groups.Index > #Groups then Groups.Index = Groups.Index - #Groups
 		elseif Groups.Index < 1 then Groups.Index = Groups.Index + #Groups
 		end
-		Songs = SONGMAN:GetSongsInGroup(Groups[Groups.Index])
+		Songs = GrabSongs()
 		Songs.Index = 1
 		self:playcommand('ChangeSong', {direction = 0, time = 0})
 		local folders = self:GetChild('Wheel'):GetChild('GroupTab'):GetChild('Groups')
@@ -450,19 +487,16 @@ local ret = Def.ActorFrame {
 		elseif Songs.Index < 1 then Songs.Index = Songs.Index + #Songs
 		end
 		TF_CurrentSong = Songs[Songs.Index]
-		GAMESTATE:SetCurrentSong(TF_CurrentSong)
-		Diffs = {}
-		for _, d in ipairs(TF_CurrentSong:GetAllSteps()) do
-			local match = d:GetStepsType():lower()
-			if match:find(game) then
-				if not (match:find('double') and BothSidesJoined()) then
-					Diffs[#Diffs + 1] = d
-				end
-			end
+		if GAMESTATE:IsCourseMode() then
+			GAMESTATE:SetCurrentCourse(TF_CurrentSong)
+		else
+			GAMESTATE:SetCurrentSong(TF_CurrentSong)
 		end
+		Diffs = GrabDiffs()
 		for pn = 1, 2 do
 			if GAMESTATE:IsSideJoined(PlayerNumber[pn]) then
-				self:playcommand('ChangeDifficulty', {pn = PlayerNumber[pn], direction = 0, time = 0})
+				self:playcommand('ChangeDifficulty', {pn = PlayerNumber[pn], direction = 1, time = 0})
+				self:playcommand('ChangeDifficulty', {pn = PlayerNumber[pn], direction = -1, time = 0})
 			end
 		end
 		local songs = self:GetChild('Wheel'):GetChild('SongTab'):GetChild('Songs' .. Groups.Index)
@@ -514,10 +548,13 @@ local ret = Def.ActorFrame {
 			local diffstr = d:GetDifficulty()
 			diffstr = diffstr:sub(diffstr:find('_') + 1, -1)
 			local radar = d:GetRadarValues(params.pn)
+			print(d)
 			local data = {
-				author = d:GetAuthorCredit(),
+				author = (GAMESTATE:IsCourseMode() and TF_CurrentSong:GetScripter()) or d:GetAuthorCredit(),
 				style = THEME:GetString('LongStepsType', ToEnumShortString(d:GetStepsType())),
-				info = d:GetDescription(),
+				info = (GAMESTATE:IsCourseMode() and (
+					'Includes '..#d:GetTrailEntries()..' Entries.'
+				)) or d:GetDescription(),
 
 
 				taps = radar:GetValue(RadarCategory[6]),
@@ -608,7 +645,6 @@ local ret = Def.ActorFrame {
 		end
 	end,
 	EnterGameplayCommand = function(self)
-		--SOUND:StopMusic()
 		for _, pn in ipairs(GAMESTATE:GetHumanPlayers()) do
 			PROFILEMAN:SaveProfile(pn)
 			GAMESTATE:SetCurrentSteps(pn, Diffs[self:GetChild('Wheel'):GetChild('DifficultyTab'):GetChild('Difficulty'..ToEnumShortString(pn)):getaux()])
@@ -634,7 +670,7 @@ local ret = Def.ActorFrame {
 	wheel,
 	Def.Actor {
 		CurrentSongChangedMessageCommand = function(self)
-			SOUND:StopMusic()
+			if not GAMESTATE:IsCourseMode() then SOUND:StopMusic() end
 			self
 				:stoptweening()
 				:sleep(0.4)
@@ -642,14 +678,16 @@ local ret = Def.ActorFrame {
 		end,
 		PreviewMusicCommand = function(self)
 			local song = Songs[Songs.Index]
-			SOUND:PlayMusicPart(
-				song:GetPreviewMusicPath(),
-				song:GetSampleStart(),
-				song:GetSampleLength(),
-				0,
-				1,
-				true
-			)
+			if not GAMESTATE:IsCourseMode() then
+				SOUND:PlayMusicPart(
+					song:GetPreviewMusicPath(),
+					song:GetSampleStart(),
+					song:GetSampleLength(),
+					0,
+					1,
+					true
+				)
+			end
 		end,
 	}
 }
