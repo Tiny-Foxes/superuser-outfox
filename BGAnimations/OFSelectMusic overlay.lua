@@ -1,3 +1,5 @@
+-- TODO: Finalize and refactor the hell out of this bullshit. ~Sudo
+
 local ThemeColor = LoadModule('Theme.Colors.lua')
 
 local wheel = Def.ActorFrame { Name = 'Wheel' }
@@ -244,8 +246,7 @@ wheel[#wheel + 1] = Def.Quad {
 	Name = 'GroupDim',
 	InitCommand = function(self)
 		self
-			:Center()
-			:SetSize(SCREEN_WIDTH, SCREEN_HEIGHT)
+			:FullScreen()
 			:diffuse(color('#00000000'))
 	end,
 }
@@ -259,8 +260,7 @@ wheel[#wheel + 1] = Def.Quad {
 	Name = 'DifficultyDim',
 	InitCommand = function(self)
 		self
-			:Center()
-			:SetSize(SCREEN_WIDTH, SCREEN_HEIGHT)
+			:FullScreen()
 			:diffuse(color('#00000000'))
 	end,
 }
@@ -268,7 +268,7 @@ wheel[#wheel + 1] = Def.Quad {
 local diffTab = Def.ActorFrame {
 	Name = 'DifficultyTab',
 	InitCommand = function(self)
-		self:y(SCREEN_WIDTH)
+		self:x(SCREEN_WIDTH)
 	end,
 }
 
@@ -279,7 +279,7 @@ for pn = 1, 2 do
 			self:Center():zoom(1.5):aux(1)
 			self:GetChild('BackFrame')
 				:SetSize(SCREEN_HEIGHT * 0.65, 96)
-				:addx(SCREEN_CENTER_Y * 0.05)
+				:addx(SCREEN_CENTER_Y * 0.15)
 				:diffuse(0, 0, 0, 0.5)
 				:skewx(-0.5)
 			self:GetChild('MeterFrame')
@@ -359,18 +359,71 @@ end
 
 wheel[#wheel + 1] = diffTab
 
-local popTab = Def.ActorFrame {
-	Name = 'OptionsTab',
+
+wheel[#wheel + 1] = Def.Quad {
+	Name = 'OptionsDim',
+	InitCommand = function(self)
+		self
+			:FullScreen()
+			:diffuse(color('#00000000'))
+	end,
 }
 
+local InOptions = {false, false}
 for pn = 1, 2 do
-	local popt = Def.ActorFrame {
-		Name = 'OptionsP'..pn,
 
+	local popTab = Def.ActorFrame {
+		Name = 'OptionsTabP'..pn,
+		InitCommand = function(self)
+			self:y(SCREEN_HEIGHT * 1.5)
+		end,
+		Def.ActorFrame {
+			Name = 'Options',
+			InitCommand = function(self)
+				local x = 0
+				if BothSidesJoined() then x = SCREEN_CENTER_X * 0.5 end
+				self:x(PositionPerPlayer(PlayerNumber[pn], SCREEN_CENTER_X - x, SCREEN_CENTER_X + x))
+				self:visible(GAMESTATE:IsSideJoined(PlayerNumber[pn]))
+			end,
+			ShowOptionsTabCommand = function(self, params)
+				if Groups.Active == 'Difficulty' and params.pn == PlayerNumber[pn] then
+					InOptions[pn] = true
+					SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'collapse'))
+					self:stoptweening():easeinoutexpo(0.4):y(-SCREEN_HEIGHT)
+				end
+			end,
+			HideOptionsTabCommand = function(self, params)
+				if Groups.Active == 'Difficulty' and params.pn == PlayerNumber[pn] then
+					InOptions[pn] = false
+					SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'collapse'))
+					self:stoptweening():easeinoutexpo(0.4):y(0)
+				end
+			end,
+			ChangeOptionsCommand = function(self)
+			end,
+			ConfirmSelectionCommand = function(self)
+				-- TODO: Fill these with the actual code
+				self:playcommand('HideOptionsTab', {pn = PlayerNumber[pn]})
+			end,
+			CancelSelectionCommand = function(self)
+				-- TODO: Fill these with the actual code
+				self:playcommand('HideOptionsTab', {pn = PlayerNumber[pn]})
+			end,
+			Def.Quad {
+				InitCommand = function(self)
+					self
+						:SetSize(360, SCREEN_HEIGHT * 0.5)
+						:diffuse(ThemeColor[ToEnumShortString(PlayerNumber[pn])])
+						:diffusealpha(0.5)
+						:skewx(-0.5)
+				end,
+			},
+		}
 	}
-end
 
-wheel[#wheel + 1] = popTab
+	wheel[#wheel + 1] = popTab
+
+end
 
 
 local function WheelSwap(self, input)
@@ -379,7 +432,14 @@ local function WheelSwap(self, input)
 	elseif Groups.Active == 'Song' then
 		self:playcommand('ChangeFocus', {element = 'Group'})
 	end
-	if Groups.Active ~= 'Difficulty' then SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'collapse'), true) end
+	local pn = PlayerNumber:Reverse()[input.PlayerNumber] + 1
+	if not InOptions[pn] then
+		if Groups.Active == 'Difficulty' then
+			self:playcommand('ShowOptionsTab', {pn = PlayerNumber[pn]})
+		else
+			SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'collapse'), true)
+		end
+	end
 end
 local function WheelUp(self, input)
 	if not Groups.Loop then
@@ -390,7 +450,11 @@ local function WheelUp(self, input)
 		end
 	end
 	local pn = PlayerNumber:Reverse()[input.PlayerNumber] + 1
-	self:playcommand('Change'..Groups.Active, {pn = PlayerNumber[pn], direction = -1, time = 0.25})
+	if InOptions[pn] then
+		self:playcommand('ChangeOptions', {pn = PlayerNumber[pn], direction = {-1, 0}, time = 0.25})
+	else
+		self:playcommand('Change'..Groups.Active, {pn = PlayerNumber[pn], direction = -1, time = 0.25})
+	end
 	if Groups.Active ~= 'Difficulty' then SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'change'), true) end
 end
 local function WheelDown(self, input)
@@ -402,7 +466,11 @@ local function WheelDown(self, input)
 		end
 	end
 	local pn = PlayerNumber:Reverse()[input.PlayerNumber] + 1
-	self:playcommand('Change'..Groups.Active, {pn = PlayerNumber[pn], direction = 1, time = 0.25})
+	if InOptions[pn] then
+		self:playcommand('ChangeOptions', {pn = PlayerNumber[pn], direction = {1, 0}, time = 0.25})
+	else
+		self:playcommand('Change'..Groups.Active, {pn = PlayerNumber[pn], direction = 1, time = 0.25})
+	end
 	if Groups.Active ~= 'Difficulty' then SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'change'), true) end
 end
 local function Confirm(self, input)
@@ -413,18 +481,30 @@ local function Confirm(self, input)
 		SOUND:PlayOnce(THEME:GetPathS('Common', 'Start'), true)
 		self:playcommand('ChangeFocus', {element = 'Difficulty'})
 	elseif Groups.Active == 'Difficulty' then
-		if #Diffs ~= 0 then
-			SOUND:PlayOnce(THEME:GetPathS('Common', 'Start'), true)
-			self:playcommand('EnterGameplay')
+		local pn = PlayerNumber:Reverse()[input.PlayerNumber] + 1
+		local options = self:GetChild('Wheel'):GetChild('OptionsTab'..ToEnumShortString(input.PlayerNumber)):GetChild('Options')
+		if InOptions[pn] then
+			options:playcommand('ConfirmSelection')
 		else
-			self:playcommand('ChartWarning')
+			if #Diffs ~= 0 then
+				SOUND:PlayOnce(THEME:GetPathS('Common', 'Start'), true)
+				self:playcommand('EnterGameplay')
+			else
+				self:playcommand('ChartWarning')
+			end
 		end
 	end
 end
 local function Cancel(self, input)
 	if Groups.Active == 'Difficulty' then
-		SOUND:PlayOnce(THEME:GetPathS('Common', 'Cancel'), true)
-		self:playcommand('ChangeFocus', {element = 'Song'})
+		local pn = PlayerNumber:Reverse()[input.PlayerNumber] + 1
+		local options = self:GetChild('Wheel'):GetChild('OptionsTab'..ToEnumShortString(input.PlayerNumber)):GetChild('Options')
+		if InOptions[pn] then
+			options:playcommand('CancelSelection')
+		else
+			SOUND:PlayOnce(THEME:GetPathS('Common', 'Cancel'), true)
+			self:playcommand('ChangeFocus', {element = 'Song'})
+		end
 	elseif Groups.Active == 'Group' then
 		SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'collapse'), true)
 		self:playcommand('ChangeFocus', {element = 'Song'})
@@ -548,7 +628,6 @@ local ret = Def.ActorFrame {
 			local diffstr = d:GetDifficulty()
 			diffstr = diffstr:sub(diffstr:find('_') + 1, -1)
 			local radar = d:GetRadarValues(params.pn)
-			print(d)
 			local data = {
 				author = (GAMESTATE:IsCourseMode() and TF_CurrentSong:GetScripter()) or d:GetAuthorCredit(),
 				style = THEME:GetString('LongStepsType', ToEnumShortString(d:GetStepsType())),
@@ -579,44 +658,61 @@ local ret = Def.ActorFrame {
 	end,
 	ChangeFocusCommand = function(self, params)
 		if not params.element then return end
+		if params.element == 'Group' then
+			self:GetChild("GroupInfoFrame")
+				:stoptweening()
+				:easeinoutexpo((params.time or 0.4))
+				:x(SCREEN_RIGHT - 280)
+		else
+			self:GetChild("GroupInfoFrame")
+				:stoptweening()
+				:easeinoutexpo((params.time or 0.4))
+				:x((SCREEN_RIGHT - 280) + 630)
+		end
 		Groups.Active = params.element
 		local x = {
 			Song = 0,
 			Group = 0,
 			Difficulty = 0,
+			Options = 0,
 		}
 		local y = {
 			Song = 0,
 			Group = 0,
 			Difficulty = 0,
+			Options = 0,
 		}
 		local dim = {
 			Song = 0,
 			Group = 0,
 			Difficulty = 0,
+			Options = 0,
 		}
 		if Groups.Active == 'Song' then
 			x.Song, y.Song = 0, 0
 			x.Group, y.Group = -630, -SCREEN_CENTER_Y + 82
-			x.Difficulty, y.Difficulty = 0, SCREEN_HEIGHT
+			x.Difficulty, y.Difficulty = SCREEN_WIDTH, 0
 			dim.Song, dim.Group, dim.Difficulty = 0, 0, 0
 		elseif Groups.Active == 'Group' then
 			x.Song, y.Song = 0, 0
 			x.Group, y.Group = 0, 0
-			x.Difficulty, y.Difficulty = 0, SCREEN_HEIGHT
-			dim.Song, dim.Group, dim.Difficulty = 0, 0.5, 0
+			x.Difficulty, y.Difficulty = SCREEN_WIDTH, 0
+			dim.Song, dim.Group, dim.Difficulty = 0, 0.75, 0
 		elseif Groups.Active == 'Difficulty' then
 			x.Song, y.Song = 630, SCREEN_CENTER_Y - 82
 			x.Group, y.Group = -630, -SCREEN_CENTER_Y + 82
 			x.Difficulty, y.Difficulty = 0, 0
-			dim.Song, dim.Group, dim.Difficulty = 0, 0, 0.5
+			dim.Song, dim.Group, dim.Difficulty = 0, 0, 0.75
 		end
 		for _, name in ipairs {'Song', 'Group', 'Difficulty'} do
 			local tab = self:GetChild('Wheel'):GetChild(name..'Tab')
+			if Groups.Active == 'Options' then
+				tab = self:GetChild('Wheel'):GetChild(name..'Tab'..ToEnumShortString(params.pn))
+			end
 			if tab then tab:stoptweening():easeinoutexpo((params.time or 0.4)):xy(x[name], y[name]) end
 			local dimmer = self:GetChild('Wheel'):GetChild(name..'Dim')
 			if dimmer then dimmer:stoptweening():easeinoutexpo((params.time or 0.4)):diffusealpha(dim[name]) end
-			if Groups.Active == 'Difficulty' and name == Groups.Active then
+			if name == 'Difficulty' and Groups.Active == 'Difficulty' then
 				for pn = 1, 2 do
 					for i = 1, tab:GetChild('DifficultyP'..pn):GetChild('Data'):GetNumChildren() do
 						local v = tab:GetChild('DifficultyP'..pn):GetChild('Data'):GetChildAt(i)
@@ -629,7 +725,7 @@ local ret = Def.ActorFrame {
 						:easeinoutexpo((params.time or 0.4) * 0.5)
 						:cropright(0)
 				end
-			elseif name == 'Difficulty' then
+			elseif name == 'Difficulty' and Groups.Active == 'Song' then
 				for pn = 1, 2 do
 					for i = 1, tab:GetChild('DifficultyP'..pn):GetChild('Data'):GetNumChildren() do
 						local v = tab:GetChild('DifficultyP'..pn):GetChild('Data'):GetChildAt(i)
@@ -693,7 +789,159 @@ local ret = Def.ActorFrame {
 				)
 			end
 		end,
-	}
+	},
+
+	-- this is where the group info is
+	Def.ActorFrame {
+		Name = 'GroupInfoFrame',
+		InitCommand = function(self)
+			self:xy(SCREEN_WIDTH / 4 * 3, 140)
+		end,
+		Def.Quad {
+			Name = 'InfoDim',
+			InitCommand = function(self)
+				self
+					:addx(-275)
+					:addy(220)
+					:SetSize(SCREEN_WIDTH, SCREEN_HEIGHT)
+					:diffuse(color('#000000FF'))
+					:fadeleft(0.05)
+					:cropleft(0.45)
+			end,
+		},
+		Def.Banner {
+			Name = 'GroupBanner',
+			InitCommand = function(self)
+				self:scaletoclipped(512, 160)
+			end,
+			CurrentSongChangedMessageCommand = function(self)
+				local song = TF_CurrentSong
+				self
+					:stoptweening()
+					:LoadFromSongGroup(song:GetGroupName())
+			end,
+		},
+		Def.BitmapText {
+			Name = "SongCount",
+			Font = "Common Normal",
+			Text = "SONGS IN GROUP:",
+			InitCommand = function(self)
+				self
+					:xy(-250, 100)
+					:zoom(1)
+					:horizalign("left")
+					:vertalign("middle")
+			end,
+			CurrentSongChangedMessageCommand = function(self)
+				local song = TF_CurrentSong
+				self
+					:stoptweening()
+					:settext("SONGS IN GROUP: "..table.getn( SONGMAN:GetSongsInGroup(song:GetGroupName()) ))
+				if table.getn( SONGMAN:GetSongsInGroup(song:GetGroupName()) ) == 69 then
+					self:rainbowscroll(true)
+				else
+					self:rainbowscroll(false)
+				end
+			end,
+		},
+		Def.BitmapText {
+			Name = "ChartCount",
+			Font = "Common Normal",
+			Text = "",
+			InitCommand = function(self)
+				self
+					:xy(-250, 135)
+					:zoom(1)
+					:horizalign("left")
+					:vertalign("middle")
+			end,
+			CurrentSongChangedMessageCommand = function(self)
+				local song = TF_CurrentSong
+				local numcharts = 0
+				local sgroup = SONGMAN:GetSongsInGroup(song:GetGroupName())
+	
+				for i = 1, #sgroup do
+					for _, c in ipairs(sgroup[i]:GetAllSteps()) do
+						if c:GetStepsType():lower():find(GAMESTATE:GetCurrentGame():GetName()) then
+							numcharts = numcharts + 1
+						end
+					end
+				end
+	
+				self:stoptweening():settext(GAMESTATE:GetCurrentGame():GetName().." CHARTS IN GROUP: "..numcharts)
+			end,
+		},
+		Def.BitmapText {
+			Name = "FeaturedSongArtistsHeader",
+			Font = "Common Normal",
+			Text = "FEATURED SONG ARTISTS:",
+			InitCommand = function(self)
+				self
+					:xy(-250, 170)
+					:zoom(1)
+					:horizalign("left")
+					:vertalign("middle")
+			end,
+		},
+		Def.BitmapText {
+			Name = "FeaturedSongArtists",
+			Font = "Common Normal",
+			Text = "",
+			InitCommand = function(self)
+				self
+					:xy(-250, 185)
+					:zoom(1)
+					:horizalign("left")
+					:vertalign("top")
+			end,
+			CurrentSongChangedMessageCommand = function(self)
+				local song = TF_CurrentSong
+				local sgroup = SONGMAN:GetSongsInGroup(song:GetGroupName())
+				local artists = {}
+				local artistsnorepeats = {}
+				local txt = ""
+	
+				local seenartist = ""
+				for i = 1, #sgroup do
+					-- We'll break out of here if we hit over 11. ~Sudo
+					--if i > 11 then break end
+					artists[#artists + 1] = sgroup[i]:GetDisplayArtist()
+				
+					-- this SHOULD remove duplicate song artists but it only removes one duplicate ~ yosefu
+					for j = 1, #artists do
+						-- I accidentally deleted everything because i was j. ~Sudo
+						if artists[j]:find(artists[i]) and i ~= j then
+							-- We can remove them easier if they're blank. ~Sudo
+							artists[j] = ''
+						end
+					end
+				end
+
+				-- We need to ONLY increment when we DON'T delete. ~Sudo
+				local i = 0
+				while i <= #artists do
+					if artists[i] == '' then
+						table.remove(artists, i)
+					else
+						i = i + 1
+					end
+				end
+				-- Now we gotta remove all the extra stuff and put the 'and more'! ~Sudo
+				if #artists > 10 then
+					for i = 11, #artists do
+						table.remove(artists, #artists)
+					end
+					artists[11] = "and more"
+				end
+	
+				for _, i in ipairs(artists) do
+					txt = txt..i.."\n"
+				end
+	
+				self:stoptweening():settext(txt)
+			end,
+		},
+	},
 }
 
 for msg, func in pairs(Controls) do
