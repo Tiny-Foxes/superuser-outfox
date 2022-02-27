@@ -1,6 +1,7 @@
 collectgarbage()
 
-su()
+local konko = LoadModule('Konko.Core.lua')
+konko()
 
 local SuperActor = LoadModule('Konko.SuperActor.lua')
 

@@ -6,7 +6,7 @@ local function SelectMusicOrCourse()
 	elseif GAMESTATE:IsCourseMode() then
 		return "ScreenSelectCourse"
 	else
-		return "ScreenSelectMusic"
+		return SelectMusicRedirect()
 	end
 end
 
@@ -22,7 +22,7 @@ CustomBranch = {
 		if PROFILEMAN:GetNumLocalProfiles() > 0 then
 			return "ScreenSelectProfile"
 		else
-			return "ScreenSelectMusic"
+			return SelectMusicRedirect()
 		end
 	end,
 	AfterProfileSave = function()
@@ -36,3 +36,7 @@ CustomBranch = {
 		end
 	end,
 }
+
+function SelectMusicRedirect()
+	return 'OFSelectMusic'
+end
