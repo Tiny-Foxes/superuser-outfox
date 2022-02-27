@@ -34,20 +34,20 @@ local function GrabGroups()
 	end
 end
 
-local function GrabSongs()
+local function GrabSongs(group)
 	if GAMESTATE:IsCourseMode() then
-		return SONGMAN:GetCoursesInGroup(Groups[Groups.Index], true)
+		return SONGMAN:GetCoursesInGroup(group, true)
 	else
-		return SONGMAN:GetSongsInGroup(Groups[Groups.Index])
+		return SONGMAN:GetSongsInGroup(group)
 	end
 end
 
-local function GrabDiffs()
+local function GrabDiffs(song)
 	local ret, charts = {}, {}
 	if GAMESTATE:IsCourseMode() then
-		charts = TF_CurrentSong:GetAllTrails()
+		charts = song:GetAllTrails()
 	else
-		charts = TF_CurrentSong:GetAllSteps()
+		charts = song:GetAllSteps()
 	end
 	for _, d in ipairs(charts) do
 		local match
@@ -72,7 +72,7 @@ for i = 1, #Groups do
 end
 Groups.Active = 'Song'
 Groups.Loop = false
-Songs = GrabSongs()
+Songs = GrabSongs(Groups[Groups.Index])
 Songs.Index = 1
 for i = 1, #Songs do
 	if TF_CurrentSong == Songs[i] then
@@ -80,7 +80,7 @@ for i = 1, #Songs do
 		break
 	end
 end
-Diffs = GrabDiffs()
+Diffs = GrabDiffs(Songs[Songs.Index])
 
 
 local folderList = Def.ActorScroller {
@@ -135,7 +135,7 @@ local folderList = Def.ActorScroller {
 local folderSongs = {}
 
 for i, group in ipairs(Groups) do
-	local groupSongs = GrabSongs()
+	local groupSongs = GrabSongs(group)
 	local actor = loadfile(THEME:GetPathG('MusicWheelItem', 'SectionExpanded NormalPart'))() .. {
 		InitCommand = function(self)
 			for i = 1, self:GetNumWrapperStates() do
@@ -472,7 +472,7 @@ local ret = Def.ActorFrame {
 		if Groups.Index > #Groups then Groups.Index = Groups.Index - #Groups
 		elseif Groups.Index < 1 then Groups.Index = Groups.Index + #Groups
 		end
-		Songs = GrabSongs()
+		Songs = GrabSongs(Groups[Groups.Index])
 		Songs.Index = 1
 		self:playcommand('ChangeSong', {direction = 0, time = 0})
 		local folders = self:GetChild('Wheel'):GetChild('GroupTab'):GetChild('Groups')
@@ -492,7 +492,7 @@ local ret = Def.ActorFrame {
 		else
 			GAMESTATE:SetCurrentSong(TF_CurrentSong)
 		end
-		Diffs = GrabDiffs()
+		Diffs = GrabDiffs(TF_CurrentSong)
 		for pn = 1, 2 do
 			if GAMESTATE:IsSideJoined(PlayerNumber[pn]) then
 				self:playcommand('ChangeDifficulty', {pn = PlayerNumber[pn], direction = 1, time = 0})
