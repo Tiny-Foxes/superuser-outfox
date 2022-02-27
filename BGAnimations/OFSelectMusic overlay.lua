@@ -2,14 +2,17 @@ local ThemeColor = LoadModule('Theme.Colors.lua')
 
 local wheel = Def.ActorFrame { Name = 'Wheel' }
 
--- Must be global.
+local function BothSidesJoined()
+	return (GAMESTATE:IsSideJoined(PLAYER_1) and GAMESTATE:IsSideJoined(PLAYER_2))
+end
 
 GAMESTATE:SetCurrentPlayMode('PlayMode_Regular')
-if GAMESTATE:IsSideJoined(PLAYER_1) and GAMESTATE:IsSideJoined(PLAYER_2) then
+if BothSidesJoined() then
 	GAMESTATE:SetCurrentStyle('versus')
 else
 	GAMESTATE:SetCurrentStyle('single')
 end
+local game, style = GAMESTATE:GetCurrentGame():GetName(), GAMESTATE:GetCurrentStyle():GetName()
 
 local profile = PROFILEMAN:GetProfile(GAMESTATE:GetMasterPlayerNumber())
 TF_CurrentSong = TF_CurrentSong or profile:GetLastPlayedSong() or SONGMAN:GetAllSongs()[1]
@@ -17,7 +20,7 @@ TF_CurrentSong = TF_CurrentSong or profile:GetLastPlayedSong() or SONGMAN:GetAll
 local Groups = SONGMAN:GetSongGroupNames()
 Groups.Index = 1
 for i = 1, #Groups do
-	if TF_CurrentSong and TF_CurrentSong:GetGroupName() == Groups[i] then
+	if TF_CurrentSong:GetGroupName() == Groups[i] then
 		Groups.Index = i
 		break
 	end
@@ -28,15 +31,17 @@ local Songs = SONGMAN:GetSongsInGroup(Groups[Groups.Index])
 Songs.Index = 1
 for i = 1, #Songs do
 	if TF_CurrentSong == Songs[i] then
-		print('Found a match at index '..i)
 		Songs.Index = i
 		break
 	end
 end
 local Diffs = {}
 for _, d in ipairs(TF_CurrentSong:GetAllSteps()) do
-	if d:GetStepsType():lower():find(GAMESTATE:GetCurrentGame():GetName()) then
-		Diffs[#Diffs + 1] = d
+	local match = d:GetStepsType():lower()
+	if match:find(game) then
+		if not (match:find('double') and BothSidesJoined()) then
+			Diffs[#Diffs + 1] = d
+		end
 	end
 end
 
@@ -379,7 +384,7 @@ local function Confirm(self, input)
 		end
 	end
 end
-local function Unconfirm(self, input)
+local function Cancel(self, input)
 	if Groups.Active == 'Difficulty' then
 		SOUND:PlayOnce(THEME:GetPathS('Common', 'Cancel'), true)
 		self:playcommand('ChangeFocus', {element = 'Song'})
@@ -398,7 +403,7 @@ local Controls = {
 	MenuUp = WheelSwap,
 	MenuDown = WheelSwap,
 	Start = Confirm,
-	Back = Unconfirm,
+	Back = Cancel,
 }
 
 local function InputHandler(event)
@@ -448,8 +453,11 @@ local ret = Def.ActorFrame {
 		GAMESTATE:SetCurrentSong(TF_CurrentSong)
 		Diffs = {}
 		for _, d in ipairs(TF_CurrentSong:GetAllSteps()) do
-			if d:GetStepsType():lower():find(GAMESTATE:GetCurrentGame():GetName()) then
-				Diffs[#Diffs + 1] = d
+			local match = d:GetStepsType():lower()
+			if match:find(game) then
+				if not (match:find('double') and BothSidesJoined()) then
+					Diffs[#Diffs + 1] = d
+				end
 			end
 		end
 		for pn = 1, 2 do
