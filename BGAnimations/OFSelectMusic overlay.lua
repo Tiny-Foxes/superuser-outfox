@@ -647,7 +647,11 @@ local ret = Def.ActorFrame {
 	EnterGameplayCommand = function(self)
 		for _, pn in ipairs(GAMESTATE:GetHumanPlayers()) do
 			PROFILEMAN:SaveProfile(pn)
-			GAMESTATE:SetCurrentSteps(pn, Diffs[self:GetChild('Wheel'):GetChild('DifficultyTab'):GetChild('Difficulty'..ToEnumShortString(pn)):getaux()])
+			if GAMESTATE:IsCourseMode() then
+				GAMESTATE:SetCurrentTrail(pn, Diffs[self:GetChild('Wheel'):GetChild('DifficultyTab'):GetChild('Difficulty'..ToEnumShortString(pn)):getaux()])
+			else
+				GAMESTATE:SetCurrentSteps(pn, Diffs[self:GetChild('Wheel'):GetChild('DifficultyTab'):GetChild('Difficulty'..ToEnumShortString(pn)):getaux()])
+			end
 		end
 		SCREENMAN:GetTopScreen()
 			:SetNextScreenName('ScreenGameplay')

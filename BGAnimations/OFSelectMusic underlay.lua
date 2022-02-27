@@ -1,6 +1,18 @@
 local ThemeColor = LoadModule('Theme.Colors.lua')
 
 return Def.ActorFrame {
+	Name = 'Underlay',
+	OnCommand = function(self)
+		-- discord support UwU -y0sefu
+		local player = GAMESTATE:GetMasterPlayerNumber()
+		GAMESTATE:UpdateDiscordProfile(GAMESTATE:GetPlayerDisplayName(player))
+		if GAMESTATE:IsCourseMode() then
+			GAMESTATE:UpdateDiscordScreenInfo("Selecting Course","",1)
+		else
+			local StageIndex = GAMESTATE:GetCurrentStageIndex()
+			GAMESTATE:UpdateDiscordScreenInfo("Selecting a Song (Stage ".. StageIndex + 1 .. ")	","",1)
+		end
+	end,
 	Def.Sprite {
 		Name = 'Background',
 		InitCommand = function(self)
