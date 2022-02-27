@@ -1,6 +1,6 @@
 -- environment builder stolen this from xero thanks xero
-local su = {}
-su = setmetatable(su, su)
+_G.su = {}
+local su = setmetatable(su, su)
 su.__index = _G
 local function nop() end
 function envcall(self, f, name)
@@ -142,5 +142,3 @@ function Def.KonkoAF(t)
 
 	return af
 end
-
-return su
