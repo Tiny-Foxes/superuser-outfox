@@ -52,8 +52,7 @@ local function GrabDiffs(song)
 		charts = song:GetAllSteps()
 	end
 	for _, d in ipairs(charts) do
-		local match
-		match = d:GetStepsType()
+		local match = d:GetStepsType()
 		match = match:lower()
 		if match:find(game) then
 			if not (match:find('double') and BothSidesJoined()) then
@@ -305,11 +304,14 @@ for pn = 1, 2 do
 				datum
 					:stoptweening()
 					:settext(datum:GetName()..': '..newln..params.data[datum:GetName():lower()])
-					:stoptweening()
-					:cropright(1)
-					:sleep(i * 0.01)
-					:linear(0.05)
-					:cropright(0)
+				if #Diffs > 1 then
+					datum
+						:stoptweening()
+						:cropright(1)
+						:sleep(i * 0.01)
+						:linear(0.05)
+						:cropright(0)
+				end
 			end
 			self:GetChild('Meter'):settext(params.meter)
 			self:GetChild('DiffName'):settext(params.name)
@@ -366,6 +368,10 @@ wheel[#wheel + 1] = Def.Quad {
 		self
 			:FullScreen()
 			:diffuse(color('#00000000'))
+			:cropleft(0.5)
+			:fadeleft(0.1)
+			:cropright(0.5)
+			:faderight(0.1)
 	end,
 }
 
@@ -388,6 +394,11 @@ for pn = 1, 2 do
 			ShowOptionsTabCommand = function(self, params)
 				if Groups.Active == 'Difficulty' and params.pn == PlayerNumber[pn] then
 					InOptions[pn] = true
+					if pn == 1 then
+						self:GetParent():GetParent():GetChild('OptionsDim'):stoptweening():easeinoutexpo(0.2):cropleft(0)
+					else
+						self:GetParent():GetParent():GetChild('OptionsDim'):stoptweening():easeinoutexpo(0.2):cropright(0)
+					end
 					SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'collapse'))
 					self:stoptweening():easeinoutexpo(0.4):y(-SCREEN_HEIGHT)
 				end
@@ -395,6 +406,11 @@ for pn = 1, 2 do
 			HideOptionsTabCommand = function(self, params)
 				if Groups.Active == 'Difficulty' and params.pn == PlayerNumber[pn] then
 					InOptions[pn] = false
+					if pn == 1 then
+						self:GetParent():GetParent():GetChild('OptionsDim'):stoptweening():easeinoutexpo(0.2):cropleft(0.5)
+					else
+						self:GetParent():GetParent():GetChild('OptionsDim'):stoptweening():easeinoutexpo(0.2):cropright(0.5)
+					end
 					SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'collapse'))
 					self:stoptweening():easeinoutexpo(0.4):y(0)
 				end
@@ -502,6 +518,7 @@ local function Cancel(self, input)
 		if InOptions[pn] then
 			options:playcommand('CancelSelection')
 		else
+			self:GetChild('Wheel'):GetChild('OptionsTabP'..(pn + 1)):GetChild('Options'):playcommand('CancelSelection')
 			SOUND:PlayOnce(THEME:GetPathS('Common', 'Cancel'), true)
 			self:playcommand('ChangeFocus', {element = 'Song'})
 		end
@@ -573,6 +590,7 @@ local ret = Def.ActorFrame {
 			GAMESTATE:SetCurrentSong(TF_CurrentSong)
 		end
 		Diffs = GrabDiffs(TF_CurrentSong)
+		print(#Diffs)
 		for pn = 1, 2 do
 			if GAMESTATE:IsSideJoined(PlayerNumber[pn]) then
 				self:playcommand('ChangeDifficulty', {pn = PlayerNumber[pn], direction = 1, time = 0})
@@ -616,8 +634,8 @@ local ret = Def.ActorFrame {
 			diff:aux(0)
 		else
 			diff:addaux(params.direction)
-			if diff:getaux() > #Diffs then diff:aux(#Diffs) return
-			elseif diff:getaux() < 1 then diff:aux(1) return
+			if diff:getaux() > #Diffs then diff:aux(#Diffs)
+			elseif diff:getaux() < 1 then diff:aux(1)
 			end
 			local d = Diffs[diff:getaux()]
 			while not d or not d:GetMeter() do
@@ -653,7 +671,7 @@ local ret = Def.ActorFrame {
 				time = params.time,
 				data = data
 			})
-			if Groups.Active == 'Difficulty' and diff:getaux() ~= 0 then SOUND:PlayOnce(THEME:GetPathS('Common', 'value'), true) end
+			if Groups.Active == 'Difficulty' and diff:getaux() > 1 then SOUND:PlayOnce(THEME:GetPathS('Common', 'value'), true) end
 		end
 	end,
 	ChangeFocusCommand = function(self, params)
