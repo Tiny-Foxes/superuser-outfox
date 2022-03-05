@@ -63,6 +63,13 @@ local function GrabDiffs(song)
 	return ret
 end
 
+local function InputHandler(event)
+	if event.type ~= 'InputEventType_Release' then
+		MESSAGEMAN:Broadcast(event.GameButton, event)
+	end
+end
+
+
 Groups = GrabGroups()
 Groups.Index = 1
 for i = 1, #Groups do
@@ -393,6 +400,7 @@ for pn = 1, 2 do
 			end,
 			ShowOptionsTabCommand = function(self, params)
 				if Groups.Active == 'Difficulty' and params.pn == PlayerNumber[pn] then
+					--[[
 					InOptions[pn] = true
 					if pn == 1 then
 						self:GetParent():GetParent():GetChild('OptionsDim'):stoptweening():easeinoutexpo(0.2):cropleft(0)
@@ -401,6 +409,12 @@ for pn = 1, 2 do
 					end
 					SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'collapse'))
 					self:stoptweening():easeinoutexpo(0.4):y(-SCREEN_HEIGHT)
+					--]]
+					SOUND:PlayOnce(THEME:GetPathS('Common', 'Start'), true)
+					SCREENMAN:GetTopScreen()
+						--:RemoveInputCallback(InputHandler)
+						:SetNextScreenName('ScreenPlayerOptions')
+						:StartTransitioningScreen('SM_GoToNextScreen')
 				end
 			end,
 			HideOptionsTabCommand = function(self, params)
@@ -411,7 +425,7 @@ for pn = 1, 2 do
 					else
 						self:GetParent():GetParent():GetChild('OptionsDim'):stoptweening():easeinoutexpo(0.2):cropright(0.5)
 					end
-					SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'collapse'))
+					SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'collapse'), true)
 					self:stoptweening():easeinoutexpo(0.4):y(0)
 				end
 			end,
@@ -540,12 +554,6 @@ local Controls = {
 	Back = Cancel,
 }
 
-local function InputHandler(event)
-	if event.type ~= 'InputEventType_Release' then
-		MESSAGEMAN:Broadcast(event.GameButton, event)
-	end
-end
-
 local ret = Def.ActorFrame {
 	Name = 'Overlay',
 	OnCommand = function(self)
@@ -672,6 +680,7 @@ local ret = Def.ActorFrame {
 				data = data
 			})
 			if Groups.Active == 'Difficulty' and diff:getaux() > 1 then SOUND:PlayOnce(THEME:GetPathS('Common', 'value'), true) end
+			if GAMESTATE:IsSideJoined(params.pn) then GAMESTATE:SetCurrentSteps(params.pn, d) end
 		end
 	end,
 	ChangeFocusCommand = function(self, params)
