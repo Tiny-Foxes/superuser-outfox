@@ -847,7 +847,7 @@ local ret = Def.ActorFrame {
 					:cropleft(0.45)
 			end,
 		},
-		Def.Banner {
+		Def.FadingBanner {
 			Name = 'GroupBanner',
 			InitCommand = function(self)
 				self:scaletoclipped(512, 160)
