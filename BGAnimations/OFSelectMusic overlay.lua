@@ -410,6 +410,7 @@ for pn = 1, 2 do
 					SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'collapse'))
 					self:stoptweening():easeinoutexpo(0.4):y(-SCREEN_HEIGHT)
 					--]]
+					if not GAMESTATE:GetCurrentSteps(params.pn) then return end
 					SOUND:PlayOnce(THEME:GetPathS('Common', 'Start'), true)
 					SCREENMAN:GetTopScreen()
 						--:RemoveInputCallback(InputHandler)
