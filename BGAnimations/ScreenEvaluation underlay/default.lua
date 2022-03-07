@@ -158,10 +158,9 @@ return Def.ActorFrame {
 					:cropleft(1)
 			end,
 		},
-		Def.Sprite {
+		Def.Banner {
 			InitCommand = function(self)
-				local target = GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentCourse() or GAMESTATE:GetCurrentSong()
-				self:LoadFromCached("banner",target:GetBannerPath())
+				self
 					:scaletoclipped(402,160)
 					:skewx(0.5)
 					:fadeleft(1)
@@ -170,6 +169,13 @@ return Def.ActorFrame {
 					:x(SCREEN_CENTER_X)
 			end,
 			OnCommand = function(self)
+				local target = (GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentCourse()) or GAMESTATE:GetCurrentSong()
+				local bannerpath = target:GetBannerPath()
+				if bannerpath then
+					self:LoadFromCachedBanner(bannerpath)
+				else
+					self:LoadFromSongGroup(target:GetGroupName())
+				end
 				self
 					:sleep(0.5)
 					:easeoutexpo(0.25)

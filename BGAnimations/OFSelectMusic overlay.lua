@@ -653,10 +653,12 @@ local ret = Def.ActorFrame {
 				diff:aux(1)
 			end
 			local d = Diffs[diff:getaux()]
-			while not d or not d:GetMeter() do
-				diff:addaux(-1)
-				if diff:getaux() < 1 then diff:aux(#Diffs) end
-				d = Diffs[diff:getaux()]
+			if not d then
+				while not d or not d:GetMeter() do
+					diff:addaux(-1)
+					if diff:getaux() < 1 then diff:aux(#Diffs) end
+					d = Diffs[diff:getaux()]
+				end
 			end
 			local diffstr = d:GetDifficulty()
 			diffstr = diffstr:sub(diffstr:find('_') + 1, -1)
@@ -678,7 +680,7 @@ local ret = Def.ActorFrame {
 				fakes = radar:GetValue(RadarCategory[14]),
 				mines = radar:GetValue(RadarCategory[10]),
 			}
-			if moving then
+			if moving or #Diffs == 1 then
 				diff:playcommand('SetDifficulty', {
 					pn = params.pn,
 					difficulty = diffstr,
@@ -687,7 +689,7 @@ local ret = Def.ActorFrame {
 					time = params.time,
 					data = data
 				})
-				if Groups.Active == 'Difficulty' then SOUND:PlayOnce(THEME:GetPathS('Common', 'value'), true) end
+				if Groups.Active == 'Difficulty' and #Diffs > 1 then SOUND:PlayOnce(THEME:GetPathS('Common', 'value'), true) end
 			end
 			if GAMESTATE:IsSideJoined(params.pn) then GAMESTATE:SetCurrentSteps(params.pn, d) end
 		end
