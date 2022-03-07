@@ -614,8 +614,10 @@ local ret = Def.ActorFrame {
 		MESSAGEMAN:Broadcast('CurrentSongChanged')
 	end,
 	ChangeDifficultyCommand = function(self, params)
+		local moving = true
 		local diff = self:GetChild('Wheel'):GetChild('DifficultyTab'):GetChild('Difficulty'..ToEnumShortString(params.pn))
 		if #Diffs == 0 then
+			moving = false
 			if diff:getaux() ~= 0 then
 				print('No compatible chart found.')
 				diff:playcommand('SetDifficulty', {
@@ -643,8 +645,12 @@ local ret = Def.ActorFrame {
 			diff:aux(0)
 		else
 			diff:addaux(params.direction)
-			if diff:getaux() > #Diffs then diff:aux(#Diffs)
-			elseif diff:getaux() < 1 then diff:aux(1)
+			if diff:getaux() > #Diffs then
+				moving = false
+				diff:aux(#Diffs)
+			elseif diff:getaux() < 1 then
+				moving = false
+				diff:aux(1)
 			end
 			local d = Diffs[diff:getaux()]
 			while not d or not d:GetMeter() do
@@ -672,15 +678,17 @@ local ret = Def.ActorFrame {
 				fakes = radar:GetValue(RadarCategory[14]),
 				mines = radar:GetValue(RadarCategory[10]),
 			}
-			diff:playcommand('SetDifficulty', {
-				pn = params.pn,
-				difficulty = diffstr,
-				name = THEME:GetString('CustomDifficulty', ToEnumShortString(d:GetDifficulty())),
-				meter = math.floor(d:GetMeter() * 10) * 0.1,
-				time = params.time,
-				data = data
-			})
-			if Groups.Active == 'Difficulty' and diff:getaux() > 1 then SOUND:PlayOnce(THEME:GetPathS('Common', 'value'), true) end
+			if moving then
+				diff:playcommand('SetDifficulty', {
+					pn = params.pn,
+					difficulty = diffstr,
+					name = THEME:GetString('CustomDifficulty', ToEnumShortString(d:GetDifficulty())),
+					meter = math.floor(d:GetMeter() * 10) * 0.1,
+					time = params.time,
+					data = data
+				})
+				if Groups.Active == 'Difficulty' then SOUND:PlayOnce(THEME:GetPathS('Common', 'value'), true) end
+			end
 			if GAMESTATE:IsSideJoined(params.pn) then GAMESTATE:SetCurrentSteps(params.pn, d) end
 		end
 	end,
