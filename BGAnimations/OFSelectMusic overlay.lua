@@ -850,13 +850,20 @@ local ret = Def.ActorFrame {
 		Def.FadingBanner {
 			Name = 'GroupBanner',
 			InitCommand = function(self)
-				self:scaletoclipped(512, 160)
+				--self:scaletoclipped(512, 160)
 			end,
 			CurrentSongChangedMessageCommand = function(self)
 				local song = TF_CurrentSong
 				self
 					:stoptweening()
 					:LoadFromSongGroup(song:GetGroupName())
+				for i = 1, self:GetNumChildren() do
+					local img = self:GetChildAt(i)
+					local w, h = img:GetWidth(), img:GetHeight()
+					print(w, h)
+					img:zoomto(160 * w/h, 160)
+				end
+					
 			end,
 		},
 		Def.BitmapText {

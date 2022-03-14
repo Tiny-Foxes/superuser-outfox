@@ -8,6 +8,37 @@ Branch.AfterTitleMenu = function()
 	return Branch.StartGame()
 end
 
+Branch.AfterSelectMusic = function()
+	if SCREENMAN:GetTopScreen():GetGoToOptions() then
+		return SelectFirstOptionsScreen()
+	else
+		return "ScreenGameplay"
+	end
+end
+
+Branch.PlayerOptions = function()
+	local pm = GAMESTATE:GetPlayMode()
+	local restricted = { PlayMode_Oni= true, PlayMode_Rave= true,
+		--"PlayMode_Battle" -- ??
+	}
+	local optionsScreen = "ScreenPlayerOptions"
+	if restricted[pm] then
+		optionsScreen = "ScreenPlayerOptionsRestricted"
+	end
+	if SCREENMAN:GetTopScreen():GetGoToOptions() then
+		return optionsScreen
+	else
+		return "ScreenGameplay"
+	end
+end
+Branch.SongOptions = function()
+	if SCREENMAN:GetTopScreen():GetGoToOptions() then
+		return "ScreenSongOptions"
+	else
+		return "ScreenGameplay"
+	end
+end
+
 Branch.AfterSelectProfile = function()
 	if getenv("StartFitness") == true then
 		return "ScreenFitnessOptions"

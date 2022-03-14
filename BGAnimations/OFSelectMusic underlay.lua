@@ -47,7 +47,7 @@ return Def.ActorFrame {
 		Def.Banner {
 			Name = 'Banner',
 			InitCommand = function(self)
-				self:scaletoclipped(512, 160)
+				--self:scaletoclipped(512, 160)
 			end,
 			CurrentSongChangedMessageCommand = function(self)
 				self
@@ -64,6 +64,8 @@ return Def.ActorFrame {
 				else
 					self:LoadFromSongGroup(song:GetGroupName())
 				end
+				local w, h = self:GetWidth(), self:GetHeight()
+				self:zoomto(160 * w/h, 160)
 				self:easeinoutsine(0.2):diffusealpha(1)
 			end,
 		},
