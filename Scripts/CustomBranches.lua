@@ -22,7 +22,7 @@ CustomBranch = {
 		if PROFILEMAN:GetNumLocalProfiles() > 0 then
 			return "ScreenSelectProfile"
 		else
-			return SelectMusicRedirect()
+			return "ScreenSelectPlayMode"
 		end
 	end,
 	AfterProfileSave = function()

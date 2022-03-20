@@ -599,7 +599,6 @@ local ret = Def.ActorFrame {
 			GAMESTATE:SetCurrentSong(TF_CurrentSong)
 		end
 		Diffs = GrabDiffs(TF_CurrentSong)
-		print(#Diffs)
 		for pn = 1, 2 do
 			if GAMESTATE:IsSideJoined(PlayerNumber[pn]) then
 				self:playcommand('ChangeDifficulty', {pn = PlayerNumber[pn], direction = 1, time = 0})
@@ -780,12 +779,15 @@ local ret = Def.ActorFrame {
 	end,
 	EnterGameplayCommand = function(self)
 		for _, pn in ipairs(GAMESTATE:GetHumanPlayers()) do
-			PROFILEMAN:SaveProfile(pn)
+			if PROFILEMAN:GetProfile(pn) then PROFILEMAN:SaveProfile(pn) end
 			if GAMESTATE:IsCourseMode() then
 				GAMESTATE:SetCurrentTrail(pn, Diffs[self:GetChild('Wheel'):GetChild('DifficultyTab'):GetChild('Difficulty'..ToEnumShortString(pn)):getaux()])
 			else
 				GAMESTATE:SetCurrentSteps(pn, Diffs[self:GetChild('Wheel'):GetChild('DifficultyTab'):GetChild('Difficulty'..ToEnumShortString(pn)):getaux()])
 			end
+		end
+		if not PROFILEMAN:GetProfile(PLAYER_1) and not PROFILEMAN:GetProfile(PLAYER_2) then
+			PROFILEMAN:SaveMachineProfile()
 		end
 		SCREENMAN:GetTopScreen()
 			:SetNextScreenName('ScreenGameplay')
@@ -860,7 +862,6 @@ local ret = Def.ActorFrame {
 				for i = 1, self:GetNumChildren() do
 					local img = self:GetChildAt(i)
 					local w, h = img:GetWidth(), img:GetHeight()
-					print(w, h)
 					img:zoomto(160 * w/h, 160)
 				end
 					
