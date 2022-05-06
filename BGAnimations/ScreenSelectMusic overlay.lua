@@ -1,7 +1,7 @@
 local songpos = GAMESTATE:GetSongPosition()
 
 return Def.ActorFrame {
-	loadfile(THEME:GetPathG('', 'screenheader'))(),
+	LoadActorWithParams(THEME:GetPathG('', 'screenheader'), {}),
 	Def.Sprite {
 		Texture = THEME:GetPathG('', 'niko'),
 		InitCommand = function(self)

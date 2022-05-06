@@ -266,7 +266,7 @@ local t = Def.ActorFrame {
 	end;
 
 	children = {
-		loadfile(THEME:GetPathG('', 'screenheader'))(),
+		LoadActorWithParams(THEME:GetPathG('', 'screenheader'), {}),
 		Def.ActorFrame {
 			Name = 'P1Frame';
 			InitCommand=function(self) self:xy(SCREEN_CENTER_X-160,SCREEN_CENTER_Y):skewx(-0.5) end;

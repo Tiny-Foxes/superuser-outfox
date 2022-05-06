@@ -1,4 +1,4 @@
-return loadfile(THEME:GetPathG('', 'screenheader'))() .. {
+return LoadActorWithParams(THEME:GetPathG('', 'screenheader'), {}) .. {
 	-- This solely exists for the purpose of updating Discord status. ~Sudo
 	Def.Actor {
 		InitCommand = function(self)

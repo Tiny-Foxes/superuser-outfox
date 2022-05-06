@@ -1,1 +1,1 @@
-return LoadActor(THEME:GetPathB('ScreenWithMenuElements', 'background'))
+return LoadActorWithParams(THEME:GetPathB('ScreenWithMenuElements', 'background'), {})

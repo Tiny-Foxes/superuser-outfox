@@ -217,6 +217,6 @@ return Def.ActorFrame {
 					:maxwidth(SCREEN_CENTER_X * 0.5)
 			end,
 		},
-		loadfile(THEME:GetPathG('','ButtonLayout'))(),
+		LoadActorWithParams(THEME:GetPathG('','ButtonLayout'), {}),
 	},
 }

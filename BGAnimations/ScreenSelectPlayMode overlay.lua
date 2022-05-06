@@ -1,1 +1,1 @@
-return loadfile(THEME:GetPathG('', 'screenheader'))()
+return LoadActorWithParams(THEME:GetPathG('', 'screenheader'), {})

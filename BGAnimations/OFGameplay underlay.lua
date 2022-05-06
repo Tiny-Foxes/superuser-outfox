@@ -1,1 +1,1 @@
-return LoadActor(THEME:GetPathB('ScreenGameplay', 'underlay'))
+return LoadActorWithParams(THEME:GetPathB('ScreenGameplay', 'underlay'), {})

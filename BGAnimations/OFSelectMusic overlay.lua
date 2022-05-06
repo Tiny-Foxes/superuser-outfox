@@ -12,9 +12,17 @@ end
 
 --GAMESTATE:SetCurrentPlayMode('PlayMode_Regular')
 if BothSidesJoined() then
-	GAMESTATE:SetCurrentStyle('versus')
+	if GAMESTATE:GetCurrentGame():GetName() == 'taiko' then
+		GAMESTATE:SetCurrentStyle('taiko-versus')
+	else
+		GAMESTATE:SetCurrentStyle('versus')
+	end
 else
-	GAMESTATE:SetCurrentStyle('single')
+	if GAMESTATE:GetCurrentGame():GetName() == 'taiko' then
+		GAMESTATE:SetCurrentStyle('taiko-single')
+	else
+		GAMESTATE:SetCurrentStyle('single')
+	end
 end
 local game, style = GAMESTATE:GetCurrentGame():GetName(), GAMESTATE:GetCurrentStyle():GetName()
 local profile = PROFILEMAN:GetProfile(GAMESTATE:GetMasterPlayerNumber())
@@ -28,22 +36,6 @@ else
 end
 
 
-local function GrabGroups()
-	if GAMESTATE:IsCourseMode() then
-		return SONGMAN:GetCourseGroupNames()
-	else
-		return SONGMAN:GetSongGroupNames()
-	end
-end
-
-local function GrabSongs(group)
-	if GAMESTATE:IsCourseMode() then
-		return SONGMAN:GetCoursesInGroup(group, true)
-	else
-		return SONGMAN:GetSongsInGroup(group)
-	end
-end
-
 local function GrabDiffs(song)
 	local ret, charts = {}, {}
 	if GAMESTATE:IsCourseMode() then
@@ -51,17 +43,54 @@ local function GrabDiffs(song)
 	else
 		charts = song:GetAllSteps()
 	end
-	for _, d in ipairs(charts) do
-		local match = d:GetStepsType()
-		match = match:lower()
-		if match:find(game) then
-			if not (match:find('double') and BothSidesJoined()) then
-				ret[#ret + 1] = d
+	if charts then
+		for _, d in ipairs(charts) do
+			local match = d:GetStepsType()
+			match = match:lower()
+			if match:find(game) then
+				if not (match:find('double') and BothSidesJoined()) then
+					ret[#ret + 1] = d
+				end
 			end
 		end
 	end
 	return ret
 end
+
+local function GrabSongs(group)
+	local ret, songs = {}, {}
+	if GAMESTATE:IsCourseMode() then
+		songs = SONGMAN:GetCoursesInGroup(group, true)
+	else
+		songs = SONGMAN:GetSongsInGroup(group)
+	end
+	if songs then
+		for _, s in ipairs(songs) do
+			if s:IsEnabled() and #GrabDiffs(s) > 0 then
+				ret[#ret + 1] = s
+			end
+		end
+	end
+	return ret
+end
+
+local function GrabGroups()
+	local ret, groups = {}, {}
+	if GAMESTATE:IsCourseMode() then
+		groups = SONGMAN:GetCourseGroupNames()
+	else
+		groups = SONGMAN:GetSongGroupNames()
+	end
+	if groups then
+		for _, g in ipairs(groups) do
+			if #GrabSongs(g) > 0 then
+				ret[#ret + 1] = g
+			end
+		end
+	end
+	return ret
+end
+
 
 local function InputHandler(event)
 	if event.type ~= 'InputEventType_Release' then
@@ -144,7 +173,7 @@ local folderSongs = {}
 
 for i, group in ipairs(Groups) do
 	local groupSongs = GrabSongs(group)
-	local actor = loadfile(THEME:GetPathG('MusicWheelItem', 'SectionExpanded NormalPart'))() .. {
+	local actor = LoadActorWithParams(THEME:GetPathG('MusicWheelItem', 'SectionExpanded NormalPart'), {}) .. {
 		InitCommand = function(self)
 			for i = 1, self:GetNumWrapperStates() do
 				self:RemoveWrapperState(i)
@@ -219,7 +248,7 @@ for i, group in ipairs(Groups) do
 		end,
 	}
 	for _, song in ipairs(groupSongs) do
-		local actor = loadfile(THEME:GetPathG('MusicWheelItem', 'Song NormalPart'))() .. {
+		local actor = LoadActorWithParams(THEME:GetPathG('MusicWheelItem', 'Song NormalPart'), {}) .. {
 			InitCommand = function(self)
 				for i = 1, self:GetNumWrapperStates() do
 					self:RemoveWrapperState(i)
@@ -956,7 +985,7 @@ local ret = Def.ActorFrame {
 					-- this SHOULD remove duplicate song artists but it only removes one duplicate ~ yosefu
 					for j = 1, #artists do
 						-- I accidentally deleted everything because i was j. ~Sudo
-						if artists[j]:find(artists[i]) and i ~= j then
+						if artists[i] == artists[j] and i ~= j then
 							-- We can remove them easier if they're blank. ~Sudo
 							artists[j] = ''
 						end
