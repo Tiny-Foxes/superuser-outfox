@@ -311,7 +311,7 @@ t[#t+1] = Def.ActorFrame{
 		AskForGoToOptionsCommand=function(self)
 			if showmessage then
 				setenv("NewOptions","Main")
-				self:visible(true):diffusealpha(0):vertalign('bottom'):y(SCREEN_BOTTOM+120):decelerate(0.2):addy(-118):diffusealpha(1) 
+				self:visible(true):diffusealpha(0):vertalign('bottom'):y(SCREEN_BOTTOM+120):decelerate(0.2):addy(-118):diffusealpha(1)
 				self:sleep(1):decelerate(0.2):addy(118):diffusealpha(0)
 			end
 		end,

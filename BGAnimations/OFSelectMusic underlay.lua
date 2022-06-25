@@ -5,7 +5,9 @@ return Def.ActorFrame {
 	OnCommand = function(self)
 		-- discord support UwU -y0sefu
 		local player = GAMESTATE:GetMasterPlayerNumber()
-		GAMESTATE:UpdateDiscordProfile(GAMESTATE:GetPlayerDisplayName(player))
+		if player then
+			GAMESTATE:UpdateDiscordProfile(GAMESTATE:GetPlayerDisplayName(player))
+		end
 		if GAMESTATE:IsCourseMode() then
 			GAMESTATE:UpdateDiscordScreenInfo("Selecting Course","",1)
 		else
@@ -29,10 +31,10 @@ return Def.ActorFrame {
 				:queuecommand('LoadBackground')
 		end,
 		LoadBackgroundCommand = function(self)
-			if not GAMESTATE:IsCourseMode() and TF_CurrentSong:GetPreviewVidPath() then
-				self:Load(TF_CurrentSong:GetPreviewVidPath())
+			if not GAMESTATE:IsCourseMode() and SU_Wheel.CurSong:GetPreviewVidPath() then
+				self:Load(SU_Wheel.CurSong:GetPreviewVidPath())
 			else
-				self:LoadFromSongBackground(TF_CurrentSong)
+				self:LoadFromSongBackground(SU_Wheel.CurSong)
 			end
 			self
 				:easeinoutsine(0.5)
@@ -58,7 +60,7 @@ return Def.ActorFrame {
 					:queuecommand('LoadBanner')
 			end,
 			LoadBannerCommand = function(self)
-				local song = TF_CurrentSong
+				local song = SU_Wheel.CurSong
 				if song:HasBanner() then
 					self:LoadFromCachedBanner(song:GetBannerPath())
 				else
@@ -76,7 +78,7 @@ return Def.ActorFrame {
 			self:xy(290, 460)
 		end,
 		Def.BitmapText {
-			Font = '_xide/40px',
+			Font = 'Common Large',
 			Name = 'Text',
 			InitCommand = function(self)
 				self
@@ -93,7 +95,7 @@ return Def.ActorFrame {
 					:queuecommand('LoadTitle')
 			end,
 			LoadTitleCommand = function(self)
-				local song = TF_CurrentSong
+				local song = SU_Wheel.CurSong
 				local title = song:GetDisplayFullTitle()
 				if not GAMESTATE:IsCourseMode() then
 					if song:GetDisplaySubTitle() and song:GetDisplaySubTitle() ~= '' then
@@ -107,7 +109,7 @@ return Def.ActorFrame {
 			end,
 		},
 		Def.BitmapText {
-			Font = '_xide/40px',
+			Font = 'Common Large',
 			Name = 'Separator',
 			Text = '--',
 			InitCommand = function(self)
@@ -126,7 +128,7 @@ return Def.ActorFrame {
 			end,
 		},
 		Def.BitmapText {
-			Font = '_xide/40px',
+			Font = 'Common Large',
 			Name = 'Artist',
 			InitCommand = function(self)
 				self
@@ -143,7 +145,7 @@ return Def.ActorFrame {
 					:queuecommand('LoadArtist')
 			end,
 			LoadArtistCommand = function(self)
-				local song = TF_CurrentSong
+				local song = SU_Wheel.CurSong
 				local artist = (GAMESTATE:IsCourseMode() and song:GetScripter()) or song:GetDisplayArtist()
 				self
 					:settext(artist)

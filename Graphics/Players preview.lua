@@ -93,6 +93,12 @@ local plrs = Def.ActorFrame {
 			:effectclock('bgm')
 			--]]
 	end,
+	OnCommand = function(self)
+		self:luaeffect('UpdateEffects')
+	end,
+	UpdateEffectsCommand = function(self)
+		ArrowEffects.Update()
+	end,
 }
 
 aft[#aft + 1] = plrs
@@ -148,7 +154,9 @@ for i, v in ipairs(GAMESTATE:GetEnabledPlayers()) do
 					:xy(metricN('ScreenGameplay', 'Player'..ToEnumShortString(v)..plrpos..'X') - SCREEN_CENTER_X, 0)
 					:basezoom(SCREEN_HEIGHT / 480)
 					:vanishpoint(SCREEN_CENTER_X, SCREEN_CENTER_Y)
+				if GAMESTATE:GetNumPlayersEnabled() < 2 then self:x(0):vanishpointx(SCREEN_CENTER_X) end
 			end
+			self:luaeffect('UpdateMods')
 		end,
 		SpeedChoiceChangedMessageCommand = function(self, param)
 			local poptions = self:GetChild('NoteField'):GetPlayerOptions('ModsLevel_Current')
@@ -160,8 +168,15 @@ for i, v in ipairs(GAMESTATE:GetEnabledPlayers()) do
 				poptions[speedmod](poptions, param.speed)
 			end
 		end,
-		PlayerOptionsChangedMessageCommand = function(self, param)
-			--PrintTable(param)
+		UpdateModsCommand = function(self, param)
+			if not SCREENMAN:GetTopScreen().GetGoToOptions then return end
+			if getenv('NewOptions') ~= 'Effects' then return end
+			local scr = SCREENMAN:GetTopScreen()
+			local idx = scr:GetCurrentRowIndex(v)
+			local opt = scr:GetOptionRow(idx)
+			print(opt:GetChoiceInRowWithFocus(v))
+			self:GetChild('NoteField'):GetPlayerOptions('ModsLevel_Current')
+				:FromString(GAMESTATE:GetPlayerState(v):GetPlayerOptionsString('ModsLevel_Preferred'))
 		end,
 		Def.NoteField {
 			Name = 'NoteField',
@@ -210,6 +225,10 @@ for i, v in ipairs(GAMESTATE:GetEnabledPlayers()) do
 				self:AutoPlay(false)
 				self:SetNoteDataFromLua(nf.chart[i])
 				self:AutoPlay(true)
+			end,
+			LuaNoteSkinsChangeMessageCommand = function(self, param)
+				if param.pn ~= v then return end
+				self:GetPlayerOptions('ModsLevel_Current'):NoteSkinCol(nil, param.choicename)
 			end,
 		},
 		Def.Sprite { Name = 'Judgment', InitCommand = function(self) self:visible(false) end },

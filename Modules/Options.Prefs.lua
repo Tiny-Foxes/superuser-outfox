@@ -330,7 +330,7 @@ return {
 			"ScreenPlayerOptions",
 			"ScreenPlayerOptions",
 			"ScreenPlayerOptions",
-			"ScreenSelectMusic"
+			SelectMusicRedirect()
 		},
 		LoadFunction = function(self,list)
 			list[1] = true
@@ -346,7 +346,6 @@ return {
 					end
 				end
 			end
-			lua.Trace(GAMESTATE:Env()["PlayerOptionsNextScreen"])
 		end,
 	},
 	SpeedModType =

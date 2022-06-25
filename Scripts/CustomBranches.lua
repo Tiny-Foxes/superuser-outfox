@@ -35,6 +35,13 @@ CustomBranch = {
 			return SelectMusicOrCourse()
 		end
 	end,
+	AfterGameSet = function()
+		if SCREENMAN:GetTopScreen():GetName():find('SelectMusic') then
+			return SelectMusicRedirect()
+		else
+			return 'ScreenTitleMenu'
+		end
+	end,
 }
 
 function SelectMusicRedirect()

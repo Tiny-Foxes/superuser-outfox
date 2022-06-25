@@ -4,7 +4,19 @@ local ThemeColor = LoadModule('Theme.Colors.lua')
 
 local wheel = Def.ActorFrame { Name = 'Wheel' }
 
-local Groups, Songs, Diffs = {}, {}, {}
+SU_Wheel = SU_Wheel or {}
+SU_Wheel.Players = SU_Wheel.Players or GAMESTATE:GetEnabledPlayers()
+SU_Wheel.MainPlayer = SU_Wheel.MainPlayer or GAMESTATE:GetMasterPlayerNumber()
+
+if not GAMESTATE:IsSideJoined(SU_Wheel.MainPlayer) then GAMESTATE:JoinPlayer(SU_Wheel.MainPlayer) end
+for _, v in ipairs(SU_Wheel.Players) do
+	if not GAMESTATE:IsSideJoined(v) and v ~= SU_Wheel.MainPlayer then GAMESTATE:JoinPlayer(v) end
+end
+GAMESTATE:LoadProfiles()
+
+
+local SongActor = LoadActorWithParams(THEME:GetPathG('MusicWheelItem', 'Song NormalPart'), {})
+local GroupActor = LoadActorWithParams(THEME:GetPathG('MusicWheelItem', 'SectionExpanded NormalPart'), {})
 
 local function BothSidesJoined()
 	return (GAMESTATE:IsSideJoined(PLAYER_1) and GAMESTATE:IsSideJoined(PLAYER_2))
@@ -20,81 +32,51 @@ if BothSidesJoined() then
 else
 	if GAMESTATE:GetCurrentGame():GetName() == 'taiko' then
 		GAMESTATE:SetCurrentStyle('taiko-single')
+	elseif GAMESTATE:GetCurrentGame():GetName() == 'kbx' then
+		GAMESTATE:SetCurrentStyle('single4')
 	else
 		GAMESTATE:SetCurrentStyle('single')
 	end
 end
-local game, style = GAMESTATE:GetCurrentGame():GetName(), GAMESTATE:GetCurrentStyle():GetName()
-local profile = PROFILEMAN:GetProfile(GAMESTATE:GetMasterPlayerNumber())
-
-if GAMESTATE:IsCourseMode() then
-	if tostring(TF_CurrentSong):find('Song') then TF_CurrentSong = nil end
-	TF_CurrentSong = TF_CurrentSong or profile:GetLastPlayedCourse() or SONGMAN:GetAllCourses(true)[1]
-else
-	if tostring(TF_CurrentSong):find('Course') then TF_CurrentSong = nil end
-	TF_CurrentSong = TF_CurrentSong or profile:GetLastPlayedSong() or SONGMAN:GetAllSongs()[1]
+local game = GAMESTATE:GetCurrentGame():GetName()
+local mainplr = GAMESTATE:GetMasterPlayerNumber()
+local profile = PROFILEMAN:GetMachineProfile()
+if mainplr then
+	profile = PROFILEMAN:GetProfile(GAMESTATE:GetMasterPlayerNumber())
 end
 
 
-local function GrabDiffs(song)
-	local ret, charts = {}, {}
-	if GAMESTATE:IsCourseMode() then
-		charts = song:GetAllTrails()
-	else
-		charts = song:GetAllSteps()
-	end
-	if charts then
-		for _, d in ipairs(charts) do
-			local match = d:GetStepsType()
-			match = match:lower()
-			if match:find(game) then
-				if not (match:find('double') and BothSidesJoined()) then
-					ret[#ret + 1] = d
+local Groups, Songs, Diffs = {}, {}, {}
+
+local GrabGroups, GrabSongs, GrabDiffs = LoadModule('Wheel.Songs.lua', game)
+
+if GAMESTATE:IsCourseMode() then
+	if tostring(SU_Wheel.CurSong):find('Song') then SU_Wheel.CurSong = nil end
+	SU_Wheel.CurSong = profile:GetLastPlayedCourse() or SONGMAN:GetAllCourses(true)[1]
+else
+	if tostring(SU_Wheel.CurSong):find('Course') then SU_Wheel.CurSong = nil end
+	SU_Wheel.CurSong = profile:GetLastPlayedSong() or SONGMAN:GetAllSongs()[1]
+end
+
+
+local games = {
+	'dance',
+	'pump',
+	'kbx',
+}
+local function InputHandler(event)
+	if event.type ~= 'InputEventType_Release' then
+		if event.PlayerNumber then
+			MESSAGEMAN:Broadcast(event.GameButton, event)
+		else
+			for i, v in ipairs(games) do
+				if event.DeviceInput.button:find(tostring(i)) then
+					TF_Players = GAMESTATE:GetEnabledPlayers()
+					TF_MainPlayer = GAMESTATE:GetMasterPlayerNumber()
+					--GAMEMAN:SetGame(v, THEME:GetCurThemeName())
 				end
 			end
 		end
-	end
-	return ret
-end
-
-local function GrabSongs(group)
-	local ret, songs = {}, {}
-	if GAMESTATE:IsCourseMode() then
-		songs = SONGMAN:GetCoursesInGroup(group, true)
-	else
-		songs = SONGMAN:GetSongsInGroup(group)
-	end
-	if songs then
-		for _, s in ipairs(songs) do
-			if s:IsEnabled() and #GrabDiffs(s) > 0 then
-				ret[#ret + 1] = s
-			end
-		end
-	end
-	return ret
-end
-
-local function GrabGroups()
-	local ret, groups = {}, {}
-	if GAMESTATE:IsCourseMode() then
-		groups = SONGMAN:GetCourseGroupNames()
-	else
-		groups = SONGMAN:GetSongGroupNames()
-	end
-	if groups then
-		for _, g in ipairs(groups) do
-			if #GrabSongs(g) > 0 then
-				ret[#ret + 1] = g
-			end
-		end
-	end
-	return ret
-end
-
-
-local function InputHandler(event)
-	if event.type ~= 'InputEventType_Release' then
-		MESSAGEMAN:Broadcast(event.GameButton, event)
 	end
 end
 
@@ -102,7 +84,7 @@ end
 Groups = GrabGroups()
 Groups.Index = 1
 for i = 1, #Groups do
-	if TF_CurrentSong:GetGroupName() == Groups[i] then
+	if SU_Wheel.CurSong:GetGroupName() == Groups[i] then
 		Groups.Index = i
 		break
 	end
@@ -112,7 +94,7 @@ Groups.Loop = false
 Songs = GrabSongs(Groups[Groups.Index])
 Songs.Index = 1
 for i = 1, #Songs do
-	if TF_CurrentSong == Songs[i] then
+	if SU_Wheel.CurSong == Songs[i] then
 		Songs.Index = i
 		break
 	end
@@ -173,7 +155,7 @@ local folderSongs = {}
 
 for i, group in ipairs(Groups) do
 	local groupSongs = GrabSongs(group)
-	local actor = LoadActorWithParams(THEME:GetPathG('MusicWheelItem', 'SectionExpanded NormalPart'), {}) .. {
+	local actor = GroupActor .. {
 		InitCommand = function(self)
 			for i = 1, self:GetNumWrapperStates() do
 				self:RemoveWrapperState(i)
@@ -182,10 +164,12 @@ for i, group in ipairs(Groups) do
 		end,
 	}
 	actor[#actor + 1] = Def.BitmapText {
-		Font = 'Common Normal',
+		Font = 'Common Large',
 		Text = group,
 		InitCommand = function(self)
-			self:maxwidth(280)
+			self
+				:maxwidth(560)
+				:zoom(0.5)
 		end,
 	}
 	folderList[#folderList + 1] = actor
@@ -248,7 +232,7 @@ for i, group in ipairs(Groups) do
 		end,
 	}
 	for _, song in ipairs(groupSongs) do
-		local actor = LoadActorWithParams(THEME:GetPathG('MusicWheelItem', 'Song NormalPart'), {}) .. {
+		local actor = SongActor .. {
 			InitCommand = function(self)
 				for i = 1, self:GetNumWrapperStates() do
 					self:RemoveWrapperState(i)
@@ -257,10 +241,12 @@ for i, group in ipairs(Groups) do
 			end,
 		}
 		actor[#actor + 1] = Def.BitmapText {
-			Font = 'Common Normal',
+			Font = 'Common Large',
 			Text = song:GetDisplayFullTitle(),
 			InitCommand = function(self)
-				self:maxwidth(280)
+				self
+					:maxwidth(560)
+					:zoom(0.5)
 			end,
 		}
 		songList[#songList + 1] = actor
@@ -300,6 +286,33 @@ wheel[#wheel + 1] = Def.Quad {
 	end,
 }
 
+wheel[#wheel + 1] = Def.ActorFrame {
+	Name = 'PreviewFrame',
+	OnCommand = function(self)
+		--self:AddChildFromPath(THEME:GetPathG('Players', 'preview'))
+		self:y(SCREEN_HEIGHT)
+	end,
+	ChangeFocusCommand = function(self, params)
+		if params.element == 'Difficulty' then
+			self:finishtweening():easeinoutexpo(0.5):y(0)
+		else
+			self:finishtweening():easeinoutexpo(0.5):y(SCREEN_HEIGHT)
+		end
+	end,
+	--[[
+	ApplyModsMessageCommand = function(self, params)
+		local nf = self:GetChild('Preview')
+			:GetChild('PreviewAFT')
+			:GetChild('PlayerFrame')
+			:GetChild('Player'..pname(params.pn))
+			:GetChild('NoteField')
+
+		if params.modstring then nf:ModsFromString(params.modstring) end
+		if params.noteskin then nf:GetPlayerOptions('ModsLevel_Current'):NoteSkinCol(nil, params.noteskin) end
+	end,
+	--]]
+}
+
 local diffTab = Def.ActorFrame {
 	Name = 'DifficultyTab',
 	InitCommand = function(self)
@@ -311,7 +324,7 @@ for pn = 1, 2 do
 	local diff = Def.ActorFrame {
 		Name = 'DifficultyP'..pn,
 		InitCommand = function(self)
-			self:Center():zoom(1.5):aux(1)
+			self:Center():zoom(1.5):aux(1):addy(60)
 			self:GetChild('BackFrame')
 				:SetSize(SCREEN_HEIGHT * 0.65, 96)
 				:addx(SCREEN_CENTER_Y * 0.15)
@@ -323,6 +336,7 @@ for pn = 1, 2 do
 				:skewx(-0.5)
 			self:GetChild('Meter'):addx(-SCREEN_CENTER_Y * 0.6 + 3):addy(-12)
 			self:GetChild('DiffName'):zoom(0.75):addx(-SCREEN_CENTER_Y * 0.6 - 12):addy(24)
+			self:GetChild('DiffTitle'):valign(1):addy(-60):zoom(0.5)
 			self:visible(GAMESTATE:IsSideJoined(PlayerNumber[pn]))
 		end,
 		OnCommand = function(self)
@@ -351,6 +365,7 @@ for pn = 1, 2 do
 			end
 			self:GetChild('Meter'):settext(params.meter)
 			self:GetChild('DiffName'):settext(params.name)
+			self:GetChild('DiffTitle'):settext(params.title)
 			self:GetChild('MeterFrame')
 				:stoptweening()
 				:easeinoutsine(params.time)
@@ -358,8 +373,9 @@ for pn = 1, 2 do
 		end,
 		Def.Quad { Name = 'BackFrame' },
 		Def.Quad { Name = 'MeterFrame' },
-		Def.BitmapText { Font = '_xide/40px', Name = 'Meter' },
+		Def.BitmapText { Font = 'Common Large', Name = 'Meter' },
 		Def.BitmapText { Font = 'Common Normal', Name = 'DiffName' },
+		Def.BitmapText { Font = 'Common Large', Name = 'DiffTitle' },
 	}
 	local info = Def.ActorFrame {
 		Name = 'Data',
@@ -413,11 +429,12 @@ wheel[#wheel + 1] = Def.Quad {
 
 local InOptions = {false, false}
 for pn = 1, 2 do
-
+	local popRows = {
+	}
 	local popTab = Def.ActorFrame {
 		Name = 'OptionsTabP'..pn,
 		InitCommand = function(self)
-			self:y(SCREEN_HEIGHT * 1.5)
+			self:y(SCREEN_HEIGHT * 1.75)
 		end,
 		Def.ActorFrame {
 			Name = 'Options',
@@ -439,12 +456,12 @@ for pn = 1, 2 do
 					SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'collapse'))
 					self:stoptweening():easeinoutexpo(0.4):y(-SCREEN_HEIGHT)
 					--]]
-					if not GAMESTATE:GetCurrentSteps(params.pn) then return end
-					SOUND:PlayOnce(THEME:GetPathS('Common', 'Start'), true)
+					---[[
 					SCREENMAN:GetTopScreen()
 						--:RemoveInputCallback(InputHandler)
 						:SetNextScreenName('ScreenPlayerOptions')
 						:StartTransitioningScreen('SM_GoToNextScreen')
+					--]]
 				end
 			end,
 			HideOptionsTabCommand = function(self, params)
@@ -469,14 +486,43 @@ for pn = 1, 2 do
 				-- TODO: Fill these with the actual code
 				self:playcommand('HideOptionsTab', {pn = PlayerNumber[pn]})
 			end,
-			Def.Quad {
+			Def.ActorFrame {
 				InitCommand = function(self)
-					self
-						:SetSize(360, SCREEN_HEIGHT * 0.5)
-						:diffuse(ThemeColor[ToEnumShortString(PlayerNumber[pn])])
-						:diffusealpha(0.5)
-						:skewx(-0.5)
+					self:skewx(-0.5)
 				end,
+				Def.Quad {
+					InitCommand = function(self)
+						self
+							:SetSize(360, SCREEN_HEIGHT * 0.25)
+							:diffuse(color('#000000'))
+							:diffusealpha(0.75)
+					end,
+				},
+				Def.Quad {
+					InitCommand = function(self)
+						self
+							:SetSize(360, SCREEN_HEIGHT * 0.125)
+							:y(-46)
+							:diffuse(PlayerColor(PlayerNumber[pn]))
+							:diffusealpha(0.5)
+					end,
+				},
+				Def.BitmapText {
+					Name = 'OptionType',
+					Font = 'Common Normal',
+					Text = 'Option',
+					InitCommand = function(self)
+						self:y(-46):skewx(0.5)
+					end,
+				},
+				Def.BitmapText {
+					Name = 'OptionValue',
+					Font = 'Common Normal',
+					Text = 'Value1',
+					InitCommand = function(self)
+						self:y(46):skewx(0.5)
+					end,
+				}
 			},
 		}
 	}
@@ -621,13 +667,13 @@ local ret = Def.ActorFrame {
 		if Songs.Index > #Songs then Songs.Index = Songs.Index - #Songs
 		elseif Songs.Index < 1 then Songs.Index = Songs.Index + #Songs
 		end
-		TF_CurrentSong = Songs[Songs.Index]
+		SU_Wheel.CurSong = Songs[Songs.Index]
 		if GAMESTATE:IsCourseMode() then
-			GAMESTATE:SetCurrentCourse(TF_CurrentSong)
+			GAMESTATE:SetCurrentCourse(SU_Wheel.CurSong)
 		else
-			GAMESTATE:SetCurrentSong(TF_CurrentSong)
+			GAMESTATE:SetCurrentSong(SU_Wheel.CurSong)
 		end
-		Diffs = GrabDiffs(TF_CurrentSong)
+		Diffs = GrabDiffs(SU_Wheel.CurSong)
 		for pn = 1, 2 do
 			if GAMESTATE:IsSideJoined(PlayerNumber[pn]) then
 				self:playcommand('ChangeDifficulty', {pn = PlayerNumber[pn], direction = 1, time = 0})
@@ -652,6 +698,7 @@ local ret = Def.ActorFrame {
 					pn = params.pn,
 					difficulty = 'Black',
 					name = 'Empty',
+					title = '???',
 					meter = '?',
 					time = params.time,
 					data = {
@@ -692,7 +739,7 @@ local ret = Def.ActorFrame {
 			diffstr = diffstr:sub(diffstr:find('_') + 1, -1)
 			local radar = d:GetRadarValues(params.pn)
 			local data = {
-				author = (GAMESTATE:IsCourseMode() and TF_CurrentSong:GetScripter()) or d:GetAuthorCredit(),
+				author = (GAMESTATE:IsCourseMode() and SU_Wheel.CurSong:GetScripter()) or d:GetAuthorCredit(),
 				style = THEME:GetString('LongStepsType', ToEnumShortString(d:GetStepsType())),
 				info = (GAMESTATE:IsCourseMode() and (
 					'Includes '..#d:GetTrailEntries()..' Entries.'
@@ -713,6 +760,7 @@ local ret = Def.ActorFrame {
 					pn = params.pn,
 					difficulty = diffstr,
 					name = THEME:GetString('CustomDifficulty', ToEnumShortString(d:GetDifficulty())),
+					title = d:GetChartName(),
 					meter = math.floor(d:GetMeter() * 10) * 0.1,
 					time = params.time,
 					data = data
@@ -884,7 +932,7 @@ local ret = Def.ActorFrame {
 				--self:scaletoclipped(512, 160)
 			end,
 			CurrentSongChangedMessageCommand = function(self)
-				local song = TF_CurrentSong
+				local song = SU_Wheel.CurSong
 				self
 					:stoptweening()
 					:LoadFromSongGroup(song:GetGroupName())
@@ -908,7 +956,7 @@ local ret = Def.ActorFrame {
 					:vertalign("middle")
 			end,
 			CurrentSongChangedMessageCommand = function(self)
-				local song = TF_CurrentSong
+				local song = SU_Wheel.CurSong
 				self
 					:stoptweening()
 					:settext("SONGS IN GROUP: "..table.getn( SONGMAN:GetSongsInGroup(song:GetGroupName()) ))
@@ -931,7 +979,7 @@ local ret = Def.ActorFrame {
 					:vertalign("middle")
 			end,
 			CurrentSongChangedMessageCommand = function(self)
-				local song = TF_CurrentSong
+				local song = SU_Wheel.CurSong
 				local numcharts = 0
 				local sgroup = SONGMAN:GetSongsInGroup(song:GetGroupName())
 	
@@ -970,7 +1018,7 @@ local ret = Def.ActorFrame {
 					:vertalign("top")
 			end,
 			CurrentSongChangedMessageCommand = function(self)
-				local song = TF_CurrentSong
+				local song = SU_Wheel.CurSong
 				local sgroup = SONGMAN:GetSongsInGroup(song:GetGroupName())
 				local artists = {}
 				local artistsnorepeats = {}
