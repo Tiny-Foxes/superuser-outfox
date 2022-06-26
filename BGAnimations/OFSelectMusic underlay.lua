@@ -154,4 +154,27 @@ return Def.ActorFrame {
 			end,
 		},
 	},
+	Def.ActorFrame {
+		Name = 'ControlsFrame',
+		InitCommand = function(self)
+			self:xy(SCREEN_LEFT + 20, SCREEN_BOTTOM - 80)
+		end,
+		Def.Quad {
+			InitCommand = function(self)
+				self:halign(0.25):valign(1)
+				self
+					:SetSize(480, 100)
+					:y(20)
+					:diffuse(color('#00000080'))
+					:skewx(-0.5)
+			end,
+		},
+		Def.BitmapText {
+			Font = 'Common Normal',
+			Text = '&LEFT;&RIGHT;: Change Selection\n&DOWN;&UP;: Change Wheel',
+			InitCommand = function(self)
+				self:halign(0):y(-30)
+			end,
+		}
+	}
 }

@@ -38,24 +38,30 @@ else
 		GAMESTATE:SetCurrentStyle('single')
 	end
 end
-local game = GAMESTATE:GetCurrentGame():GetName()
 local mainplr = GAMESTATE:GetMasterPlayerNumber()
 local profile = PROFILEMAN:GetMachineProfile()
 if mainplr then
 	profile = PROFILEMAN:GetProfile(GAMESTATE:GetMasterPlayerNumber())
 end
 
+local AllSongs = {}
+for _, v in ipairs(SONGMAN:GetAllSongs()) do
+	if (v:IsEnabled()) then
+		AllSongs[#AllSongs + 1] = v
+	end
+end
 
 local Groups, Songs, Diffs = {}, {}, {}
 
-local GrabGroups, GrabSongs, GrabDiffs = LoadModule('Wheel.Songs.lua', game)
+local GrabGroups, GrabSongs, GrabDiffs = LoadModule('Wheel.Songs.lua', AllSongs)
+
 
 if GAMESTATE:IsCourseMode() then
-	if tostring(SU_Wheel.CurSong):find('Song') then SU_Wheel.CurSong = nil end
-	SU_Wheel.CurSong = profile:GetLastPlayedCourse() or SONGMAN:GetAllCourses(true)[1]
+	--if tostring(SU_Wheel.CurSong):find('Song') then SU_Wheel.CurSong = nil end
+	SU_Wheel.CurSong = SU_Wheel.CurSong or profile:GetLastPlayedCourse() or AllSongs[1]
 else
-	if tostring(SU_Wheel.CurSong):find('Course') then SU_Wheel.CurSong = nil end
-	SU_Wheel.CurSong = profile:GetLastPlayedSong() or SONGMAN:GetAllSongs()[1]
+	--if tostring(SU_Wheel.CurSong):find('Course') then SU_Wheel.CurSong = nil end
+	SU_Wheel.CurSong = SU_Wheel.CurSong or profile:GetLastPlayedSong() or AllSongs[1]
 end
 
 
@@ -153,6 +159,11 @@ local folderList = Def.ActorScroller {
 
 local folderSongs = {}
 
+local function chartcompare(a, b)
+	local enum = Difficulty:Reverse()
+	return enum[a:GetDifficulty()] < enum[b:GetDifficulty()]
+end
+
 for i, group in ipairs(Groups) do
 	local groupSongs = GrabSongs(group)
 	local actor = GroupActor .. {
@@ -231,8 +242,9 @@ for i, group in ipairs(Groups) do
 			self:GetChildAt(idx):GetWrapperState(1):x(-self:GetParent():GetX())
 		end,
 	}
-	for _, song in ipairs(groupSongs) do
+	for i, song in ipairs(groupSongs) do
 		local actor = SongActor .. {
+			Name = 'Song'..i,
 			InitCommand = function(self)
 				for i = 1, self:GetNumWrapperStates() do
 					self:RemoveWrapperState(i)
@@ -249,6 +261,27 @@ for i, group in ipairs(Groups) do
 					:zoom(0.5)
 			end,
 		}
+		actor[#actor + 1] = Def.BitmapText {
+			Font = 'Common Normal',
+			InitCommand = function(self)
+			end,
+		}
+		local charts = song:GetStepsByStepsType(GAMESTATE:GetCurrentStyle():GetStepsType())
+		table.sort(charts, chartcompare)
+		for i, chart in ipairs(charts) do
+			actor[#actor + 1] = Def.Quad {
+				Name = 'Diff'..i,
+				InitCommand = function(self)
+					self
+						:valign(0)
+						:SetSize(16, 12)
+						:xy(-150, -25)
+						:addx(i * 20)
+						:skewx(-0.5)
+						:diffuse(ThemeColor[chart:GetDifficulty():sub(chart:GetDifficulty():find('_') + 1, -1)] or color('#080808'))
+				end,
+			}
+		end
 		songList[#songList + 1] = actor
 	end
 
@@ -324,7 +357,7 @@ for pn = 1, 2 do
 	local diff = Def.ActorFrame {
 		Name = 'DifficultyP'..pn,
 		InitCommand = function(self)
-			self:Center():zoom(1.5):aux(1):addy(60)
+			self:Center():zoom(1.5):aux(1):addy(20)
 			self:GetChild('BackFrame')
 				:SetSize(SCREEN_HEIGHT * 0.65, 96)
 				:addx(SCREEN_CENTER_Y * 0.15)
@@ -340,7 +373,7 @@ for pn = 1, 2 do
 			self:visible(GAMESTATE:IsSideJoined(PlayerNumber[pn]))
 		end,
 		OnCommand = function(self)
-			local y = (GAMESTATE:IsSideJoined(PLAYER_1) and GAMESTATE:IsSideJoined(PLAYER_2)) and 80 or 0
+			local y = (GAMESTATE:IsSideJoined(PLAYER_1) and GAMESTATE:IsSideJoined(PLAYER_2)) and 100 or 0
 			self:addy(PositionPerPlayer(PlayerNumber[pn], -y, y))
 			self:addx(PositionPerPlayer(PlayerNumber[pn], y * 0.5, -y * 0.5))
 		end,
@@ -365,7 +398,11 @@ for pn = 1, 2 do
 			end
 			self:GetChild('Meter'):settext(params.meter)
 			self:GetChild('DiffName'):settext(params.name)
-			self:GetChild('DiffTitle'):settext(params.title)
+			self:GetChild('DiffTitle'):settext(params.title ~= '' and params.title or params.name)
+				:stoptweening()
+				:cropright(1)
+				:linear(0.05)
+				:cropright(0)
 			self:GetChild('MeterFrame')
 				:stoptweening()
 				:easeinoutsine(params.time)
@@ -408,6 +445,31 @@ for pn = 1, 2 do
 		}
 	end
 	diff[#diff + 1] = info
+	diff[#diff + 1] = Def.BitmapText {
+		Font = 'Common Large',
+		InitCommand = function(self)
+			self:halign(1):valign(1):xy(290, -60):zoom(0.5)
+		end,
+		SetDifficultyCommand = function(self, params)
+			self
+				:stoptweening()
+				:cropright(1)
+				:settext('')
+			local aux = self:GetParent():getaux()
+			local diff = Diffs[aux]
+			if not diff then return end
+			local prof = PROFILEMAN:GetProfile(PlayerNumber[pn]) or PROFILEMAN:GetMachineProfile()
+			local scorelist = prof:GetHighScoreListIfExists(SU_Wheel.CurSong, diff)
+			if not scorelist then return end
+			local score = scorelist:GetHighScores()[1]
+			if not score then return end
+			self
+				:sleep(0.1)
+				:settext(PrettyPercent(score:GetPercentDP(), 1))
+				:linear(0.05)
+				:cropright(0)
+		end
+	}
 	diffTab[#diffTab + 1] = diff
 end
 
@@ -618,6 +680,16 @@ local function Cancel(self, input)
 	elseif Groups.Active == 'Song' then
 		SOUND:PlayOnce(THEME:GetPathS('Common', 'Cancel'), true)
 		self:playcommand('EnterTitleMenu')
+	end
+end
+
+local function Random(self, input)
+	if Groups.Active == 'Group' then
+		self:playcommand('ChangeGroup', {direction = math.random(-#Groups, #Groups), time = 0.5})
+	elseif Groups.Active == 'Songs' then
+		self:playcommand('ChangeSong', {direction = math.random(-#Songs, #Songs), time = 0.5})
+	elseif Groups.Active == 'Difficulty' then
+		self:playcommand('ChangeDifficulty', {pn = input.PlayerNumber, direction = math.random(-#Diffs, #Diffs), time = 0})
 	end
 end
 
@@ -926,6 +998,7 @@ local ret = Def.ActorFrame {
 					:cropleft(0.45)
 			end,
 		},
+		--[[
 		Def.FadingBanner {
 			Name = 'GroupBanner',
 			InitCommand = function(self)
@@ -943,6 +1016,31 @@ local ret = Def.ActorFrame {
 				end
 					
 			end,
+		},
+		--]]
+		Def.ActorFrame {
+			Name = 'GroupBannerFrame',
+			Def.Banner {
+				Name = 'GroupBanner',
+				InitCommand = function(self)
+					--self:scaletoclipped(512, 160)
+				end,
+				CurrentSongChangedMessageCommand = function(self)
+					self
+						:stoptweening()
+						:linear(0.1)
+						:diffusealpha(0)
+						:sleep(0.25)
+						:queuecommand('LoadBanner')
+				end,
+				LoadBannerCommand = function(self)
+					local song = SU_Wheel.CurSong
+					self:LoadFromSongGroup(song:GetGroupName())
+					local w, h = self:GetWidth(), self:GetHeight()
+					self:zoomto(160 * w/h, 160)
+					self:easeinoutsine(0.2):diffusealpha(1)
+				end,
+			},
 		},
 		Def.BitmapText {
 			Name = "SongCount",

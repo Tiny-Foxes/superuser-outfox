@@ -1,4 +1,5 @@
-local game = ...
+local allsongs = ...
+local game = GAMESTATE:GetCurrentGame():GetName()
 
 local function BothSidesJoined()
 	return (GAMESTATE:IsSideJoined(PLAYER_1) and GAMESTATE:IsSideJoined(PLAYER_2))
@@ -29,6 +30,7 @@ end
 local function GrabSongs(group)
 	if not group then return end
 	local ret, songs = {}, {}
+	--[[
 	if GAMESTATE:IsCourseMode() then
 		songs = SONGMAN:GetCoursesInGroup(group, true)
 	else
@@ -39,6 +41,12 @@ local function GrabSongs(group)
 			if s:IsEnabled() and #GrabDiffs(s) > 0 then
 				ret[#ret + 1] = s
 			end
+		end
+	end
+	--]]
+	for _, s in ipairs(allsongs) do
+		if s:GetGroupName() == group then
+			ret[#ret + 1] = s
 		end
 	end
 	return ret
