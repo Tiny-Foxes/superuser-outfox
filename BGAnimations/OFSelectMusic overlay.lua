@@ -879,11 +879,21 @@ local ret = Def.ActorFrame {
 			x.Group, y.Group = -630, -SCREEN_CENTER_Y + 82
 			x.Difficulty, y.Difficulty = SCREEN_WIDTH, 0
 			dim.Song, dim.Group, dim.Difficulty = 0, 0, 0
+			SOUND:StopMusic()
+			self:GetChild('Music')
+				:stoptweening()
+				:sleep(0.4)
+				:queuecommand('PreviewMusic')
 		elseif Groups.Active == 'Group' then
 			x.Song, y.Song = 0, 0
 			x.Group, y.Group = 0, 0
 			x.Difficulty, y.Difficulty = SCREEN_WIDTH, 0
 			dim.Song, dim.Group, dim.Difficulty = 0, 0.75, 0
+			SOUND:StopMusic()
+			self:GetChild('Music')
+				:stoptweening()
+				:sleep(0.4)
+				:queuecommand('GroupMusic')
 		elseif Groups.Active == 'Difficulty' then
 			x.Song, y.Song = 630, SCREEN_CENTER_Y - 82
 			x.Group, y.Group = -630, -SCREEN_CENTER_Y + 82
@@ -958,20 +968,39 @@ local ret = Def.ActorFrame {
 	end,
 	wheel,
 	Def.Actor {
+		Name = 'Music',
 		CurrentSongChangedMessageCommand = function(self)
-			if not GAMESTATE:IsCourseMode() then SOUND:StopMusic() end
-			self
-				:stoptweening()
-				:sleep(0.4)
-				:queuecommand('PreviewMusic')
+			if not GAMESTATE:IsCourseMode() then
+				if Groups.Active == 'Song' then
+					SOUND:StopMusic()
+						self
+							:stoptweening()
+							:sleep(0.4)
+							:queuecommand('PreviewMusic')
+				end
+			end
 		end,
 		PreviewMusicCommand = function(self)
 			local song = Songs[Songs.Index]
 			if not GAMESTATE:IsCourseMode() then
+				if Groups.Active == 'Song' then
+					SOUND:PlayMusicPart(
+						song:GetPreviewMusicPath(),
+						song:GetSampleStart(),
+						song:GetSampleLength(),
+						0,
+						1,
+						true
+					)
+				end
+			end
+		end,
+		GroupMusicCommand = function(self)
+			if not GAMESTATE:IsCourseMode() then
 				SOUND:PlayMusicPart(
-					song:GetPreviewMusicPath(),
-					song:GetSampleStart(),
-					song:GetSampleLength(),
+					THEME:GetPathS('', 'Interluden'),
+					0,
+					25,
 					0,
 					1,
 					true
