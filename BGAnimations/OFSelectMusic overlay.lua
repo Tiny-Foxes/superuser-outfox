@@ -1000,9 +1000,9 @@ local ret = Def.ActorFrame {
 				SOUND:PlayMusicPart(
 					THEME:GetPathS('', 'Interluden'),
 					0,
-					25,
+					25.6,
 					0,
-					1,
+					0,
 					true
 				)
 			end
