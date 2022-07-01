@@ -1,3 +1,5 @@
+local ThemeColor = LoadModule("Theme.Colors.lua")
+
 return Def.ActorFrame {
 	Name = "ArcadeOverlay",
 	InitCommand = function(self)
@@ -6,17 +8,15 @@ return Def.ActorFrame {
 	end,
 	Def.BitmapText {
 		Font = "_xide/20px",
-        Text = "uhh",
+        Text = "something's gone very wrong!",
         InitCommand = function(self)
             self:zoom(1):vertalign(middle):diffuse(color("#EEF1FF")):diffusealpha(0)
             self:diffuseblink()
             self:effectcolor1(1,1,1,1)
             self:effectcolor2(1,1,1,0)
             self:effectperiod(2)
-			if Var "LoadingScreen" == "ScreenLogo" then
-				self:x((SCREEN_CENTER_X * 0.5) - 16)
-				self:y(((SCREEN_CENTER_Y) * 0.5))
-			end
+			:shadowlengthy(3)
+			:shadowcolor(0,0,0,1)
         end,
         OnCommand = function(self)
             self:playcommand("Refresh")
