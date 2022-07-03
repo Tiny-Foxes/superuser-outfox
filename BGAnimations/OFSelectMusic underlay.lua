@@ -79,7 +79,7 @@ return Def.ActorFrame {
 		end,
 		Def.BitmapText {
 			Font = 'Common Large',
-			Name = 'Text',
+			Name = 'Title',
 			InitCommand = function(self)
 				self
 					:valign(1)
@@ -153,28 +153,43 @@ return Def.ActorFrame {
 					:diffusealpha(1)
 			end,
 		},
-	},
-	Def.ActorFrame {
-		Name = 'ControlsFrame',
-		InitCommand = function(self)
-			self:xy(SCREEN_LEFT + 20, SCREEN_BOTTOM - 80)
-		end,
-		Def.Quad {
-			InitCommand = function(self)
-				self:halign(0.25):valign(1)
-				self
-					:SetSize(480, 100)
-					:y(20)
-					:diffuse(color('#00000080'))
-					:skewx(-0.5)
-			end,
-		},
 		Def.BitmapText {
 			Font = 'Common Normal',
-			Text = '&LEFT;&RIGHT;: Change Selection\n&DOWN;&UP;: Change Wheel',
+			Name = 'Misc',
 			InitCommand = function(self)
-				self:halign(0):y(-30)
+				self
+					:valign(0)
+					:addy(78)
+					:maxwidth(488)
+			end,
+			CurrentSongChangedMessageCommand = function(self)
+				self
+					:stoptweening()
+					:linear(0.1)
+					:diffusealpha(0)
+					:sleep(0.25)
+					:queuecommand('LoadMisc')
+			end,
+			LoadMiscCommand = function(self)
+				if GAMESTATE:IsCourseMode() then return end
+				local song = SU_Wheel.CurSong
+				local data = {
+					(song:IsDisplayBpmRandom() and '???') or tostring(math.floor(song:GetDisplayBpms()[2])),
+					SecondsToMSS(song:GetStepsSeconds())
+				}
+				local str = (
+					'BPM: '..
+					-- If we have significant BPM changes to display and we're not just doubling BPM, put both display BPMs.
+					(((not song:IsDisplayBpmSpecified() and song:HasSignificantBPMChanges() and (song:GetDisplayBpms()[2] / song:GetDisplayBpms()[1] ~= 2)) and tostring(math.floor(song:GetDisplayBpms()[1])..'-')) or '')..
+					data[1]..
+					'  |  Length: '..
+					data[2]
+				)
+				self
+					:settext(str)
+					:easeinoutsine(0.2)
+					:diffusealpha(1)
 			end,
 		}
-	}
+	},
 }
