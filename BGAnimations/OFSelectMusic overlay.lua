@@ -44,24 +44,19 @@ if mainplr then
 	profile = PROFILEMAN:GetProfile(GAMESTATE:GetMasterPlayerNumber())
 end
 
-local AllSongs = {}
-for _, v in ipairs(SONGMAN:GetAllSongs()) do
-	if (v:IsEnabled()) then
-		AllSongs[#AllSongs + 1] = v
-	end
-end
+SU_Wheel.AllSongs = SONGMAN:GetAllSongs()
 
 local Groups, Songs, Diffs = {}, {}, {}
 
-local GrabGroups, GrabSongs, GrabDiffs = LoadModule('Wheel.Songs.lua', AllSongs)
+local GrabGroups, GrabSongs, GrabDiffs = LoadModule('Wheel/Songs.Grabber.lua', SU_Wheel.AllSongs)
 
 
 if GAMESTATE:IsCourseMode() then
 	--if tostring(SU_Wheel.CurSong):find('Song') then SU_Wheel.CurSong = nil end
-	SU_Wheel.CurSong = SU_Wheel.CurSong or profile:GetLastPlayedCourse() or AllSongs[1]
+	SU_Wheel.CurSong = SU_Wheel.CurSong or profile:GetLastPlayedCourse() or SU_Wheel.AllSongs[1]
 else
 	--if tostring(SU_Wheel.CurSong):find('Course') then SU_Wheel.CurSong = nil end
-	SU_Wheel.CurSong = SU_Wheel.CurSong or profile:GetLastPlayedSong() or AllSongs[1]
+	SU_Wheel.CurSong = SU_Wheel.CurSong or profile:GetLastPlayedSong() or SU_Wheel.AllSongs[1]
 end
 
 
@@ -96,6 +91,7 @@ for i = 1, #Groups do
 	end
 end
 Groups.Active = 'Song'
+Groups.Last = 'Groups'
 Groups.Loop = false
 Songs = GrabSongs(Groups[Groups.Index])
 Songs.Index = 1
@@ -266,21 +262,36 @@ for i, group in ipairs(Groups) do
 			InitCommand = function(self)
 			end,
 		}
-		local charts = song:GetStepsByStepsType(GAMESTATE:GetCurrentStyle():GetStepsType())
-		table.sort(charts, chartcompare)
+		local charts = GrabDiffs(song)
 		for i, chart in ipairs(charts) do
-			actor[#actor + 1] = Def.Quad {
+			local pip = Def.ActorFrame {
 				Name = 'Diff'..i,
 				InitCommand = function(self)
 					self
 						:valign(0)
-						:SetSize(16, 12)
 						:xy(-150, -25)
 						:addx(i * 20)
-						:skewx(-0.5)
-						:diffuse(ThemeColor[chart:GetDifficulty():sub(chart:GetDifficulty():find('_') + 1, -1)] or color('#080808'))
 				end,
+				Def.Quad {
+					InitCommand = function(self)
+						self
+							:SetSize(16, 12)
+							:skewx(-0.5)
+							:diffuse(ThemeColor[chart:GetDifficulty():sub(chart:GetDifficulty():find('_') + 1, -1)] or color('#080808'))
+							if chart:IsAutogen() then self:diffusebottomedge(ThemeColor.Pink) end
+					end
+				}
 			}
+			if chart:GetStepsType():lower():find('_double') then
+				pip[#pip + 1] = Def.BitmapText {
+					Font = 'Common Normal',
+					Text = 'D',
+					InitCommand = function(self)
+						self:zoom(0.5)
+					end,
+				}
+			end
+			actor[#actor + 1] = pip
 		end
 		songList[#songList + 1] = actor
 	end
@@ -593,7 +604,6 @@ for pn = 1, 2 do
 
 end
 
-
 local function WheelSwap(self, input)
 	if Groups.Active == 'Group' then
 		self:playcommand('ChangeFocus', {element = 'Song'})
@@ -844,7 +854,9 @@ local ret = Def.ActorFrame {
 	end,
 	ChangeFocusCommand = function(self, params)
 		if not params.element then return end
-		if params.element == 'Group' then
+		Groups.Last = Groups.Active
+		Groups.Active = params.element
+		if Groups.Active == 'Group' then
 			self:GetChild("GroupInfoFrame")
 				:stoptweening()
 				:easeinoutexpo((params.time or 0.4))
@@ -855,7 +867,6 @@ local ret = Def.ActorFrame {
 				:easeinoutexpo((params.time or 0.4))
 				:x((SCREEN_RIGHT - 280) + 630)
 		end
-		Groups.Active = params.element
 		local x = {
 			Song = 0,
 			Group = 0,
@@ -879,11 +890,13 @@ local ret = Def.ActorFrame {
 			x.Group, y.Group = -630, -SCREEN_CENTER_Y + 82
 			x.Difficulty, y.Difficulty = SCREEN_WIDTH, 0
 			dim.Song, dim.Group, dim.Difficulty = 0, 0, 0
-			SOUND:StopMusic()
-			self:GetChild('Music')
-				:stoptweening()
-				:sleep(0.4)
-				:queuecommand('PreviewMusic')
+			if Groups.Last == 'Group' then
+				SOUND:StopMusic()
+				self:GetChild('Music')
+					:stoptweening()
+					:sleep(0.4)
+					:queuecommand('PreviewMusic')
+			end
 		elseif Groups.Active == 'Group' then
 			x.Song, y.Song = 0, 0
 			x.Group, y.Group = 0, 0

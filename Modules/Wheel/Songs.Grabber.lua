@@ -45,7 +45,7 @@ local function GrabSongs(group)
 	end
 	--]]
 	for _, s in ipairs(allsongs) do
-		if s:GetGroupName() == group then
+		if s:GetGroupName() == group and s:IsEnabled() then
 			ret[#ret + 1] = s
 		end
 	end
