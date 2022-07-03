@@ -1,11 +1,19 @@
 local allsongs = ...
 local game = GAMESTATE:GetCurrentGame():GetName()
 
+local include_doubles = false
+
+function SU_Wheel.IncludeDoubles(b)
+	if b ~= nil then include_doubles = b end
+	return include_doubles
+end
+
 local function BothSidesJoined()
 	return (GAMESTATE:IsSideJoined(PLAYER_1) and GAMESTATE:IsSideJoined(PLAYER_2))
 end
 
-local function GrabDiffs(song)
+local function GrabDiffs(song, b)
+	local doubs = b or include_doubles
 	if not song then return end
 	local ret, charts = {}, {}
 	if GAMESTATE:IsCourseMode() then
@@ -18,7 +26,7 @@ local function GrabDiffs(song)
 			local match = d:GetStepsType()
 			match = match:lower()
 			if match:find(game) then
-				if not (match:find('double') and BothSidesJoined()) then
+				if not (match:find('double') and (BothSidesJoined() or not doubs)) then
 					ret[#ret + 1] = d
 				end
 			end
