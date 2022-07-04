@@ -1,7 +1,5 @@
 collectgarbage()
 
--- Move this entire section into a custom screen? -lighthexagon
-
 local id = ProductID()
 
 -- Check for OutFox. This theme will break if we aren't running on it.
