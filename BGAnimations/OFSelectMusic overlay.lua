@@ -1041,6 +1041,7 @@ local ret = Def.ActorFrame {
 			:StartTransitioningScreen('SM_GoToNextScreen')
 	end,
 	EnterTitleMenuCommand = function(self)
+		SOUND:StopMusic()
 		SCREENMAN:GetTopScreen():Cancel()
 	end,
 	ChartWarningCommand = function(self)
