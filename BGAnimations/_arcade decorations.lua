@@ -15,7 +15,7 @@ return Def.ActorFrame {
             self:effectcolor1(1,1,1,1)
             self:effectcolor2(1,1,1,0)
             self:effectperiod(2)
-			:shadowlengthy(3)
+			:shadowlengthy(2)
 			:shadowcolor(0,0,0,1)
         end,
         OnCommand = function(self)
