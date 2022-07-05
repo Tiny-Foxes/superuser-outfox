@@ -6,7 +6,7 @@ local function SelectMusicOrCourse()
 	elseif GAMESTATE:IsCourseMode() then
 		return "ScreenSelectCourse"
 	else
-		return SelectMusicRedirect()
+		return "ScreenSelectMusic"
 	end
 end
 

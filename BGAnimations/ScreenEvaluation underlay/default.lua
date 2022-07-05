@@ -219,8 +219,7 @@ return Def.ActorFrame {
 						:addy(-18)
 						:maxwidth(SCREEN_WIDTH - 360)
 					local target = GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentCourse() or GAMESTATE:GetCurrentSong()
-					text = GAMESTATE:IsCourseMode() and target:GetDisplayFullTitle() or target:GetDisplayMainTitle()
-					self:settext(text)
+					self:settext(target:GetDisplayMainTitle())
 				end,
 				OnCommand = function(self)
 					if self:GetParent():GetChild('SongTitleS'):GetWidth() > 0 then
@@ -241,7 +240,6 @@ return Def.ActorFrame {
 						:addy(-18)
 						:maxwidth((SCREEN_WIDTH - 400) * (1/3) * 0.75)
 					local target = GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentCourse() or GAMESTATE:GetCurrentSong()
-					local text = GAMESTATE:IsCourseMode() and '' or target:GetDisplaySubTitle()
 					self:settext(target:GetDisplaySubTitle())
 				end,
 			},
@@ -255,8 +253,7 @@ return Def.ActorFrame {
 						:addy(12)
 						:maxwidth(SCREEN_WIDTH - 360)
 					local target = GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentCourse() or GAMESTATE:GetCurrentSong()
-					local text = GAMESTATE:IsCourseMode() and target:GetScripter() or target:GetDisplayArtist()
-					self:settext(text)
+					self:settext(target:GetDisplayArtist())
 				end,
 				OffCommand = function(self)
 					self:sleep(1.25)
