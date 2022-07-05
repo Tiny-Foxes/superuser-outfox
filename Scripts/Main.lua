@@ -1,5 +1,3 @@
-LoadModule('Konko.Core.lua')
-
 function OptionNameString(str)
 	return THEME:GetString('OptionNames',str)
 end
@@ -51,6 +49,10 @@ Branch.AfterSelectProfile = function()
 	else
 		return "ScreenSelectStyle"
 	end
+end
+
+Branch.GameplayScreen = function()
+	return "ScreenGameplay"
 end
 
 function check_stop_course_early()
