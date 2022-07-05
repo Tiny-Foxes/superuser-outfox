@@ -19,7 +19,7 @@ local Choices = {
 	{
 		Name = "forfeit_song",
 		Action = function( screen )
-			screen:SetPrevScreenName(SelectMusicRedirect()):begin_backing_out()
+			screen:SetPrevScreenName(SelectMusicOrCourse()):begin_backing_out()
 		end
 	},
 }
