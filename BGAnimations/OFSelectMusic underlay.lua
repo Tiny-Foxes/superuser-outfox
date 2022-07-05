@@ -48,9 +48,6 @@ return Def.ActorFrame {
 		end,
 		Def.Banner {
 			Name = 'Banner',
-			InitCommand = function(self)
-				--self:scaletoclipped(512, 160)
-			end,
 			CurrentSongChangedMessageCommand = function(self)
 				self
 					:stoptweening()
@@ -190,6 +187,6 @@ return Def.ActorFrame {
 					:easeinoutsine(0.2)
 					:diffusealpha(1)
 			end,
-		}
+		},
 	},
 }
