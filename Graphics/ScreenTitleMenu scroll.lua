@@ -53,6 +53,26 @@ return Def.ActorFrame {
 					:shadowlength(2, 2)
 			end,
 		},
+		Def.Quad {
+			InitCommand= function(self)
+				self
+					:SetSize(item_width, item_height)
+					:diffuse(color('#FFFFFF'))
+					:skewx(-0.5)
+			end,
+			GainFocusCommand = function(self)
+				self
+					:diffusealpha(0.3)
+					:glowshift()
+					:effectcolor1(color('#00000000'))
+					:effectcolor2(color('#FFFFFFFF'))
+			end,
+			LoseFocusCommand = function(self)
+				self
+					:diffusealpha(0)
+					:stopeffect()
+			end,
+		},
 		Def.BitmapText {
 			Font = 'Common Normal',
 			Text = THEME:GetString('ScreenTitleMenu', gc:GetText()),
