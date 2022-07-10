@@ -3,7 +3,10 @@ local ThemeColor = LoadModule('Theme.Colors.lua')
 return Def.ActorFrame {
     Def.ActorFrame {
         InitCommand = function(self)
-            self:draworder(99999)
+            self
+                :draworder(99999)
+                :fov(90)
+
         end,
         OnCommand = function(self)
             self
@@ -20,23 +23,12 @@ return Def.ActorFrame {
         Def.Quad {
             InitCommand = function(self)
                 self
-                    :SetSize(SCREEN_WIDTH,50)
+                    :SetSize(SCREEN_WIDTH,60)
                     :xy(SCREEN_CENTER_X,SCREEN_CENTER_Y)
                     :diffuse(ThemeColor.Primary)
                     :diffusealpha(0.95)
-            end,
-        },
-        Def.Quad {
-            OnCommand = function(self)
-                self
-                    :sleep(0.2)
-                    :SetSize(SCREEN_WIDTH,50)
-                    :xy(SCREEN_CENTER_X,SCREEN_CENTER_Y)
-                    :diffusealpha(0.1)
-                    :glowshift()
-                    :effectcolor1(1,1,1,0)
-                    :effectcolor2(1,1,1,1)
-                    :effectperiod(2)
+                    :fadetop(0.2)
+                    :fadebottom(0.2)
             end,
         },
         Def.BitmapText {
