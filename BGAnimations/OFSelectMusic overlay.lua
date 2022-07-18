@@ -15,8 +15,9 @@ end
 GAMESTATE:LoadProfiles()
 
 
-local SongActor = LoadActorWithParams(THEME:GetPathG('MusicWheelItem', 'Song NormalPart'), {})
-local GroupActor = LoadActorWithParams(THEME:GetPathG('MusicWheelItem', 'SectionExpanded NormalPart'), {})
+local SongActor = THEME:GetPathG('MusicWheelItem', 'Song NormalPart')
+local SongOver = THEME:GetPathG('MusicWheelItem', 'Song OverPart')
+local GroupActor = THEME:GetPathG('MusicWheelItem', 'SectionExpanded NormalPart')
 
 local function BothSidesJoined()
 	return (GAMESTATE:IsSideJoined(PLAYER_1) and GAMESTATE:IsSideJoined(PLAYER_2))
@@ -156,7 +157,7 @@ local folderSongs = {}
 
 for i, group in ipairs(Groups) do
 	local groupSongs = GrabSongs(group)
-	local actor = GroupActor .. {
+	local actor = LoadActorWithParams(GroupActor, {Group = group}) .. {
 		InitCommand = function(self)
 			for i = 1, self:GetNumWrapperStates() do
 				self:RemoveWrapperState(i)
@@ -198,7 +199,10 @@ for i, group in ipairs(Groups) do
 				end
 			end
 		end,
-		CurrentSongChangedMessageCommand = function(self)
+		ChangeGroupCommand = function(self)
+			self:stoptweening():visible(false):sleep(0.4):queuecommand('ToggleShow')
+		end,
+		ToggleShowCommand = function(self)
 			self:visible(Groups[Groups.Index] == group)
 		end,
 		InitCommand = function(self)
@@ -207,9 +211,12 @@ for i, group in ipairs(Groups) do
 				:SetLoop(Groups.Loop)
 				:SetFastCatchup(true)
 				:aux(1)
+				:visible(false)
 		end,
 		OnCommand = function(self)
-			self:queuecommand('StartUpdate')
+			self
+				:visible(Groups[Groups.Index] == group)
+				:queuecommand('StartUpdate')
 		end,
 		StartUpdateCommand = function(self)
 			self:luaeffect('Update')
@@ -233,7 +240,7 @@ for i, group in ipairs(Groups) do
 		end,
 	}
 	for i, song in ipairs(groupSongs) do
-		local actor = SongActor .. {
+		local actor = LoadActorWithParams(SongActor, {Song = song}) .. {
 			Name = 'Song'..i,
 			InitCommand = function(self)
 				for i = 1, self:GetNumWrapperStates() do
@@ -256,46 +263,6 @@ for i, group in ipairs(Groups) do
 			InitCommand = function(self)
 			end,
 		}
-		local charts = GrabDiffs(song, true)
-		for i, chart in ipairs(charts) do
-			local pip = Def.ActorFrame {
-				Name = 'Diff'..i,
-				InitCommand = function(self)
-					self
-						:valign(0)
-						:xy(-150, -20)
-						:addx(i * 20)
-					if chart:GetStepsType():lower():find('_double') then
-						self:addx(10)
-						self:visible(SU_Wheel.IncludeDoubles())
-					end
-				end,
-				ChangeDifficultyCommand = function(self)
-					if chart:GetStepsType():lower():find('_double') then
-						self:visible(SU_Wheel.IncludeDoubles())
-					end
-				end,
-				Def.Quad {
-					InitCommand = function(self)
-						self
-							:SetSize(16, 12)
-							:skewx(-0.5)
-							:diffuse(ThemeColor[chart:GetDifficulty():sub(chart:GetDifficulty():find('_') + 1, -1)] or color('#080808'))
-							if chart:IsAutogen() then self:diffusebottomedge(ThemeColor.Pink) end
-					end
-				}
-			}
-			if chart:GetStepsType():lower():find('_double') then
-				pip[#pip + 1] = Def.BitmapText {
-					Font = 'Common Normal',
-					Text = 'D',
-					InitCommand = function(self)
-						self:zoom(0.5):xy(1, -1)
-					end,
-				}
-			end
-			actor[#actor + 1] = pip
-		end
 		songList[#songList + 1] = actor
 	end
 
