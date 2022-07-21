@@ -1,3 +1,5 @@
+local ThemeColor = LoadModule('Theme.Colors.lua')
+
 local can_play = false
 local gc = Var("GameCommand");
 local item_width = 260;
@@ -44,7 +46,7 @@ return Def.ActorFrame {
         InitCommand = function(self)
             self
                 :SetSize(item_width, item_height)
-                :diffuse(color('#9D276C'))
+                :diffuse(ThemeColor.Elements)
                 :skewx(-0.5)
                 :shadowlength(2, 2)
         end,
