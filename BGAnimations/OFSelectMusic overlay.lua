@@ -256,6 +256,9 @@ for i, group in ipairs(Groups) do
 			InitCommand = function(self)
 			end,
 		}
+		-- Currently, this causes massive performance issues.
+		-- This requires a refactor to work properly.
+		--[[
 		local charts = GrabDiffs(song, true)
 		for i, chart in ipairs(charts) do
 			local pip = Def.ActorFrame {
@@ -296,6 +299,7 @@ for i, group in ipairs(Groups) do
 			end
 			actor[#actor + 1] = pip
 		end
+		--]]
 		songList[#songList + 1] = actor
 	end
 
