@@ -102,6 +102,7 @@ for i = 1, #Songs do
 end
 Diffs = GrabDiffs(Songs[Songs.Index])
 
+local folderSongs = {}
 
 local folderList = Def.ActorScroller {
 	Name = 'Groups',
@@ -151,8 +152,6 @@ local folderList = Def.ActorScroller {
 		self:GetChildAt(idx):GetWrapperState(1):x(-self:GetParent():GetX())
 	end,
 }
-
-local folderSongs = {}
 
 for i, group in ipairs(Groups) do
 	local groupSongs = GrabSongs(group)
@@ -258,7 +257,6 @@ for i, group in ipairs(Groups) do
 		}
 		-- Currently, this causes massive performance issues.
 		-- This requires a refactor to work properly.
-		--[[
 		local charts = GrabDiffs(song, true)
 		for i, chart in ipairs(charts) do
 			local pip = Def.ActorFrame {
@@ -299,7 +297,6 @@ for i, group in ipairs(Groups) do
 			end
 			actor[#actor + 1] = pip
 		end
-		--]]
 		songList[#songList + 1] = actor
 	end
 

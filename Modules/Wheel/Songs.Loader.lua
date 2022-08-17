@@ -12,7 +12,7 @@ return function(Style)
 		local DiffCon = {}
 			
 		-- Set the first value to be Current Looped Song, In the Temp Current Song Container.
-		local CurSongCon = {CurSong}	
+		local CurSongCon = {CurSong}
 		
 		-- For all the steps in Current looped Song.
 		for i, CurStep in ipairs(CurSong:GetAllSteps()) do
@@ -43,7 +43,7 @@ return function(Style)
 			end
 		end
 		
-		-- We want to sort the Difficulties, So we gra the Keys and Sort based on them.
+		-- We want to sort the Difficulties, So we grab the Keys and Sort based on them.
 		local Keys = {}
 		for k in pairs(DiffCon) do table.insert(Keys, k) end
 		table.sort(Keys)
@@ -56,13 +56,13 @@ return function(Style)
 		end
 		
 		-- If a Difficulty exist for song using Style, Add it to All Compatible Songs.
-		if CurSongCon[2] then				
+		if CurSongCon[2] then
 			AllCompSongs[#AllCompSongs+1] = CurSong
 		end
 	end	
 
 	local function compare(a,b)
-        return a[1]:GetDisplayMainTitle() < b[1]:GetDisplayMainTitle()
+        return a:GetDisplayMainTitle() < b:GetDisplayMainTitle()
     end
 	
 	table.sort(AllCompSongs, compare)

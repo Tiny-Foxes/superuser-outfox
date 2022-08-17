@@ -97,14 +97,19 @@ local function GetMessage(self, name)
 	return self[name..'MessageCommand']
 end
 local function SetInput(self, func)
-	--lua.Trace('SuperActor:SetInput')
+	--print('SuperActor:SetInput')
 	self.InputMessageCommand = function(self, args)
 		return func(self, args[1])
 	end
 	return self
 end
 local function SetDraw(self, func)
-	if self.Type ~= 'ActorFrame' and self.Type ~= 'ActorFrameTexture' then
+	local allowed = {
+		ActorFrame = true,
+		ActorFrameTexture = true,
+		ActorScroller = true,
+	}
+	if not allowed[self.Type] then
 		printerr('Node.SetDraw: Cannot set draw function of type '..self.Type)
 		return
 	end
@@ -116,13 +121,18 @@ local function SetDraw(self, func)
 	return self
 end
 local function SetName(self, name)
-	--lua.Trace('SuperActor:SetName')
+	--print('SuperActor:SetName')
 	self.Name = name
 	return self
 end
 local function AddChild(self, child, idx, name)
 	--print('SuperActor:AddChild')
-	if self.Type ~= 'ActorFrame' and self.Type ~= 'ActorFrameTexture' then
+	local allowed = {
+		ActorFrame = true,
+		ActorFrameTexture = true,
+		ActorScroller = true,
+	}
+	if not allowed[self.Type] then
 		printerr('SuperActor.AddChild: Cannot add child to type '..self.Type)
 		return
 	end
@@ -140,8 +150,13 @@ local function AddChild(self, child, idx, name)
 	return self
 end
 local function GetChildIndex(self, name)
-	print('SuperActor:GetChildIndex')
-	if self.Type ~= 'ActorFrame' and self.Type ~= 'ActorFrameTexture' then
+	--print('SuperActor:GetChildIndex')
+	local allowed = {
+		ActorFrame = true,
+		ActorFrameTexture = true,
+		ActorScroller = true,
+	}
+	if not allowed[self.Type] then
 		printerr('SuperActor.GetChildIndex: Cannot add child to type '..self.Type)
 		return
 	end

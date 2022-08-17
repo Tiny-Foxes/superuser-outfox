@@ -61,16 +61,7 @@ function su.getfrom(ns, deep)
 	end
 end
 
-
-function su.print(s, ret)
-	print('SU: '..(s or 'nil'))
-	return ret
-end
-function su.printerr(s, ret)
-	lua.ReportScriptError('SU: '..(s or 'Error occured.'))
-	return ret
-end
-
+su.printerr = lua.ReportScriptError
 
 function su.switch(var)
 	local env = getfenv(2)
@@ -95,6 +86,8 @@ end
 su()
 
 -- Environment global variables, mostly shortcuts
+SL, SR = SCREEN_LEFT, SCREEN_RIGHT
+ST, SB = SCREEN_TOP, SCREEN_BOTTOM
 SW, SH = SCREEN_WIDTH, SCREEN_HEIGHT -- screen width and height
 SCX, SCY = SCREEN_CENTER_X, SCREEN_CENTER_Y -- screen center x and y
 
@@ -107,13 +100,12 @@ if not _G.Tweens.instant then
 	_G.Tweens.instant = function(x) return 1 end
 end
 
-function Def.KonkoAF(t)
+Def.KonkoAF = Def.KonkoAF or function(t)
 	local env = getfenv(2)
 	local af = Def.ActorFrame(t)
 
 	local init = af.InitCommand
 	local on = af.OnCommand
-	local ready = af.ReadyCommand
 	af.InitCommand = function(self)
 		if init then init(self) end
 		KonkoAF = self
@@ -139,7 +131,6 @@ function Def.KonkoAF(t)
 			end
 		end,
 	}
-
 	return af
 end
 
