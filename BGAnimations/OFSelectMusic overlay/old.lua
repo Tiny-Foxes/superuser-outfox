@@ -18,6 +18,7 @@ GAMESTATE:LoadProfiles()
 local SongActor = LoadActorWithParams(THEME:GetPathG('MusicWheelItem', 'Song NormalPart'), {})
 local GroupActor = LoadActorWithParams(THEME:GetPathG('MusicWheelItem', 'SectionExpanded NormalPart'), {})
 
+
 local function BothSidesJoined()
 	return (GAMESTATE:IsSideJoined(PLAYER_1) and GAMESTATE:IsSideJoined(PLAYER_2))
 end
@@ -102,6 +103,7 @@ for i = 1, #Songs do
 end
 Diffs = GrabDiffs(Songs[Songs.Index])
 
+local folderSongs = {}
 
 local folderList = Def.ActorScroller {
 	Name = 'Groups',
@@ -152,11 +154,9 @@ local folderList = Def.ActorScroller {
 	end,
 }
 
-local folderSongs = {}
-
 for i, group in ipairs(Groups) do
 	local groupSongs = GrabSongs(group)
-	local actor = GroupActor .. {
+	local actor = LoadActorWithParams(GroupActor, {Group = group}) .. {
 		InitCommand = function(self)
 			for i = 1, self:GetNumWrapperStates() do
 				self:RemoveWrapperState(i)
@@ -198,7 +198,10 @@ for i, group in ipairs(Groups) do
 				end
 			end
 		end,
-		CurrentSongChangedMessageCommand = function(self)
+		ChangeGroupCommand = function(self)
+			self:stoptweening():visible(false):sleep(0.4):queuecommand('ToggleShow')
+		end,
+		ToggleShowCommand = function(self)
 			self:visible(Groups[Groups.Index] == group)
 		end,
 		InitCommand = function(self)
@@ -207,9 +210,12 @@ for i, group in ipairs(Groups) do
 				:SetLoop(Groups.Loop)
 				:SetFastCatchup(true)
 				:aux(1)
+				:visible(false)
 		end,
 		OnCommand = function(self)
-			self:queuecommand('StartUpdate')
+			self
+				:visible(Groups[Groups.Index] == group)
+				:queuecommand('StartUpdate')
 		end,
 		StartUpdateCommand = function(self)
 			self:luaeffect('Update')
@@ -233,7 +239,7 @@ for i, group in ipairs(Groups) do
 		end,
 	}
 	for i, song in ipairs(groupSongs) do
-		local actor = SongActor .. {
+		local actor = LoadActorWithParams(SongActor, {Song = song}) .. {
 			Name = 'Song'..i,
 			InitCommand = function(self)
 				for i = 1, self:GetNumWrapperStates() do
@@ -256,6 +262,8 @@ for i, group in ipairs(Groups) do
 			InitCommand = function(self)
 			end,
 		}
+		-- Currently, this causes massive performance issues.
+		-- This requires a refactor to work properly.
 		local charts = GrabDiffs(song, true)
 		for i, chart in ipairs(charts) do
 			local pip = Def.ActorFrame {
