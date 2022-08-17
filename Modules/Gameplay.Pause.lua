@@ -136,7 +136,9 @@ end
 
 return Def.ActorFrame {
 	OnCommand = function(self)
-		self:queuecommand('ReportCursor')
+		-- i literally put this in as a joke about how taro always his cursor on screen.
+		-- it shouldnt even be here anymore. its just fucking annoying me now.
+		--self:queuecommand('ReportCursor')
 	end,
 	ReportCursorCommand = function(self)
 		if not Paused then
