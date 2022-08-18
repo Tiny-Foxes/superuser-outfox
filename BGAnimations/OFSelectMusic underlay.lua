@@ -31,10 +31,11 @@ return Def.ActorFrame {
 				:queuecommand('LoadBackground')
 		end,
 		LoadBackgroundCommand = function(self)
-			if not GAMESTATE:IsCourseMode() and SU_Wheel.CurSong:GetPreviewVidPath() then
-				self:Load(SU_Wheel.CurSong:GetPreviewVidPath())
+			local song = GAMESTATE:GetCurrentSong()
+			if not GAMESTATE:IsCourseMode() and song:GetPreviewVidPath() then
+				self:Load(song:GetPreviewVidPath())
 			else
-				self:LoadFromSongBackground(SU_Wheel.CurSong)
+				self:LoadFromSongBackground(song)
 			end
 			self
 				:easeinoutsine(0.5)
@@ -57,7 +58,7 @@ return Def.ActorFrame {
 					:queuecommand('LoadBanner')
 			end,
 			LoadBannerCommand = function(self)
-				local song = SU_Wheel.CurSong
+				local song = GAMESTATE:GetCurrentSong()
 				if song:HasBanner() then
 					self:LoadFromCachedBanner(song:GetBannerPath())
 				else
@@ -92,7 +93,7 @@ return Def.ActorFrame {
 					:queuecommand('LoadTitle')
 			end,
 			LoadTitleCommand = function(self)
-				local song = SU_Wheel.CurSong
+				local song = GAMESTATE:GetCurrentSong()
 				local title = song:GetDisplayFullTitle()
 				if not GAMESTATE:IsCourseMode() then
 					if song:GetDisplaySubTitle() and song:GetDisplaySubTitle() ~= '' then
@@ -142,7 +143,7 @@ return Def.ActorFrame {
 					:queuecommand('LoadArtist')
 			end,
 			LoadArtistCommand = function(self)
-				local song = SU_Wheel.CurSong
+				local song = GAMESTATE:GetCurrentSong()
 				local artist = (GAMESTATE:IsCourseMode() and song:GetScripter()) or song:GetDisplayArtist()
 				self
 					:settext(artist)
@@ -169,7 +170,7 @@ return Def.ActorFrame {
 			end,
 			LoadMiscCommand = function(self)
 				if GAMESTATE:IsCourseMode() then return end
-				local song = SU_Wheel.CurSong
+				local song = GAMESTATE:GetCurrentSong()
 				local data = {
 					(song:IsDisplayBpmRandom() and '???') or tostring(math.floor(song:GetDisplayBpms()[2])),
 					SecondsToMSS(song:GetStepsSeconds())

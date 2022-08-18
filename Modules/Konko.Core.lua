@@ -133,3 +133,5 @@ Def.KonkoAF = Def.KonkoAF or function(t)
 	}
 	return af
 end
+
+return su

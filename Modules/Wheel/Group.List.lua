@@ -2,21 +2,22 @@ return function(Songs)
 
     local Groups = {}
 
-	for _,v in ipairs(Songs) do
+	for v in ivalues(Songs) do
 		local Add = true
-		for _,v2 in ipairs(Groups) do
+		for v2 in ivalues(Groups) do
 			if v2 == v:GetGroupName() then Add = false break end
 		end
 		if Add then
 			Groups[#Groups+1] = v:GetGroupName()
-		end		
-    end	
+		end
+    end
 
 	local function compare(a,b)
-        return a < b
+		if a:sub(1, 1):find('%p') then return false end
+        return a:lower() < b:lower()
     end
-	
+
 	table.sort(Groups, compare)
-    
+
     return Groups
 end

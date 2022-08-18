@@ -45,15 +45,31 @@ return Def.ActorFrame {
 		end,
 	},
 	Def.BitmapText {
+		Name = 'Text',
+		Font = 'Common Large',
+		OnCommand = function(self)
+			self
+				:xy(-SCREEN_CENTER_X + 20, 10)
+				:skewx(0.5)
+				:zoom(0.5)
+				:horizalign('left')
+				:vertalign('bottom')
+				:settext(THEME:GetString(SCREENMAN:GetTopScreen():GetName(), 'HeaderText'))
+		end,
+		OffCommand = function(self)
+		end,
+	},
+	Def.BitmapText {
+		Name = 'SubText',
 		Font = 'Common Normal',
 		OnCommand = function(self)
 			self
-				:x(-SCREEN_CENTER_X + 10)
-				:y(-10)
+				:xy(-SCREEN_CENTER_X + 20 + self:GetParent():GetChild('Text'):GetZoomedWidth() + 12, 10)
 				:skewx(0.5)
+				:zoom(0.5)
 				:horizalign('left')
-				:vertalign('top')
-			self:settext(THEME:GetString(SCREENMAN:GetTopScreen():GetName(), 'HeaderText'))
+				:vertalign('bottom')
+				:settext(THEME:GetString(SCREENMAN:GetTopScreen():GetName(), 'HeaderSubText'))
 		end,
 		OffCommand = function(self)
 		end,

@@ -156,3 +156,15 @@ function TF_WHEEL.Input(self)
 		end
 	end
 end
+
+local subtext = {
+	'Now let me see you dance.',
+	'Play NUCLEAR-STAR from MRC2. Now.',
+	'GET THAT UPSCORE BOIIIIIIIIIII',
+	'And also select an XMod probably',
+	'Not Drugs'
+}
+
+function TF_WHEEL.RandomSubText()
+	return subtext[math.random(1, #subtext)]
+end
