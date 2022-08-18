@@ -24,6 +24,9 @@ Evaluation
 **Q. I want a feature in this theme. What should I do?**  
 *A. Submit a feature request detailing what feature you would like to have added to the theme. If you know a bit of Lua yourself, feel free to give implementing it yourself a go! You can even submit a pull request to the main theme if you'd like.*
 
+**Q. The screenshots look totally different from the actual theme? What the heck?**  
+*A. sorry ill fix it at some point*
+
 **Q. I found a bug in the theme. What should I do?**  
 *A. Submit an issue report detailing what bug you encountered and how to reproduce it, as well as what OS, OutFox build, and theme version and branch you are using. Please keep in mind that a feature request and an issue report are two very different things. Feature requests sent as issue reports will not be considered and deleted upon review.*
 
