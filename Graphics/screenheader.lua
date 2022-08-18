@@ -84,7 +84,7 @@ return Def.ActorFrame {
 				:skewx(0.5)
 		end,
 		CurrentSongChangedMessageCommand = function(self)
-			if SCREENMAN:GetTopScreen() and SCREENMAN:GetTopScreen():GetName() == "ScreenSelectMusic" then
+			if Var "LoadingScreen" == "ScreenSelectMusic" then
 				self:settext(string.sub(GAMESTATE:GetSortOrder(), 11))
 			else
 				self:settext('')

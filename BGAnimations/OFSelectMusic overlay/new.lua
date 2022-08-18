@@ -5,13 +5,13 @@
 		X Use only 12 ActorFrames on wheel.
 		X Switch out text for wheels rather than entire wheels.
 		X Add song preview.
-		- Pretty up music select screen.
-		- Allow dynamic player join and unjoin.
 		- Add difficulty select subscreen.
+		- Add chart preview on difficulty select screen.
+		- Allow dynamic player join and unjoin.
 		- Add player option select subscreen.
+		- Pretty up music select screen.
 		- Add song elements to music select screen.
 		- Add difficulty pips to song wheel.
-		- Add chart preview on difficulty select screen.
 		- Preview player option modifiers.
 		- Allow custom sorting on wheel and groups.
 		- Add song and group search.
@@ -27,16 +27,18 @@ local ThemeColor = LoadModule('Theme.Colors.lua')
 local konko = LoadModule('Konko.Core.lua')
 konko()
 
-PlayersJoined = PlayersJoined or {}
+PlayersJoined = PlayersJoined or {
+	[PLAYER_1] = false,
+	[PLAYER_2] = false,
+}
+for pn in ivalues(GAMESTATE:GetEnabledPlayers()) do
+	PlayersJoined[pn] = true
+end
 -- Song list indices.
 -- Group, song, and difficulty. Difficulty has one for each player.
 Index = Index or {
 	Group = 1,
 	Song = 1,
-	Diff = {
-		[PLAYER_1] = 1,
-		[PLAYER_2] = 1,
-	},
 }
 -- Wheel offsets.
 -- Size, increment offset, decrement offset, center offset.
@@ -78,19 +80,19 @@ local function MoveSong(self, offset, Songs, reset)
 	else
 		Index.Song = Index.Song + offset
 		while Index.Song > songCount do Index.Song = Index.Song - songCount end
-		while Index.Song < 1 do Index.Song = songCount + Index.Song end
+		while Index.Song < 1 do Index.Song = Index.Song + songCount end
 
 		wheel.Song.Dec = wheel.Song.Dec + offset
 		while wheel.Song.Dec > wheel.Song.Size do wheel.Song.Dec = wheel.Song.Dec - wheel.Song.Size end
-		while wheel.Song.Dec < 1 do wheel.Song.Dec = wheel.Song.Size + wheel.Song.Dec end
+		while wheel.Song.Dec < 1 do wheel.Song.Dec = wheel.Song.Dec + wheel.Song.Size end
 
 		wheel.Song.Inc = wheel.Song.Inc + offset
 		while wheel.Song.Inc > wheel.Song.Size do wheel.Song.Inc = wheel.Song.Inc - wheel.Song.Size end
-		while wheel.Song.Inc < 1 do wheel.Song.Inc = wheel.Song.Size + wheel.Song.Inc end
+		while wheel.Song.Inc < 1 do wheel.Song.Inc = wheel.Song.Inc + wheel.Song.Size end
 
 		wheel.Song.Ctr = wheel.Song.Ctr + offset
 		while wheel.Song.Ctr > wheel.Song.Size do wheel.Song.Ctr = wheel.Song.Ctr - wheel.Song.Size end
-		while wheel.Song.Ctr < 1 do wheel.Song.Ctr = wheel.Song.Size + wheel.Song.Ctr end
+		while wheel.Song.Ctr < 1 do wheel.Song.Ctr = wheel.Song.Ctr + wheel.Song.Size end
 	end
 
 	if offset ~= 0 then
@@ -98,7 +100,7 @@ local function MoveSong(self, offset, Songs, reset)
 
 			local pos = Index.Song + (offset * 6) - 1
 			while pos > songCount do pos = pos - songCount end
-			while pos < 1 do pos = songCount + pos end
+			while pos < 1 do pos = pos + songCount end
 
 			local aux = self:getaux() + offset
 			self:stoptweening():easeoutexpo(0.2):aux(aux)
@@ -129,7 +131,7 @@ local function MoveSong(self, offset, Songs, reset)
 				pos = Index.Song + i - wheel.Song.Size
 			end
 			while pos > songCount do pos = pos - songCount end
-			while pos < 1 do pos = songCount + pos end
+			while pos < 1 do pos = pos + songCount end
 			local contAF = self:GetChild('Container'..off)
 			contAF:GetChild('Title'):settext(Songs[pos]:GetDisplayMainTitle()):zoom(0.5):maxwidth(540)
 			contAF:GetChild('SubTitle'):settext(Songs[pos]:GetDisplaySubTitle()):zoom(0.5):maxwidth(540)
@@ -223,6 +225,8 @@ local groupWheel = SuperActor.new('ActorScroller')
 local groupSelect = SuperActor.new('ActorFrame')
 
 local diffCover = SuperActor.new('Quad')
+
+local preview = SuperActor.new('ActorFrame')
 
 local diffFrame = SuperActor.new('ActorFrame')
 
@@ -333,29 +337,43 @@ do songWheel
 		end)
 		self:luaeffect('Update')
 	end)
-	:SetMessage('SongSelected', function(self)
+	:SetMessage('SongSelect', function(self)
 		self:finishtweening():easeinoutexpo(0.25):addx(640)
+		SCREENMAN:PlayStartSound()
+		SCREENMAN:AddNewScreenToTop('OFSelectDifficulty')
 	end)
-	:SetMessage('SongDeselected', function(self)
+	:SetMessage('SongUnselect', function(self)
 		self:finishtweening():sleep(0.25):easeinoutexpo(0.25):addx(-640)
+		SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'expand'), true)
 	end)
 	:SetCommand('MenuUp', function(self)
 		MoveSong(self, -1, CurSongs)
+		SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'change'), true)
 	end)
 	:SetCommand('MenuDown', function(self)
 		MoveSong(self, 1, CurSongs)
+		SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'change'), true)
 	end)
 	:SetCommand('MenuLeft', function(self)
 		MoveSong(self, -1, CurSongs)
+		SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'change'), true)
 	end)
 	:SetCommand('MenuRight', function(self)
 		MoveSong(self, 1, CurSongs)
+		SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'change'), true)
 	end)
 	:SetCommand('Back', function(self)
-		MESSAGEMAN:Broadcast('GroupDeselected')
+		MESSAGEMAN:Broadcast('GroupUnselect')
 	end)
 	:SetCommand('Start', function(self)
-		MESSAGEMAN:Broadcast('SongSelected')
+		-- If this player is not joined, join them.
+		if not PlayersJoined[self.pn] then
+			GAMESTATE:JoinPlayer(self.pn)
+			PlayersJoined[self.pn] = true
+		-- Otherwise, select the current song.
+		else
+			MESSAGEMAN:Broadcast('SongSelect')
+		end
 	end)
 	:SetCommand('Update', function(self)
 		self:SetCurrentAndDestinationItem(self:getaux())
@@ -375,10 +393,10 @@ do songSelect
 	:SetMessage('Hide', function(self)
 		self:visible(false)
 	end)
-	:SetMessage('SongSelected', function(self)
+	:SetMessage('SongSelect', function(self)
 		self:finishtweening():queuecommand('Show'):easeinoutexpo(0.5):y(SB - 96)
 	end)
-	:SetMessage('SongDeselected', function(self)
+	:SetMessage('SongUnselect', function(self)
 		self:finishtweening():easeinoutexpo(0.5):y(SCY):queuecommand('Hide')
 	end)
 	:SetCommand('CurrentSongChanged', function(self)
@@ -429,10 +447,10 @@ do groupCover
 	:SetCommand('Init', function(self)
 		self:FullScreen():diffuse(color('#00000000'))
 	end)
-	:SetMessage('GroupSelected', function(self)
+	:SetMessage('GroupSelect', function(self)
 		self:stoptweening():easeinoutsine(0.25):diffusealpha(0)
 	end)
-	:SetMessage('GroupDeselected', function(self)
+	:SetMessage('GroupUnselect', function(self)
 		self:stoptweening():easeinoutsine(0.25):diffusealpha(0.75)
 	end)
 end
@@ -492,33 +510,54 @@ do groupWheel
 		end)
 		self:luaeffect('Update')
 	end)
+	:SetMessage('GroupSelect', function(self)
+		self:finishtweening():easeinoutexpo(0.25):addx(-640)
+		SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'collapse'), true)
+	end)
+	:SetMessage('GroupUnselect', function(self)
+		self:finishtweening():sleep(0.25):easeinoutexpo(0.25):addx(640)
+		SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'expand'), true)
+	end)
 	:SetCommand('MenuUp', function(self)
 		MoveGroup(self, -1, AllGroups)
 		MoveSong(self:GetParent():GetChild('SongWheel'), 0, CurSongs, true)
+		SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'change'), true)
 	end)
 	:SetCommand('MenuDown', function(self)
 		MoveGroup(self, 1, AllGroups)
 		MoveSong(self:GetParent():GetChild('SongWheel'), 0, CurSongs, true)
+		SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'change'), true)
 	end)
 	:SetCommand('MenuLeft', function(self)
 		MoveGroup(self, -1, AllGroups)
 		MoveSong(self:GetParent():GetChild('SongWheel'), 0, CurSongs, true)
+		SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'change'), true)
 	end)
 	:SetCommand('MenuRight', function(self)
 		MoveGroup(self, 1, AllGroups)
 		MoveSong(self:GetParent():GetChild('SongWheel'), 0, CurSongs, true)
+		SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'change'), true)
 	end)
 	:SetCommand('Back', function(self)
-		SCREENMAN:GetTopScreen():Cancel()
+		-- If both players are joined, unjoin the player at input.
+		if PlayersJoined[PLAYER_1] and PlayersJoined[PLAYER_2] then
+			GAMESTATE:UnjoinPlayer(self.pn)
+			PlayersJoined[self.pn] = false
+		-- Otherwise, if this player is still joined, cancel to the previous screen.
+		elseif PlayersJoined[self.pn] then
+			SCREENMAN:PlayCancelSound()
+			SCREENMAN:GetTopScreen():Cancel()
+		end
 	end)
 	:SetCommand('Start', function(self)
-		MESSAGEMAN:Broadcast('GroupSelected')
-	end)
-	:SetMessage('GroupSelected', function(self)
-		self:finishtweening():easeinoutexpo(0.25):addx(-640)
-	end)
-	:SetMessage('GroupDeselected', function(self)
-		self:finishtweening():sleep(0.25):easeinoutexpo(0.25):addx(640)
+		-- If this player is not joined, join them.
+		if not PlayersJoined[self.pn] then
+			GAMESTATE:JoinPlayer(self.pn)
+			PlayersJoined[self.pn] = true
+		-- Otherwise, select the current group.
+		else
+			MESSAGEMAN:Broadcast('GroupSelect')
+		end
 	end)
 	:SetCommand('Update', function(self)
 		self:SetCurrentAndDestinationItem(self:getaux())
@@ -538,10 +577,10 @@ do groupSelect
 	:SetMessage('Hide', function(self)
 		self:visible(false)
 	end)
-	:SetMessage('GroupSelected', function(self)
+	:SetMessage('GroupSelect', function(self)
 		self:finishtweening():queuecommand('Show'):easeinoutexpo(0.5):y(ST + 96)
 	end)
-	:SetMessage('GroupDeselected', function(self)
+	:SetMessage('GroupUnselect', function(self)
 		self:finishtweening():easeinoutexpo(0.5):y(SCY):queuecommand('Hide')
 	end)
 	:AddChild(
@@ -572,10 +611,10 @@ do diffCover
 	:SetCommand('Init', function(self)
 		self:FullScreen():diffuse(color('#00000000'))
 	end)
-	:SetMessage('SongSelected', function(self)
+	:SetMessage('SongSelect', function(self)
 		self:stoptweening():easeinoutsine(0.25):diffusealpha(0.75)
 	end)
-	:SetMessage('SongDeselected', function(self)
+	:SetMessage('SongUnselect', function(self)
 		self:stoptweening():easeinoutsine(0.25):diffusealpha(0)
 	end)
 end
@@ -589,7 +628,6 @@ do songPreview
 		self:stoptweening():sleep(0.4):queuecommand('SongPreview')
 	end)
 	:SetCommand('SongPreview', function(self)
-		--SOUND:Volume(DefVol, 0)
 		if GAMESTATE:IsCourseMode() then
 			SOUND:PlayMusicPart(
 				THEME:GetPathS('ScreenSelectMusic', 'loop music'),
@@ -614,16 +652,16 @@ do songPreview
 end
 
 do af
-	:SetMessage('GroupSelected', function(self)
+	:SetMessage('GroupSelect', function(self)
 		wheel.Focus = 'Song'
 	end)
-	:SetMessage('GroupDeselected', function(self)
+	:SetMessage('GroupUnselect', function(self)
 		wheel.Focus = 'Group'
 	end)
-	:SetMessage('SongSelected', function(self)
-		wheel.Focus = 'Difficulty'
+	:SetMessage('SongSelect', function(self)
+		wheel.Focus = 'None'
 	end)
-	:SetMessage('SongDeselected', function(self)
+	:SetMessage('SongUnselect', function(self)
 		wheel.Focus = 'Song'
 	end)
 	:AddChild(songWheel, 'SongWheel')
