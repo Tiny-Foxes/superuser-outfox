@@ -17,7 +17,7 @@ Judges[#Judges+1] = Def.ActorFrame {
 	LoseFocusCommand=function(self) self:stoptweening():linear(0.16):diffusealpha(0):zoomx(0) end;
 	Def.Quad {InitCommand=function(self) self:zoomto(item_width,4):vertalign(top):y(-52/2):diffuse(color("#FFC447")):diffuseleftedge(color("#FF8D47")) end,},
 	Def.Quad {InitCommand=function(self) self:zoomto(item_width,4):vertalign(bottom):y(52/2):diffuse(color("#FF8D47")):diffuseleftedge(color("#FFC447")) end,},
-};
+}
 
 Judges[#Judges+1] = LoadActor(THEME:GetPathG('_StepsDisplayListRow', 'Cursor') .. {
 	OnCommand=function(s)
@@ -30,12 +30,12 @@ Judges[#Judges+1] = LoadActor(THEME:GetPathG('_StepsDisplayListRow', 'Cursor') .
 		self:stoptweening():linear(0.16)
 		self:diffusealpha(focus and 1 or 0)
 		self:x( -WideScale(240,360) )
-	end;
+	end,
 	LoseFocusCommand=function(self)
 		local focus = self:GetParent():GetParent():GetParent():HasFocus(master)
 		self:stoptweening():linear(0.16):diffusealpha(focus and 1 or 0)
 		self:x( -WideScale(250,370) )
-	end;
+	end,
 }
 
 Judges[#Judges+1] = Def.ActorFrame{
