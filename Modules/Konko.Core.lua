@@ -1,11 +1,12 @@
 -- environment builder stolen this from xero thanks xero
-_G.su = {}
-local su = setmetatable(su, su)
-su.__index = _G
+if _G._su then return _G._su end
+_G._su = {}
+local _su = setmetatable(_su, _su)
+_su.__index = _G
 local function nop() end
 function envcall(self, f, name)
 	if type(f) == 'string' then
-		-- if we call sudo with a string, we need to load it as code
+		-- if we call _sudo with a string, we need to load it as code
 		local err
 		-- try compiling the code
 		f, err = loadstring( 'return function(self)' .. f .. '\nend', name)
@@ -18,10 +19,10 @@ function envcall(self, f, name)
 	setfenv(f or 2, self)
 	return f
 end
-function su:__call(f, name)
+function _su:__call(f, name)
 	return envcall(self, f, name)
 end
-function su.using(ns)
+function _su.using(ns)
 	local env = getfenv(2)
 	local newenv = setmetatable(env[ns] or {}, {
 		__index = env,
@@ -39,16 +40,16 @@ function su.using(ns)
 		return ret
 	end
 end
-function su.getfrom(ns, deep)
+function _su.getfrom(ns, deep)
 	local env = getfenv(2)
-	local target = env[ns] or su[ns]
+	local target = env[ns] or _su[ns]
 	return function(t)
 		if not target then
-			su.printerr('No table or environment "'..ns..'" found (Is table local?)')
+			_su.printerr('No table or environment "'..ns..'" found (Is table local?)')
 		else
 			for _, v in ipairs(t) do
 				if not target[v] then
-					su.printerr('No variable "'..v..'" found (Is variable local?)')
+					_su.printerr('No variable "'..v..'" found (Is variable local?)')
 				else
 					if deep == true then
 						env[v] = DeepCopy(target[v])
@@ -61,19 +62,19 @@ function su.getfrom(ns, deep)
 	end
 end
 
-su.printerr = lua.ReportScriptError
+_su.printerr = lua.ReportScriptError
 
-function su.switch(var)
+function _su.switch(var)
 	local env = getfenv(2)
 	local ret = nop
 	if not var then
-		return su.printerr('switch: given variable is nil')
+		return _su.printerr('switch: given variable is nil')
 	else
 		return function(t)
 			ret = t['_'] or ret
 			for k, v in pairs(t) do
 				if type(v) ~= 'function' then
-					return su.printerr('switch: expected case argument of type function, got '..type(v))
+					return _su.printerr('switch: expected case argument of type function, got '..type(v))
 				elseif tostring(var) == k then
 					ret = v or ret
 				end
@@ -83,7 +84,7 @@ function su.switch(var)
 	end
 end
 
-su()
+_su()
 
 -- Environment global variables, mostly shortcuts
 SL, SR = SCREEN_LEFT, SCREEN_RIGHT
@@ -134,4 +135,4 @@ Def.KonkoAF = Def.KonkoAF or function(t)
 	return af
 end
 
-return su
+return _su

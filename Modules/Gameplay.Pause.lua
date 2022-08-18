@@ -19,7 +19,7 @@ local Choices = {
 	{
 		Name = "forfeit_song",
 		Action = function( screen )
-			screen:SetPrevScreenName(SelectMusicOrCourse()):begin_backing_out()
+			screen:SetPrevScreenName(CustomBranch.SelectMusicOrCourse()):begin_backing_out()
 		end
 	},
 }
@@ -41,7 +41,7 @@ if GAMESTATE:IsCourseMode() then
 		{
 			Name = "forfeit_course",
 			Action = function( screen )
-				screen:SetPrevScreenName(SelectMusicOrCourse()):begin_backing_out()
+				screen:SetPrevScreenName(CustomBranch.SelectMusicOrCourse()):begin_backing_out()
 			end
 		},
 		{

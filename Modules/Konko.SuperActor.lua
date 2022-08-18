@@ -3,7 +3,8 @@
 	allows Kitsu SuperActor system specifically OUTSIDE of modfiles.
 --]]
 
-su()
+local konko = LoadModule('Konko.Core.lua')
+konko()
 
 local SuperActor = {}
 local VERSION = '1.0'

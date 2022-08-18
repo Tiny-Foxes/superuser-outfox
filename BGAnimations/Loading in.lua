@@ -5,7 +5,7 @@ return Def.ActorFrame {
 		Text = 'Loading...',
 		InitCommand = Actor.Center,
 		OnCommand=function(self) 
-			self:easeinexpo(0.5):diffusealpha(0):addy(SCREEN_CENTER_Y * 1.2)
+			self:easeinexpo(0.5):diffusealpha(0):addy(-SCREEN_CENTER_Y * 1.2)
 		end
 	}
 }

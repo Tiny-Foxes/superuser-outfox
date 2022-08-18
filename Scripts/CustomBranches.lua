@@ -1,6 +1,6 @@
 -- We need this local function to override the usual behavior of it.
 -- The whole point of CustomBranches is to load custom branches.
-local function SelectMusicOrCourse()
+function SelectMusicOrCourse()
 	if IsNetSMOnline() then
 		return "ScreenNetSelectMusic"
 	elseif GAMESTATE:IsCourseMode() then
@@ -11,6 +11,7 @@ local function SelectMusicOrCourse()
 end
 
 CustomBranch = {
+	SelectMusicOrCourse = SelectMusicOrCourse,
 	StartGame = function()
 		-- Check to see if there are 0 songs installed. Also make sure to check
 		-- that the additional song count is also 0, because there is

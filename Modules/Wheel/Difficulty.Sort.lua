@@ -4,6 +4,20 @@ end
 
 return function(Song)
 	local diffs = Song:GetAllSteps()
-	table.sort(diffs, compare)
-	return diffs
+	local compat = {}
+	for chart in ivalues(diffs) do
+		local match = chart:GetStepsType():lower()
+		if match:find(GAMESTATE:GetCurrentGame():GetName()) then
+			if not (
+				match:find('double') and (
+					GAMESTATE:IsSideJoined(PLAYER_1) and
+					GAMESTATE:IsSideJoined(PLAYER_2)
+				)
+			) then
+				compat[#compat + 1] = chart
+			end
+		end
+	end
+	table.sort(compat, compare)
+	return compat
 end

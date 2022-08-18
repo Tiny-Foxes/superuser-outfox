@@ -5,12 +5,12 @@
 		X Use only 12 ActorFrames on wheel.
 		X Switch out text for wheels rather than entire wheels.
 		X Add song preview.
-		- Add difficulty select subscreen.
+		X Add difficulty select subscreen.
+		X Allow dynamic player join and unjoin.
+		X Add song elements to music select screen.
 		- Add chart preview on difficulty select screen.
-		- Allow dynamic player join and unjoin.
 		- Add player option select subscreen.
 		- Pretty up music select screen.
-		- Add song elements to music select screen.
 		- Add difficulty pips to song wheel.
 		- Preview player option modifiers.
 		- Allow custom sorting on wheel and groups.
@@ -31,8 +31,8 @@ PlayersJoined = PlayersJoined or {
 	[PLAYER_1] = false,
 	[PLAYER_2] = false,
 }
-for pn in ivalues(GAMESTATE:GetEnabledPlayers()) do
-	PlayersJoined[pn] = true
+for k in pairs(PlayersJoined) do
+	PlayersJoined[k] = GAMESTATE:IsSideJoined(k)
 end
 -- Song list indices.
 -- Group, song, and difficulty. Difficulty has one for each player.
@@ -44,6 +44,7 @@ Index = Index or {
 -- Size, increment offset, decrement offset, center offset.
 local wheel = {
 	Focus = 'Song',
+	NextScreen = 'Gameplay',
 	Song = {
 		Size = 13,
 		Inc = -6,
@@ -63,10 +64,10 @@ local AllSongs = LoadModule('Wheel/Songs.Loader.lua')(style)
 local AllGroups = LoadModule('Wheel/Group.List.lua')(AllSongs)
 local SongList = LoadModule('Wheel/Group.Sort.lua')(AllSongs)
 
-
 local CurGroup = AllGroups[Index.Group]
 local CurSongs = SongList[CurGroup]
 
+local RequestOptions = false
 
 -- Function for moving along the song wheel.
 local function MoveSong(self, offset, Songs, reset)
@@ -212,6 +213,20 @@ local function MoveGroup(self, offset, Groups, reset)
 	CurSongs = SongList[CurGroup]
 end
 
+--[[
+	These are actual Actor tables. I created this module,
+	I love this module, I am keeping this module.
+	If you need help on how to use these modules, please,
+	I BEG you, ping me on the OutFox server. I would be
+	more than happy to explain how this module works.
+	But if you have an object-oriented mind like me,
+	you would probably already know how they work
+	just from looking at the rest of the code.
+
+	Get used to seeing this all over the place.
+	I'm going to completely restructure the entire
+	theme using this module for Actor creation.
+--]]
 local SuperActor = LoadModule('Konko.SuperActor.lua')
 
 local af = SuperActor.new('ActorFrame')
@@ -225,12 +240,6 @@ local groupWheel = SuperActor.new('ActorScroller')
 local groupSelect = SuperActor.new('ActorFrame')
 
 local diffCover = SuperActor.new('Quad')
-
-local preview = SuperActor.new('ActorFrame')
-
-local diffFrame = SuperActor.new('ActorFrame')
-
-local popCover = SuperActor.new('Quad')
 
 local songPreview = SuperActor.new('Actor')
 
@@ -327,7 +336,7 @@ do songWheel
 			:SetLoop(true)
 			:SetFastCatchup(true)
 			:aux(0)
-		MoveSong(self, 0, CurSongs, true)
+		MoveSong(self, 0, CurSongs)
 	end)
 	:SetCommand('On', function(self)
 		SCREENMAN:GetTopScreen():AddInputCallback(function(event)
@@ -438,6 +447,13 @@ do songSelect
 			end)
 			:SetMessage('CurrentSongChanged', function(self)
 				self:settext(GAMESTATE:GetCurrentSong():GetDisplaySubTitle())
+				if self:GetText() == '' then
+					self:GetParent():GetChild('Title'):y(0)
+					self:y(0)
+				else
+					self:GetParent():GetChild('Title'):y(-8)
+					self:y(10)
+				end
 			end),
 		'SubTitle'
 	)
@@ -663,6 +679,20 @@ do af
 	end)
 	:SetMessage('SongUnselect', function(self)
 		wheel.Focus = 'Song'
+	end)
+	:SetMessage('EnterOptions', function(self)
+		wheel.NextScreen = 'PlayerOptions'
+		self:sleep(0.25):queuecommand('BeginTransition')
+	end)
+	:SetMessage('EnterGameplay', function(self)
+		SOUND:DimMusic(0, 3)
+		wheel.NextScreen = 'Gameplay'
+		self:sleep(0.25):queuecommand('BeginTransition')
+	end)
+	:SetCommand('BeginTransition', function(self)
+		SCREENMAN:GetTopScreen()
+			:SetNextScreenName('Screen'..wheel.NextScreen)
+			:StartTransitioningScreen('SM_GoToNextScreen')
 	end)
 	:AddChild(songWheel, 'SongWheel')
 	:AddChild(songSelect, 'SongSelect')
