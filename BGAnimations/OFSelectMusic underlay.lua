@@ -25,9 +25,9 @@ return Def.ActorFrame {
 		CurrentSongChangedMessageCommand = function(self)
 			self
 				:stoptweening()
-				:easeinoutsine(0.2)
+				:easeoutexpo(0.1)
 				:diffusealpha(0)
-				:sleep(0.1)
+				:sleep(0.3)
 				:queuecommand('LoadBackground')
 		end,
 		LoadBackgroundCommand = function(self)
@@ -38,7 +38,7 @@ return Def.ActorFrame {
 				self:LoadFromSongBackground(song)
 			end
 			self
-				:easeinoutsine(0.5)
+				:easeinoutsine(0.3)
 				:diffusealpha(0.25)
 		end,
 	},
@@ -52,9 +52,8 @@ return Def.ActorFrame {
 			CurrentSongChangedMessageCommand = function(self)
 				self
 					:stoptweening()
-					:linear(0.1)
+					:easeoutexpo(0.1)
 					:diffusealpha(0)
-					:sleep(0.25)
 					:queuecommand('LoadBanner')
 			end,
 			LoadBannerCommand = function(self)
@@ -87,9 +86,8 @@ return Def.ActorFrame {
 			CurrentSongChangedMessageCommand = function(self)
 				self
 					:stoptweening()
-					:linear(0.1)
+					:easeoutexpo(0.1)
 					:diffusealpha(0)
-					:sleep(0.25)
 					:queuecommand('LoadTitle')
 			end,
 			LoadTitleCommand = function(self)
@@ -118,9 +116,8 @@ return Def.ActorFrame {
 			CurrentSongChangedMessageCommand = function(self)
 				self
 					:stoptweening()
-					:linear(0.1)
+					:easeoutexpo(0.1)
 					:diffusealpha(0)
-					:sleep(0.25)
 					:easeinoutsine(0.2)
 					:diffusealpha(1)
 			end,
@@ -137,9 +134,8 @@ return Def.ActorFrame {
 			CurrentSongChangedMessageCommand = function(self)
 				self
 					:stoptweening()
-					:linear(0.1)
+					:easeoutexpo(0.1)
 					:diffusealpha(0)
-					:sleep(0.25)
 					:queuecommand('LoadArtist')
 			end,
 			LoadArtistCommand = function(self)
@@ -163,9 +159,8 @@ return Def.ActorFrame {
 			CurrentSongChangedMessageCommand = function(self)
 				self
 					:stoptweening()
-					:linear(0.1)
+					:easeoutexpo(0.1)
 					:diffusealpha(0)
-					:sleep(0.25)
 					:queuecommand('LoadMisc')
 			end,
 			LoadMiscCommand = function(self)

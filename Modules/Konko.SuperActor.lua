@@ -38,6 +38,11 @@ local function UpdateTweens(self)
 end
 
 local ActorTree = Def.ActorFrame {
+	InitCommand = function(self)
+		SuperActor.__index.GetTree = function()
+			return self
+		end
+	end,
 	UpdateCommand = function(self)
 		UpdateTweens(self)
 	end
@@ -166,9 +171,18 @@ local function GetChildIndex(self, name)
 		end
 	end
 end
-local function AddToTree(self)
+local function AddToTree(self, idx, name)
 	--lua.Trace('SuperActor:AddToTree')
-	table.insert(ActorTree, self)
+	if type(idx) == 'string' then
+		name = idx
+		idx = nil
+	end
+	if name then self:SetName(name) end
+	if idx then
+		table.insert(ActorTree, idx, self)
+	else
+		table.insert(ActorTree, self)
+	end
 end
 local function GetTree()
 	--lua.Trace('SuperActor.GetTree')

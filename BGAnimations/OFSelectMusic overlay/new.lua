@@ -356,23 +356,33 @@ do songWheel
 		SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'expand'), true)
 	end)
 	:SetCommand('MenuUp', function(self)
-		MoveSong(self, -1, CurSongs)
-		SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'change'), true)
+		if PlayersJoined[self.pn] then
+			MoveSong(self, -1, CurSongs)
+			SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'change'), true)
+		end
 	end)
 	:SetCommand('MenuDown', function(self)
-		MoveSong(self, 1, CurSongs)
-		SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'change'), true)
+		if PlayersJoined[self.pn] then
+			MoveSong(self, 1, CurSongs)
+			SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'change'), true)
+		end
 	end)
 	:SetCommand('MenuLeft', function(self)
-		MoveSong(self, -1, CurSongs)
-		SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'change'), true)
+		if PlayersJoined[self.pn] then
+			MoveSong(self, -1, CurSongs)
+			SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'change'), true)
+		end
 	end)
 	:SetCommand('MenuRight', function(self)
-		MoveSong(self, 1, CurSongs)
-		SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'change'), true)
+		if PlayersJoined[self.pn] then
+			MoveSong(self, 1, CurSongs)
+			SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'change'), true)
+		end
 	end)
 	:SetCommand('Back', function(self)
-		MESSAGEMAN:Broadcast('GroupUnselect')
+		if PlayersJoined[self.pn] then
+			MESSAGEMAN:Broadcast('GroupUnselect')
+		end
 	end)
 	:SetCommand('Start', function(self)
 		-- If this player is not joined, join them.
@@ -387,6 +397,7 @@ do songWheel
 	:SetCommand('Update', function(self)
 		self:SetCurrentAndDestinationItem(self:getaux())
 	end)
+	:AddToTree('SongWheel')
 end
 
 do songSelect
@@ -457,6 +468,7 @@ do songSelect
 			end),
 		'SubTitle'
 	)
+	:AddToTree('SongSelector')
 end
 
 do groupCover
@@ -469,6 +481,7 @@ do groupCover
 	:SetMessage('GroupUnselect', function(self)
 		self:stoptweening():easeinoutsine(0.25):diffusealpha(0.75)
 	end)
+	:AddToTree('GroupCover')
 end
 
 local groupIdx = 0
@@ -535,24 +548,32 @@ do groupWheel
 		SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'expand'), true)
 	end)
 	:SetCommand('MenuUp', function(self)
-		MoveGroup(self, -1, AllGroups)
-		MoveSong(self:GetParent():GetChild('SongWheel'), 0, CurSongs, true)
-		SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'change'), true)
+		if PlayersJoined[self.pn] then
+			MoveGroup(self, -1, AllGroups)
+			MoveSong(SuperActor.GetTree():GetChild('SongWheel'), 0, CurSongs, true)
+			SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'change'), true)
+		end
 	end)
 	:SetCommand('MenuDown', function(self)
-		MoveGroup(self, 1, AllGroups)
-		MoveSong(self:GetParent():GetChild('SongWheel'), 0, CurSongs, true)
-		SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'change'), true)
+		if PlayersJoined[self.pn] then
+			MoveGroup(self, 1, AllGroups)
+			MoveSong(SuperActor.GetTree():GetChild('SongWheel'), 0, CurSongs, true)
+			SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'change'), true)
+		end
 	end)
 	:SetCommand('MenuLeft', function(self)
-		MoveGroup(self, -1, AllGroups)
-		MoveSong(self:GetParent():GetChild('SongWheel'), 0, CurSongs, true)
-		SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'change'), true)
+		if PlayersJoined[self.pn] then
+			MoveGroup(self, -1, AllGroups)
+			MoveSong(SuperActor.GetTree():GetChild('SongWheel'), 0, CurSongs, true)
+			SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'change'), true)
+		end
 	end)
 	:SetCommand('MenuRight', function(self)
-		MoveGroup(self, 1, AllGroups)
-		MoveSong(self:GetParent():GetChild('SongWheel'), 0, CurSongs, true)
-		SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'change'), true)
+		if PlayersJoined[self.pn] then
+			MoveGroup(self, 1, AllGroups)
+			MoveSong(SuperActor.GetTree():GetChild('SongWheel'), 0, CurSongs, true)
+			SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'change'), true)
+		end
 	end)
 	:SetCommand('Back', function(self)
 		-- If both players are joined, unjoin the player at input.
@@ -578,6 +599,7 @@ do groupWheel
 	:SetCommand('Update', function(self)
 		self:SetCurrentAndDestinationItem(self:getaux())
 	end)
+	:AddToTree('GroupWheel')
 end
 
 do groupSelect
@@ -621,6 +643,7 @@ do groupSelect
 			end),
 		'Title'
 	)
+	:AddToTree('GroupSelector')
 end
 
 do diffCover
@@ -633,6 +656,7 @@ do diffCover
 	:SetMessage('SongUnselect', function(self)
 		self:stoptweening():easeinoutsine(0.25):diffusealpha(0)
 	end)
+	:AddToTree('DiffCover')
 end
 
 do songPreview
@@ -665,6 +689,7 @@ do songPreview
 			)
 		end
 	end)
+	:AddToTree('SongPreview')
 end
 
 do af
@@ -694,13 +719,6 @@ do af
 			:SetNextScreenName('Screen'..wheel.NextScreen)
 			:StartTransitioningScreen('SM_GoToNextScreen')
 	end)
-	:AddChild(songWheel, 'SongWheel')
-	:AddChild(songSelect, 'SongSelect')
-	:AddChild(groupCover, 'GroupCover')
-	:AddChild(groupWheel, 'GroupWheel')
-	:AddChild(groupSelect, 'GroupSelect')
-	:AddChild(diffCover, 'DiffCover')
-	:AddChild(songPreview, 'SongPreview')
 	:AddToTree()
 end
 
