@@ -2,10 +2,6 @@ local function metricN(class, metric)
 	return tonumber(THEME:GetMetric(class, metric))
 end
 
-local function scale(var, lower1, upper1, lower2, upper2)
-	return ((upper2 - lower2) * (var - lower1)) / (upper1 - lower1) + lower2
-end
-
 local plrpos
 if GAMESTATE:GetNumPlayersEnabled() == 1 then
 	plrpos = (PREFSMAN:GetPreference('Center1Player') and 'OnePlayerTwoSides') or 'OnePlayerOneSide'
@@ -27,14 +23,19 @@ return function(pn)
 	local curpop = state:GetPlayerOptions('ModsLevel_Current')
 	local pref = state:GetPlayerOptionsString('ModsLevel_Preferred')
 
+	local nfpop
+
 	return Def.ActorFrame {
 		Name = 'Player'..ToEnumShortString(pn),
 		FOV = 45,
+		InitCommand = function(self)
+			self:visible(false)
+		end,
 		OnCommand = function(self)
 			self:queuecommand('Setup')
 		end,
 		SetupCommand = function(self)
-			self:fardistz(10000):fov(45)
+			self:fardistz(10000000):fov(45):visible(true)
 			local notefield = self:GetChild('NoteField')
 			local poptions = notefield:GetPlayerOptions('ModsLevel_Current')
 			local vanishx = self.vanishpointx
@@ -51,7 +52,25 @@ return function(pn)
 				return self:vanishpointx(x):vanishpointy(y)
 			end
 			function self:GetNoteData(start_beat, end_beat)
-				return self:GetChild('NoteField'):GetNoteData(start_beat, end_beat)
+				local charts = GAMESTATE:GetCurrentSong():GetAllSteps()
+				for i, v in ipairs(charts) do
+					if v:GetDifficulty() == GAMESTATE:GetCurrentSteps(pn):GetDifficulty() then
+						return GAMESTATE:GetCurrentSong():GetNoteData(i, start_beat, end_beat)
+					end
+				end
+			end
+			function self:x(n)
+				Actor.x(self, n)
+				return self:vanishpointx(SCREEN_CENTER_X - self:GetX())
+			end
+			function self:xy(x, y)
+				return self:x(x):y(y)
+			end
+			function self:Center()
+				return self:xy(SCREEN_CENTER_X, SCREEN_CENTER_Y)
+			end
+			function self:SetNoteDataFromLua(nd)
+				self:GetChild('NoteField'):SetNoteDataFromLua(nd)
 			end
 			self
 				:xy(metricN('ScreenGameplay', 'Player'..ToEnumShortString(pn)..plrpos..'X'), SCREEN_CENTER_Y)
@@ -74,14 +93,20 @@ return function(pn)
 				self
 					:y(nf.ybase)
 					:visible(true)
-					:luaeffect('UpdateMods')
+					:sleep(2)
+					:queuecommand('ModsReady')
+			end,
+			ModsReadyCommand = function(self)
+				self:luaeffect('UpdateMods')
 			end,
 			UpdateModsCommand = function(self)
-				local po = self:GetPlayerOptions('ModsLevel_Current')
-				po:FromString(state:GetPlayerOptionsString('ModsLevel_Current'))
-				local mini = scale(po:Mini(), 0, 1, 1, 0.5)
-				local tilt = 1 - (0.1 * math.abs(po:Tilt()))
-				local rotx = -30 * po:Tilt()
+				if not nfpop then nfpop = self:GetPlayerOptions('ModsLevel_Current') end
+				--local poptions = self:GetPlayerOptions('ModsLevel_Current')
+				nfpop:FromString(state:GetPlayerOptionsString('ModsLevel_Song'))
+				--nfpop:FromString(state:GetPlayerOptionsString('ModsLevel_Current'))
+				local mini = 1 - 0.5 * nfpop:Mini()
+				local tilt = 1 - (0.1 * math.abs(nfpop:Tilt()))
+				local rotx = -30 * nfpop:Tilt()
 				self
 					:zoom(mini * tilt)
 					:rotationx(rotx)

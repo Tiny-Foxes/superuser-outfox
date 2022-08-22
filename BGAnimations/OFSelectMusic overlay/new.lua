@@ -678,6 +678,8 @@ do songPreview
 				true
 			)
 		else
+			--GAMESTATE:GetCurrentSong():PlayPreviewMusic() -- Doesn't fade out.
+			---[[
 			local song = GAMESTATE:GetCurrentSong()
 			SOUND:PlayMusicPart(
 				song:GetPreviewMusicPath(),
@@ -687,6 +689,7 @@ do songPreview
 				1,
 				true
 			)
+			--]]
 		end
 	end)
 	:AddToTree('SongPreview')

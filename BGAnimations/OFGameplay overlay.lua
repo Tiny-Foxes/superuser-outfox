@@ -44,12 +44,12 @@ return Def.ActorFrame {
 				:y(plry)
 		end
 		SCREENMAN:GetTopScreen():AddInputCallback(LoadModule('Lua.InputSystem.lua')(self))
-		self:queuecommand('ScreenReady')
+		self:sleep(2):queuecommand('ScreenReady')
 	end,
 	ScreenReadyCommand = function(self)
 		SOUND:PlayMusicPart(
 			song:GetMusicPath(),
-			-2,
+			0,
 			song:GetLastSecond() + 3,
 			0,
 			0,
@@ -66,25 +66,40 @@ return Def.ActorFrame {
 	Def.ActorFrame {
 		Name = 'Modfiles',
 		ScreenReadyCommand = function(self)
-			lua.ReportScriptError(tostring(#GAMESTATE:GetCurrentSong():GetFGChanges()))
 			for k, v in pairs(song:GetBGChanges()) do
-				lua.ReportScriptError(tostring(v))
 			end
-			for k, v in pairs(song:GetFGChanges()) do
-				lua.ReportScriptError(tostring(v))
+			--for k, v in pairs(song:GetFGChanges()) do
+			local fgchanges = {}
+			local file = RageFileUtil.CreateRageFile()
+			local data = ''
+			if file:Open(song:GetSongFilePath(), 1) then
+				data = file:Read()
+			end
+			file:Close()
+			file:destroy()
+			local idx = data:find('#FGCHANGES') + string.len('#FGCHANGES:')
+			local start = data:sub(idx, data:find('=', idx) - 1)
+			idx = data:find('=', idx) + 1
+			local path = data:sub(idx, data:find('=', idx) - 1)
+			fgchanges[#fgchanges + 1] = {start_beat = start, file1 = path, rate = 1}
+			for k, v in pairs(fgchanges) do
 				if v.file1 ~= '' then
 					local file = v.file1
 					if not loadfile(song:GetSongDir()..file) then
 						file = file..'/default.lua'
 					end
 					if assert(loadfile(song:GetSongDir()..file)) then
-						local offset = 2 + (v.start_beat * GAMESTATE:GetSongBPS())
+						local offset = (v.start_beat * GAMESTATE:GetSongBPS())
 						self:AddChildFromPath(song:GetSongDir()..file)
+						self:fardistz(1000000):fov(45)
 						self:GetChildAt(self:GetNumChildren())
 							--:SetUpdateRate(v.rate or 1)
 							:playcommand('Init')
-							:sleep(offset)
-							:queuecommand('On')
+							:playcommand('On')
+							:GetChildAt(1)
+								:effectclock('bgm')
+								:set_tween_uses_effect_delta()
+								--:effectoffset(offset)
 					end
 				end
 			end
@@ -99,7 +114,7 @@ return Def.ActorFrame {
 				end
 			end
 			--]]
-			SCREENMAN:GetTopScreen():GetChild('Overlay'):visible(true)
+			--SCREENMAN:GetTopScreen():GetChild('Overlay'):visible(true)
 		end,
 	},
 	Def.Actor {
