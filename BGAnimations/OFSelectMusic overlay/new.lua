@@ -44,7 +44,7 @@ Index = Index or {
 -- Size, increment offset, decrement offset, center offset.
 local wheel = {
 	Focus = 'Song',
-	NextScreen = 'Gameplay',
+	NextScreen = 'OFGameplay',
 	Song = {
 		Size = 13,
 		Inc = -6,
@@ -706,17 +706,17 @@ do af
 		wheel.Focus = 'Song'
 	end)
 	:SetMessage('EnterOptions', function(self)
-		wheel.NextScreen = 'PlayerOptions'
+		wheel.NextScreen = 'ScreenPlayerOptions'
 		self:sleep(0.25):queuecommand('BeginTransition')
 	end)
 	:SetMessage('EnterGameplay', function(self)
 		SOUND:DimMusic(0, 3)
-		wheel.NextScreen = 'Gameplay'
+		wheel.NextScreen = 'OFGameplay'
 		self:sleep(0.25):queuecommand('BeginTransition')
 	end)
 	:SetCommand('BeginTransition', function(self)
 		SCREENMAN:GetTopScreen()
-			:SetNextScreenName('Screen'..wheel.NextScreen)
+			:SetNextScreenName(wheel.NextScreen)
 			:StartTransitioningScreen('SM_GoToNextScreen')
 	end)
 	:AddToTree()

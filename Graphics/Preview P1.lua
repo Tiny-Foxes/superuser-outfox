@@ -19,8 +19,11 @@ local nf = {
 	yrevoff = metricN('Player', 'ReceptorArrowsYReverse') - metricN('Player', 'ReceptorArrowsYStandard'),
 	ybase = metricN('Player', 'ReceptorArrowsYStandard') + metricN('Player', 'ReceptorArrowsYReverse'),
 }
-local plrpop = GAMESTATE:GetPlayerState(PlayerNumber[1]):GetPlayerOptions('ModsLevel_Preferred')
-local pref = GAMESTATE:GetPlayerState(PlayerNumber[2]):GetPlayerOptionsString('ModsLevel_Preferred')
+local state = GAMESTATE:GetPlayerState(PlayerNumber[1])
+local plrpop = state:GetPlayerOptions('ModsLevel_Preferred')
+local songpop = state:GetPlayerOptions('ModsLevel_Song')
+local curpop = state:GetPlayerOptions('ModsLevel_Current')
+local pref = state:GetPlayerOptionsString('ModsLevel_Preferred')
 
 
 return Def.ActorFrame {
@@ -54,70 +57,16 @@ return Def.ActorFrame {
 			:zoom(SCREEN_HEIGHT / 480)
 			:visible(true)
 	end,
-	SpeedChoiceChangedMessageCommand = function(self, param)
-		local poptions = self:GetChild('NoteField'):GetPlayerOptions('ModsLevel_Current')
-		if param.pn ~= PlayerNumber[1] then return end
-		local speedmod = param.mode:upper()..'Mod'
-		if speedmod == 'XMod' then
-			poptions:XMod(param.speed * 0.01)
-		else
-			poptions[speedmod](poptions, param.speed)
-		end
-	end,
-	AppearanceChoiceChangedMessageCommand = function(self, param)
-		PrintTable(param)
-	end,
-	ResetCommand = function(self)
-		if self:GetNumWrapperStates() > 0 then
-			for i = 1, self:GetNumWrapperStates() do
-				self:GetWrapperState(i)
-					:xy(0, 0):z(0)
-					:rotationx(0)
-					:rotationy(0)
-					:rotationz(0)
-					:zoom(1)
-					:zoomx(1)
-					:zoomy(1)
-					:zoomz(1)
-					:skewx(0)
-					:skewy(0)
-					:stopeffect()
-					:fov(45)
-					:visible(true)
-				self:RemoveWrapperState(i)
-			end
-		end
-		self
-			:xy(metricN('ScreenGameplay', 'PlayerP1'..plrpos..'X'), SCREEN_CENTER_Y):z(0)
-			:vanishpointx(0)
-			:vanishpointy(0)
-			:rotationx(0)
-			:rotationy(0)
-			:rotationz(0)
-			:zoom(1)
-			:zoomx(1)
-			:zoomy(1)
-			:zoomz(1)
-			:skewx(0)
-			:skewy(0)
-			:stopeffect()
-			:fov(45)
-			:zoom(SCREEN_HEIGHT / 480)
-			:visible(true)
-	end,
 	-- this is a fuck
 	Def.NoteField {
 		Name = 'NoteField',
 		Player = PlayerNumber[1],
 		FieldID = 1,
 		AutoPlay = (PREFSMAN:GetPreference('AutoPlay') == 'Human' and false) or true,
-		NoteSkin = GAMESTATE:GetPlayerState(PlayerNumber[1]):GetPlayerOptions('ModsLevel_Preferred'):NoteSkin(),
+		NoteSkin = plrpop:NoteSkin(),
 		DrawDistanceAfterTargetsPixels = nf.dda,
 		DrawDistanceBeforeTargetsPixels = nf.ddb,
 		YReverseOffsetPixels = nf.yrevoff,
-		OnCommand = function(self)
-			self:queuecommand('Setup')
-		end,
 		SetupCommand = function(self)
 			self:GetPlayerOptions('ModsLevel_Current'):FromString(pref)
 			self
@@ -126,10 +75,12 @@ return Def.ActorFrame {
 				:luaeffect('UpdateTransform')
 		end,
 		UpdateTransformCommand = function(self)
-			local poptions = GAMESTATE:GetPlayerState(PlayerNumber[1]):GetPlayerOptions('ModsLevel_Song')
-			local mini = scale(poptions:Mini(), 0, 1, 1, 0.5)
-			local tilt = 1 - (0.1 * math.abs(poptions:Tilt()))
-			local rotx = -30 * poptions:Tilt()
+			self:GetPlayerOptions('ModsLevel_Current')
+				--:FromString(state:GetPlayerOptionsString('ModsLevel_Song'))
+				:FromString(state:GetPlayerOptionsString('ModsLevel_Current'))
+			local mini = scale(curpop:Mini(), 0, 1, 1, 0.5)
+			local tilt = 1 - (0.1 * math.abs(curpop:Tilt()))
+			local rotx = -30 * curpop:Tilt()
 			self
 				:zoom(mini * tilt)
 				:rotationx(rotx)
@@ -148,23 +99,6 @@ return Def.ActorFrame {
 				:skewy(0)
 				:stopeffect()
 				:visible(true)
-		end,
-		CurrentStepsP1ChangedMessageCommand = function(self)
-			self:SetNoteDataFromLua({})
-			self:visible(false)
-			local song = GAMESTATE:GetCurrentSong()
-			if not song then return end
-			local chart
-			for n, c in ipairs(song:GetAllSteps()) do
-				if c == GAMESTATE:GetCurrentSteps(PlayerNumber[1]) then
-					chart = n
-				end
-			end
-			if not chart then return end
-			local nd = song:GetNoteData(chart)
-			if not nd then return end
-			self:SetNoteDataFromLua(nd)
-			self:visible(true)
 		end,
 	},
 	Def.Sprite { Name = 'Judgment' },

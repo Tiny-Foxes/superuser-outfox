@@ -7,7 +7,7 @@ return function(Song)
 	local compat = {}
 	for chart in ivalues(diffs) do
 		local match = chart:GetStepsType():lower()
-		if match:find(GAMESTATE:GetCurrentStyle():GetName()) then
+		if match:find(GAMESTATE:GetCurrentGame():GetName()) then
 			if not (
 				match:find('double') and (
 					GAMESTATE:IsSideJoined(PLAYER_1) and

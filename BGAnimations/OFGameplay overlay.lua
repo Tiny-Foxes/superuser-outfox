@@ -1,21 +1,12 @@
-local function InputHandler(event)
-	print(event.button)
-	if event.button == 'Back' then
-		SCREENMAN:GetTopScreen()
-			:SetPrevScreenName(SelectMusicOrCourse())
-		SCREENMAN
-			:PlayCancelSound()
-			:SetNewScreen(SCREENMAN:GetTopScreen():GetPrevScreenName())
-		SOUND:StopMusic()
-	end
-end
+local song = GAMESTATE:GetCurrentSong()
+local plrs = GAMESTATE:GetEnabledPlayers()
 
 return Def.ActorFrame {
 	FOV = 45,
 	OnCommand = function(self)
 		SCREENMAN:GetTopScreen():fardistz(10000):fov(45)
-		for i, v in ipairs(GAMESTATE:GetEnabledPlayers()) do
-			SCREENMAN:GetTopScreen():AddChildFromPath(THEME:GetPathG('Preview', ToEnumShortString(v)))
+		for v in ivalues(plrs) do
+			SCREENMAN:GetTopScreen():AddChildFromPath(THEME:GetPathG('OFGameplay', 'Player'..ToEnumShortString(v)))
 		end
 		--self:GetParent():AddChildFromPath(THEME:GetPathG('Players', 'gameplay'))
 		local P1 = SCREENMAN:GetTopScreen():GetChild('PlayerP1')
@@ -52,12 +43,10 @@ return Def.ActorFrame {
 				:easeoutexpo(1)
 				:y(plry)
 		end
-		SCREENMAN:GetTopScreen():AddInputCallback(InputHandler)
+		SCREENMAN:GetTopScreen():AddInputCallback(LoadModule('Lua.InputSystem.lua')(self))
 		self:queuecommand('ScreenReady')
 	end,
 	ScreenReadyCommand = function(self)
-		local song = GAMESTATE:GetCurrentSong()
-		local pos = GAMESTATE:GetSongPosition()
 		SOUND:PlayMusicPart(
 			song:GetMusicPath(),
 			-2,
@@ -67,40 +56,62 @@ return Def.ActorFrame {
 			false,
 			true,
 			true
-		)	
-		for k, v in pairs(song:GetFGChanges()) do
-			if v.file1 ~= '' and v.start_beat ~= -10000 then
-				local file = v.file1
-				if not loadfile(song:GetSongDir()..file) then
-					file = file..'/default.lua'
-				end
-				if assert(loadfile(song:GetSongDir()..file)) then
-					self:AddChildFromPath(song:GetSongDir()..file)
-					self:GetChildAt(self:GetNumChildren()):name('Modfile')
-					self:GetChild('Modfile')
-						:SetUpdateFunction(function(self)
-							for i, v in ipairs(GAMESTATE:GetEnabledPlayers()) do
-								local plr = SCREENMAN:GetTopScreen():GetChild('Player'..ToEnumShortString(v))
-								local mods = GAMESTATE:GetPlayerState(v):GetPlayerOptionsString('ModsLevel_Song')
-								plr:GetChild('NoteField'):GetPlayerOptions('ModsLevel_Current'):FromString(mods)
-							end
-							SCREENMAN:GetTopScreen():GetChild('Overlay'):visible(true)
-						end)
-						:SetUpdateRate(v.rate or 1)
-						:playcommand('Init')
-					local offset = 2 + (v.start_beat * GAMESTATE:GetSongBPS())
-					self
-						:sleep((offset > 0 and offset) or 0)
-						:queuecommand('FGMods')
-				end
-			end
-		end
+		)
 	end,
-	FGModsCommand = function(self)
-		self:GetChild('Modfile'):playcommand('On')
-	end,
-	OffCommand = function(self)
-		SCREENMAN:GetTopScreen():RemoveInputCallback(InputHandler)
+	BackCommand = function(self)
+		SOUND:StopMusic()
+		SCREENMAN:GetTopScreen():Cancel()
 	end,
 	LoadActor(THEME:GetPathB('ScreenGameplay', 'overlay')),
+	Def.ActorFrame {
+		Name = 'Modfiles',
+		ScreenReadyCommand = function(self)
+			lua.ReportScriptError(tostring(#GAMESTATE:GetCurrentSong():GetFGChanges()))
+			for k, v in pairs(song:GetBGChanges()) do
+				lua.ReportScriptError(tostring(v))
+			end
+			for k, v in pairs(song:GetFGChanges()) do
+				lua.ReportScriptError(tostring(v))
+				if v.file1 ~= '' then
+					local file = v.file1
+					if not loadfile(song:GetSongDir()..file) then
+						file = file..'/default.lua'
+					end
+					if assert(loadfile(song:GetSongDir()..file)) then
+						local offset = 2 + (v.start_beat * GAMESTATE:GetSongBPS())
+						self:AddChildFromPath(song:GetSongDir()..file)
+						self:GetChildAt(self:GetNumChildren())
+							--:SetUpdateRate(v.rate or 1)
+							:playcommand('Init')
+							:sleep(offset)
+							:queuecommand('On')
+					end
+				end
+			end
+		end,
+		UpdateCommand = function(self)
+			--[[
+			for v in ivalues {PLAYER_1, PLAYER_2} do
+				local plr = SCREENMAN:GetTopScreen():GetChild('Player'..ToEnumShortString(v))
+				if plr then
+					local mods = GAMESTATE:GetPlayerState(v):GetPlayerOptionsString('ModsLevel_Song')
+					plr:GetChild('NoteField'):GetPlayerOptions('ModsLevel_Current'):FromString(mods)
+				end
+			end
+			--]]
+			SCREENMAN:GetTopScreen():GetChild('Overlay'):visible(true)
+		end,
+	},
+	Def.Actor {
+		Name = 'ENDME',
+		ScreenReadyCommand = function(self)
+			self:sleep(song:GetLastSecond() + 3):queuecommand('SongFinished')
+		end,
+		SongFinishedCommand = function(self)
+			SCREENMAN:GetTopScreen()
+				:SetNextScreenName('ScreenEvaluation')
+				-- TODO: Manipulate PlayerStats so this can be replaced with 'SM_DoNextScreen'. ~Sudo
+				:StartTransitioningScreen('SM_GoToNextScreen')
+		end,
+	}
 }
