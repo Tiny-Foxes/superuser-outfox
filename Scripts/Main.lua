@@ -14,7 +14,7 @@ Branch.AfterSelectMusic = function()
 	if SCREENMAN:GetTopScreen():GetGoToOptions() then
 		return SelectFirstOptionsScreen()
 	else
-		return "OFGameplay"
+		return "ScreenGameplay"
 	end
 end
 
@@ -30,14 +30,14 @@ Branch.PlayerOptions = function()
 	if SCREENMAN:GetTopScreen():GetGoToOptions() then
 		return optionsScreen
 	else
-		return "OFGameplay"
+		return "ScreenGameplay"
 	end
 end
 Branch.SongOptions = function()
 	if SCREENMAN:GetTopScreen():GetGoToOptions() then
 		return "ScreenSongOptions"
 	else
-		return "OFGameplay"
+		return "ScreenGameplay"
 	end
 end
 

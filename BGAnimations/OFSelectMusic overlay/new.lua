@@ -287,7 +287,7 @@ for i = 1, wheel.Song.Size do
 	local panel = SuperActor.new('Quad')
 	local title = SuperActor.new('BitmapText')
 	local subtitle = SuperActor.new('BitmapText')
-	panel
+	do panel
 		:SetCommand('Init', function(self)
 			self
 				:SetSize(320, 48)
@@ -295,19 +295,22 @@ for i = 1, wheel.Song.Size do
 				:skewx(-0.5)
 				:shadowlength(2, 2)
 		end)
-	title
+	end
+	do title
 		:SetAttribute('Font', 'Common Large')
 		:SetAttribute('Text', CurSongs[songIdx]:GetDisplayMainTitle())
 		:SetCommand('Init', function(self)
 			self:zoom(0.5):maxwidth(540)
 		end)
-	subtitle
+	end
+	do subtitle
 		:SetAttribute('Font', 'Common Normal')
 		:SetAttribute('Text', CurSongs[songIdx]:GetDisplaySubTitle())
 		:SetCommand('Init', function(self)
 			self:zoom(0.5):maxwidth(540)
 		end)
-	song
+	end
+	do song
 		:AddChild(panel, 'Panel')
 		:AddChild(title, 'Title')
 		:AddChild(subtitle, 'SubTitle')
@@ -320,6 +323,7 @@ for i = 1, wheel.Song.Size do
 				self:GetChild('SubTitle'):y(10)
 			end
 		end)
+	end
 	songWheel:AddChild(song, 'Container'..i)
 end
 

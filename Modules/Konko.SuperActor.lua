@@ -43,6 +43,9 @@ local ActorTree = Def.ActorFrame {
 			return self
 		end
 	end,
+	OnCommand = function(self)
+		self:playcommand('Node')
+	end,
 	UpdateCommand = function(self)
 		UpdateTweens(self)
 	end
@@ -132,12 +135,7 @@ local function SetName(self, name)
 end
 local function AddChild(self, child, idx, name)
 	--print('SuperActor:AddChild')
-	local allowed = {
-		ActorFrame = true,
-		ActorFrameTexture = true,
-		ActorScroller = true,
-	}
-	if not allowed[self.Type] then
+	if not _G[self.Type].GetChildren then
 		printerr('SuperActor.AddChild: Cannot add child to type '..self.Type)
 		return
 	end
@@ -145,23 +143,30 @@ local function AddChild(self, child, idx, name)
 		name = idx
 		idx = nil
 	end
-	if name then child:SetName(name) end
-	child = Def[child.Type](child)
+	if name then
+		child.Name = name
+	end
+	if child.Type then
+		child = Def[child.Type](child)
+	end
 	if idx then
 		table.insert(self, idx, child)
 	else
 		table.insert(self, child)
 	end
+	if child.Name then
+		local node = self.NodeCommand
+		self.NodeCommand = function(this)
+			if node then node(this) end
+			this[child.Name] = this:GetChild(child.Name)
+		end
+		--self[child.Name] = child
+	end
 	return self
 end
 local function GetChildIndex(self, name)
 	--print('SuperActor:GetChildIndex')
-	local allowed = {
-		ActorFrame = true,
-		ActorFrameTexture = true,
-		ActorScroller = true,
-	}
-	if not allowed[self.Type] then
+	if not _G[self.Type].GetChildren then
 		printerr('SuperActor.GetChildIndex: Cannot add child to type '..self.Type)
 		return
 	end
@@ -177,11 +182,24 @@ local function AddToTree(self, idx, name)
 		name = idx
 		idx = nil
 	end
-	if name then self:SetName(name) end
+	if name then
+		self.Name = name
+	end
+	if self.Type then
+		self = Def[self.Type](self)
+	end
 	if idx then
 		table.insert(ActorTree, idx, self)
 	else
 		table.insert(ActorTree, self)
+	end
+	if self.Name then
+		local node = self.NodeCommand
+		self.NodeCommand = function(this)
+			if node then node(this) end
+			SuperActor.GetTree()[self.Name] = SuperActor.GetTree():GetChild(self.Name)
+		end
+		ActorTree[self.Name] = self
 	end
 end
 local function GetTree()

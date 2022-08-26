@@ -20,10 +20,7 @@ return function(pn)
 
 	local state = GAMESTATE:GetPlayerState(pn)
 	local prefpop = state:GetPlayerOptions('ModsLevel_Preferred')
-	local curpop = state:GetPlayerOptions('ModsLevel_Current')
 	local pref = state:GetPlayerOptionsString('ModsLevel_Preferred')
-
-	local nfpop
 
 	return Def.ActorFrame {
 		Name = 'Player'..ToEnumShortString(pn),
@@ -97,11 +94,11 @@ return function(pn)
 					:queuecommand('ModsReady')
 			end,
 			ModsReadyCommand = function(self)
-				self:luaeffect('UpdateMods')
+				self
+					:luaeffect('UpdateMods')
 			end,
 			UpdateModsCommand = function(self)
-				if not nfpop then nfpop = self:GetPlayerOptions('ModsLevel_Current') end
-				--local poptions = self:GetPlayerOptions('ModsLevel_Current')
+				local nfpop = self:GetPlayerOptions('ModsLevel_Current')
 				nfpop:FromString(state:GetPlayerOptionsString('ModsLevel_Song'))
 				--nfpop:FromString(state:GetPlayerOptionsString('ModsLevel_Current'))
 				local mini = 1 - 0.5 * nfpop:Mini()
