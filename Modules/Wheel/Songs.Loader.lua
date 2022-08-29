@@ -2,6 +2,9 @@
 -- Accepts Style.
 return function(Style)
 
+	-- We also need to match the current game. ~Sudo
+	local Game = GAMESTATE:GetCurrentGame():GetName()
+
 	-- All the Compatible Songs Container.
 	local AllCompSongs = {}
 		
@@ -17,8 +20,9 @@ return function(Style)
 		-- For all the steps in Current looped Song.
 		for CurStep in ivalues(CurSong:GetAllSteps()) do
 			-- Find if Steps supports current selected Style.
-
-			if string.find(CurStep:GetStepsType():lower(), Style) then
+			lua.ReportScriptError(CurStep:GetChartStyle():lower())
+			-- Match for game first. If we can't even match for that, don't bother with style. ~Sudo
+			if string.find(CurStep:GetChartStyle():lower(), Game) and string.find(CurStep:GetStepsType():lower(), Style) then
 
 				-- Check the type of Steps 
 				local Type = 1

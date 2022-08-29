@@ -1,4 +1,5 @@
 -- This was shamelessly stolen from the default Soundwaves theme.
+-- It's pretty goddamn horrible and I have to do it from scracth anyway. ~Sudo
 local ThemeColor = LoadModule('Theme.Colors.lua')
 
 function GetLocalProfiles()
@@ -8,7 +9,7 @@ function GetLocalProfiles()
 		return numSongs == 1 and Screen.String("SingularSongPlayed") or Screen.String("SeveralSongsPlayed")
 	end
 
-	for p = 0,PROFILEMAN:GetNumLocalProfiles()-1 do
+	for p = 0, PROFILEMAN:GetNumLocalProfiles() - 1 do
 		local profile=PROFILEMAN:GetLocalProfileFromIndex(p);
 		local ProfileCard = Def.ActorFrame {
 			Def.Sprite{
@@ -129,7 +130,7 @@ function LoadPlayerStuff(Player)
 end;
 
 function UpdateInternal3(self, Player)
-	local pn = (Player == PLAYER_1) and 1 or 2;
+	local pn = PlayerNumber:Reverse()[Player];
 	local frame = self:GetChild(string.format('P%uFrame', pn));
 	local scroller = frame:GetChild('Scroller');
 	local seltext = frame:GetChild('SelectedProfileText');
