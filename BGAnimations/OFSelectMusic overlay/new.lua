@@ -718,7 +718,7 @@ do af
 	end)
 	:SetMessage('EnterGameplay', function(self)
 		SOUND:DimMusic(0, 3)
-		wheel.NextScreen = 'OFGameplay'
+		wheel.NextScreen = 'ScreenStageInformation'
 		self:sleep(0.25):queuecommand('BeginTransition')
 	end)
 	:SetCommand('BeginTransition', function(self)

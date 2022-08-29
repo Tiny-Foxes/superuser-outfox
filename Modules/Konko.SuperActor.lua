@@ -1,8 +1,3 @@
---[[
-	This is a stripped down version of SuperActorloader.lua from Kitsu template.
-	allows Kitsu SuperActor system specifically OUTSIDE of modfiles.
---]]
-
 local konko = LoadModule('Konko.Core.lua')
 konko()
 
@@ -160,7 +155,7 @@ local function AddChild(self, child, idx, name)
 			if node then node(this) end
 			this[child.Name] = this:GetChild(child.Name)
 		end
-		--self[child.Name] = child
+		self[child.Name] = child
 	end
 	return self
 end
