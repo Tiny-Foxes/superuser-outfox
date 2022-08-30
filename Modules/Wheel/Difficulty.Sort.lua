@@ -1,5 +1,15 @@
+local st = StepsType:Reverse()
+
 local function compare(a, b)
-	return TF_WHEEL.DiffTab[a:GetDifficulty()] < TF_WHEEL.DiffTab[b:GetDifficulty()]
+	if st[a:GetStepsType()] == st[b:GetStepsType()] then
+		if TF_WHEEL.DiffTab[a:GetDifficulty()] == TF_WHEEL.DiffTab[b:GetDifficulty()] then
+			return a:GetMeter() < b:GetMeter()
+		else
+			return TF_WHEEL.DiffTab[a:GetDifficulty()] < TF_WHEEL.DiffTab[b:GetDifficulty()]
+		end
+	else
+		return st[a:GetStepsType()] < st[b:GetStepsType()]
+	end
 end
 
 return function(Song)

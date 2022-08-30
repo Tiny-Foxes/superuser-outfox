@@ -1,19 +1,21 @@
-return function(Songs)
+return function(Songs, Sort)
+
+	Sort = Sort or 'Group'
 
     local Groups = {}
 
 	for v in ivalues(Songs) do
 		local Add = true
 		for v2 in ivalues(Groups) do
-			if v2 == v:GetGroupName() then Add = false break end
+			if v2 == TF_WHEEL.SortType[Sort](v) then Add = false break end
 		end
 		if Add then
-			Groups[#Groups+1] = v:GetGroupName()
+			Groups[#Groups+1] = TF_WHEEL.SortType[Sort](v)
 		end
-    end
+	end
 
 	local function compare(a,b)
-		if a:sub(1, 1):find('%p') then return false end
+		if not a:sub(1, 1):find('%w') and b:sub(1, 1):find('%w') then return false end
         return a:lower() < b:lower()
     end
 

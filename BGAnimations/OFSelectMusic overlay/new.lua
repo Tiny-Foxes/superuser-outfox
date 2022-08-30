@@ -36,12 +36,23 @@ for k in pairs(PlayersJoined) do
 end
 -- Song list indices.
 -- Group, song, and difficulty. Difficulty has one for each player.
-Index = Index or {
+Index = {
 	Group = 1,
 	Song = 1,
 }
 -- Wheel offsets.
 -- Size, increment offset, decrement offset, center offset.
+local sorts = {
+	'Group', 'Title', 'Artist', 'Credit', 'Length',
+	Reverse = function(self)
+		local t = {}
+		for i, v in ipairs(self) do
+			t[v] = i
+		end
+		return t
+	end
+}
+local sortIdx = sorts:Reverse()[TF_WHEEL.PreferredSort]
 local wheel = {
 	Focus = 'Song',
 	NextScreen = 'OFGameplay',
@@ -61,8 +72,8 @@ local wheel = {
 
 local style = TF_WHEEL.QuickStyleDB[GAMESTATE:GetCurrentGame():GetName()]
 local AllSongs = LoadModule('Wheel/Songs.Loader.lua')(style)
-local AllGroups = LoadModule('Wheel/Group.List.lua')(AllSongs)
-local SongList = LoadModule('Wheel/Group.Sort.lua')(AllSongs)
+local AllGroups = LoadModule('Wheel/Group.List.lua')(AllSongs, TF_WHEEL.PreferredSort)
+local SongList = LoadModule('Wheel/Group.Sort.lua')(AllSongs, TF_WHEEL.PreferredSort)
 
 local CurGroup = AllGroups[Index.Group]
 local CurSongs = SongList[CurGroup]
@@ -201,7 +212,7 @@ local function MoveGroup(self, offset, Groups, reset)
 			if i > 6 then
 				pos = Index.Group + i - wheel.Group.Size
 			end
-			while pos > wheel.Group.Size do pos = pos - #Groups end
+			while pos > #Groups do pos = pos - #Groups end
 			while pos < 1 do pos = #Groups + pos end
 
 			local contAF = self:GetChild('Container'..off)
@@ -213,23 +224,9 @@ local function MoveGroup(self, offset, Groups, reset)
 	CurSongs = SongList[CurGroup]
 end
 
---[[
-	These are actual Actor tables. I created this module,
-	I love this module, I am keeping this module.
-	If you need help on how to use these modules, please,
-	I BEG you, ping me on the OutFox server. I would be
-	more than happy to explain how this module works.
-	But if you have an object-oriented mind like me,
-	you would probably already know how they work
-	just from looking at the rest of the code.
 
-	Get used to seeing this all over the place.
-	I'm going to completely restructure the entire
-	theme using this module for Actor creation.
---]]
 local SuperActor = LoadModule('Konko.SuperActor.lua')
 
-local af = SuperActor.new('ActorFrame')
 
 local songWheel = SuperActor.new('ActorScroller')
 local songSelect = SuperActor.new('ActorFrame')
@@ -242,6 +239,8 @@ local groupSelect = SuperActor.new('ActorFrame')
 local diffCover = SuperActor.new('Quad')
 
 local songPreview = SuperActor.new('Actor')
+
+local varControl = SuperActor.new('Actor')
 
 
 local songTransform = function(self, offset, itemIndex, numItems)
@@ -386,6 +385,11 @@ do songWheel
 	:SetCommand('Back', function(self)
 		if PlayersJoined[self.pn] then
 			MESSAGEMAN:Broadcast('GroupUnselect')
+		end
+	end)
+	:SetCommand('Select', function(self)
+		if PlayersJoined[self.pn] then
+			MESSAGEMAN:Broadcast('CycleSort')
 		end
 	end)
 	:SetCommand('Start', function(self)
@@ -590,6 +594,11 @@ do groupWheel
 			SCREENMAN:GetTopScreen():Cancel()
 		end
 	end)
+	:SetCommand('Select', function(self)
+		if PlayersJoined[self.pn] then
+			MESSAGEMAN:Broadcast('CycleSort')
+		end
+	end)
 	:SetCommand('Start', function(self)
 		-- If this player is not joined, join them.
 		if not PlayersJoined[self.pn] then
@@ -699,7 +708,7 @@ do songPreview
 	:AddToTree('SongPreview')
 end
 
-do af
+do varControl
 	:SetMessage('GroupSelect', function(self)
 		wheel.Focus = 'Song'
 	end)
@@ -711,6 +720,17 @@ do af
 	end)
 	:SetMessage('SongUnselect', function(self)
 		wheel.Focus = 'Song'
+	end)
+	:SetMessage('CycleSort', function(self)
+		sortIdx = sortIdx + 1
+		while sortIdx > #sorts do sortIdx = sortIdx - #sorts end
+		TF_WHEEL.PreferredSort = sorts[sortIdx]
+		AllGroups = LoadModule('Wheel/Group.List.lua')(AllSongs, TF_WHEEL.PreferredSort)
+		SongList = LoadModule('Wheel/Group.Sort.lua')(AllSongs, TF_WHEEL.PreferredSort)
+		CurGroup = AllGroups[Index.Group]
+		CurSongs = SongList[CurGroup]
+		MoveGroup(SuperActor.GetTree():GetChild('GroupWheel'), 0, AllGroups)
+		MoveSong(SuperActor.GetTree():GetChild('SongWheel'), 0, CurSongs)
 	end)
 	:SetMessage('EnterOptions', function(self)
 		wheel.NextScreen = 'ScreenPlayerOptions'

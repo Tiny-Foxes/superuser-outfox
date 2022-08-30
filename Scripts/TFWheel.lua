@@ -94,6 +94,25 @@ TF_WHEEL.DiffTab = {
 	end,
 }
 
+TF_WHEEL.SortType = {
+	Group = function(a) return a:GetGroupName() end,
+	Title = function(a) return a:GetDisplayFullTitle():lower():sub(1, 1) end,
+	Artist = function(a) return a:GetDisplayArtist():lower() end,
+	Credit = function(a)
+		if a:GetCredit() ~= '' then
+			return a:GetCredit()
+		end
+		return 'Unknown'
+	end,
+	Length = function(a)
+		local lower = math.floor(a:GetLastSecond() / 30) * 30
+		local upper = lower + 30
+		return SecondsToMSS(lower) .. '-' .. SecondsToMSS(upper)
+	end,
+}
+
+TF_WHEEL.PreferredSort = 'Group'
+
 -- Resize function, We use this to resize images to size while keeping aspect ratio.
 function TF_WHEEL.Resize(width,height,setwidth,sethight)
 

@@ -8,17 +8,19 @@
 -- 				- Song 1
 -- 				- Song 2
 -- 				- Song 3
+-- TODO: Add support for actual sorting. ~Sudo
 
-return function(Songs)
+return function(Songs, Sort)
 
-	local Groups = LoadModule('Wheel/Group.List.lua')(Songs)
-	
+	Sort = Sort or 'Group'
+
+	local Groups = LoadModule('Wheel/Group.List.lua')(Songs, Sort)
 	local GroupsAndSongs = {}
-	
-	for _, v in ipairs(Groups) do
+
+	for v in ivalues(Groups) do
 		GroupsAndSongs[v] = GroupsAndSongs[v] or {}
-		for _, v2 in ipairs(Songs) do
-			if v2:GetGroupName() == v then
+		for v2 in ivalues(Songs) do
+			if TF_WHEEL.SortType[Sort](v2) == v then
 				GroupsAndSongs[v][#GroupsAndSongs[v] + 1] = v2
 			end
 		end

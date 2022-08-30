@@ -168,7 +168,7 @@ return Def.ActorFrame {
 				local song = GAMESTATE:GetCurrentSong()
 				local data = {
 					(song:IsDisplayBpmRandom() and '???') or tostring(math.floor(song:GetDisplayBpms()[2])),
-					SecondsToMSS(song:GetStepsSeconds())
+					SecondsToMSS(song:GetLastSecond())
 				}
 				local str = (
 					'BPM: '..

@@ -130,7 +130,7 @@ function LoadPlayerStuff(Player)
 end;
 
 function UpdateInternal3(self, Player)
-	local pn = PlayerNumber:Reverse()[Player];
+	local pn = (Player == PLAYER_1) and 1 or 2;
 	local frame = self:GetChild(string.format('P%uFrame', pn));
 	local scroller = frame:GetChild('Scroller');
 	local seltext = frame:GetChild('SelectedProfileText');

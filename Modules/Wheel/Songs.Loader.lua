@@ -17,12 +17,10 @@ return function(Style)
 		-- Set the first value to be Current Looped Song, In the Temp Current Song Container.
 		local CurSongCon = {CurSong}
 		
-		-- For all the steps in Current looped Song.
-		for CurStep in ivalues(CurSong:GetAllSteps()) do
+		-- For all the playable steps in Current looped Song.
+		for CurStep in ivalues(SongUtil.GetPlayableSteps(CurSong)) do
 			-- Find if Steps supports current selected Style.
-			lua.ReportScriptError(CurStep:GetChartStyle():lower())
-			-- Match for game first. If we can't even match for that, don't bother with style. ~Sudo
-			if string.find(CurStep:GetChartStyle():lower(), Game) and string.find(CurStep:GetStepsType():lower(), Style) then
+			if string.find(CurStep:GetStepsType():lower(), Style) then
 
 				-- Check the type of Steps 
 				local Type = 1
@@ -66,8 +64,8 @@ return function(Style)
 	end
 
 	local function compare(a, b)
-		if not a:GetDisplayMainTitle():sub(1, 1):find('%w') and b:GetDisplayMainTitle():sub(1, 1):find('%w') then return false end
-		return a:GetDisplayMainTitle():lower() < b:GetDisplayMainTitle():lower()
+		if not a:GetDisplayFullTitle():sub(1, 1):find('%w') and b:GetDisplayFullTitle():sub(1, 1):find('%w') then return false end
+		return a:GetDisplayFullTitle():lower() < b:GetDisplayFullTitle():lower()
     end
 
 	table.sort(AllCompSongs, compare)
