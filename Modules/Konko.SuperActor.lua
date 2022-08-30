@@ -90,8 +90,8 @@ local function SetMessage(self, name, func)
 		printerr('SuperActor.SetSignal: Invalid argument #2 (expected function, got '..type(func)..')')
 		return
 	end
-	self[name..'MessageCommand'] = function(self)
-		return func(self)
+	self[name..'MessageCommand'] = function(self, params)
+		return func(self, params)
 	end
 	return self
 end

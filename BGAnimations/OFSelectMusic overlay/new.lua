@@ -36,7 +36,7 @@ for k in pairs(PlayersJoined) do
 end
 -- Song list indices.
 -- Group, song, and difficulty. Difficulty has one for each player.
-Index = {
+Index = Index or {
 	Group = 1,
 	Song = 1,
 }
@@ -328,7 +328,7 @@ end
 
 do songWheel
 	:SetAttribute('UseScroller', true)
-	:SetAttribute('SecondsPerItem', true)
+	:SetAttribute('SecondsPerItem', 0)
 	:SetAttribute('NumItemsToDraw', 9)
 	:SetAttribute('ItemPaddingStart', 0)
 	:SetAttribute('ItemPaddingEnd', 0)
@@ -729,8 +729,8 @@ do varControl
 		SongList = LoadModule('Wheel/Group.Sort.lua')(AllSongs, TF_WHEEL.PreferredSort)
 		CurGroup = AllGroups[Index.Group]
 		CurSongs = SongList[CurGroup]
-		MoveGroup(SuperActor.GetTree():GetChild('GroupWheel'), 0, AllGroups)
-		MoveSong(SuperActor.GetTree():GetChild('SongWheel'), 0, CurSongs)
+		MoveGroup(SuperActor.GetTree():GetChild('GroupWheel'), 0, AllGroups, true)
+		MoveSong(SuperActor.GetTree():GetChild('SongWheel'), 0, CurSongs, true)
 	end)
 	:SetMessage('EnterOptions', function(self)
 		wheel.NextScreen = 'ScreenPlayerOptions'
