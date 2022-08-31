@@ -270,7 +270,7 @@ return Def.ActorFrame {
 	end,
 	Def.BitmapText {
 		Font = 'Sudo/36px',
-		Text = 'hewo to my plamtformer thabks\n\nu can do a subo hop! (pres in the uppies)',
+		Text = 'hewo to my plamtformer thabks\n\nu can have do a subo hop! (pres in the uppies)',
 		InitCommand = function(self)
 			self
 				:xy(SCX, ST + 60)
