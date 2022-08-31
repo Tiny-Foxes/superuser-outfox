@@ -135,12 +135,12 @@ for i, v in ipairs(GAMESTATE:GetEnabledPlayers()) do
 				return self
 			end
 			function self:SetNoteDataFromLua(t)
-				self:GetChild('NoteField'):SetNoteDataFromLua(start_beat, end_beat)
+				self:GetChild('NoteField'):SetNoteDataFromLua(t)
 				return self
 			end
 			function self:SetNoteData(i)
 				local nd = GAMESTATE:GetCurrentSong():GetNoteData(i)
-				return self:SetNoteDataFromLua(t)
+				return self:SetNoteDataFromLua(nd)
 			end
 			local plr = SCREENMAN:GetTopScreen():GetChild('Player'..ToEnumShortString(v))
 			if plr then
@@ -226,7 +226,7 @@ for i, v in ipairs(GAMESTATE:GetEnabledPlayers()) do
 				self:SetNoteDataFromLua(nf.chart[i])
 				self:AutoPlay(true)
 			end,
-			LuaNoteSkinsChangeMessageCommand = function(self, param)
+			LuaNoteSkinsChangedMessageCommand = function(self, param)
 				if param.pn ~= v then return end
 				self:GetPlayerOptions('ModsLevel_Current'):NoteSkinCol(nil, param.choicename)
 			end,

@@ -1,6 +1,8 @@
-local ThemeColor = LoadModule('Theme.Colors.lua')
 local konko = LoadModule('Konko.Core.lua')
 konko()
+
+local ThemeColor = LoadModule('Theme.Colors.lua')
+local SuperActor = LoadModule('Konko.SuperActor.lua')
 
 local plrs = {
 	[PLAYER_1] = false,
@@ -20,8 +22,9 @@ Index.Diff = Index.Diff or {
 	[PLAYER_2] = 1,
 }
 
+local CurSong = GAMESTATE:GetCurrentSong()
 local DiffLoader = LoadModule('Wheel/Difficulty.Sort.lua')
-local AllDiffs = DiffLoader(GAMESTATE:GetCurrentSong())
+local AllDiffs = DiffLoader(CurSong)
 local CurDiff = {
 	[PLAYER_1] = AllDiffs[1],
 	[PLAYER_2] = AllDiffs[1],
@@ -38,11 +41,13 @@ local function MoveDifficulty(self, offset, Diffs)
 	end
 end
 
-local SuperActor = LoadModule('Konko.SuperActor.lua')
-
 
 local af = SuperActor.new('ActorFrame')
 for k in pairs(plrs) do
+
+	local PN = ToEnumShortString(k)
+
+	local previewAF = SuperActor.new('ActorFrame')
 	local diffAF = SuperActor.new('ActorFrame')
 	local backPanel = SuperActor.new('Quad')
 	local meterPanel = SuperActor.new('Quad')
@@ -52,6 +57,16 @@ for k in pairs(plrs) do
 	local diffInfo = SuperActor.new('ActorFrame')
 	local diffScore = SuperActor.new('BitmapText')
 	local readyText = SuperActor.new('BitmapText')
+
+	do previewAF
+		:SetCommand('On', function(self)
+			local a = self
+			lua.RunWithThreadVariable(function()
+				-- Currently crashes the game
+				--a:AddChildFromPath(GetModule('Chart.Preview.lua'))
+			end, {Player = k})
+		end)
+	end
 
 	do backPanel
 		:SetCommand('Init', function(self)
@@ -74,7 +89,7 @@ for k in pairs(plrs) do
 		:SetCommand('On', function(self)
 			self:diffuse(ThemeColor[ToEnumShortString(CurDiff[k]:GetDifficulty())])
 		end)
-		:SetCommand('SetDifficulty'..ToEnumShortString(k), function(self)
+		:SetCommand('SetDifficulty'..PN, function(self)
 			self
 				:stoptweening()
 				:easeoutsine(0.1)
@@ -91,7 +106,7 @@ for k in pairs(plrs) do
 			local meter = math.floor(CurDiff[k]:GetMeter() * 10) * 0.1
 			self:settext(meter)
 		end)
-		:SetCommand('SetDifficulty'..ToEnumShortString(k), function(self)
+		:SetCommand('SetDifficulty'..PN, function(self)
 			local meter = math.floor(CurDiff[k]:GetMeter() * 10) * 0.1
 			self:settext(meter)
 		end)
@@ -108,7 +123,7 @@ for k in pairs(plrs) do
 		:SetCommand('On', function(self)
 			self:settext(THEME:GetString('CustomDifficulty', ToEnumShortString(CurDiff[k]:GetDifficulty())))
 		end)
-		:SetCommand('SetDifficulty'..ToEnumShortString(k), function(self)
+		:SetCommand('SetDifficulty'..PN, function(self)
 			self:settext(THEME:GetString('CustomDifficulty', ToEnumShortString(CurDiff[k]:GetDifficulty())))
 		end)
 	end
@@ -120,7 +135,7 @@ for k in pairs(plrs) do
 				:addy(-60)
 				:zoom(0.6)
 		end)
-		:SetCommand('SetDifficulty'..ToEnumShortString(k), function(self)
+		:SetCommand('SetDifficulty'..PN, function(self)
 			local title = CurDiff[k]:GetChartName()
 			if title == '' then title = THEME:GetString('CustomDifficulty', ToEnumShortString(CurDiff[k]:GetDifficulty())) end
 			self
@@ -153,7 +168,7 @@ for k in pairs(plrs) do
 				end
 				if i > 9 then self:addx(90) end
 			end)
-			:SetCommand('SetDifficulty'..ToEnumShortString(k), function(self)
+			:SetCommand('SetDifficulty'..PN, function(self)
 				local newln = ''
 				local datum = ''
 				local chart = CurDiff[k]
@@ -211,7 +226,7 @@ for k in pairs(plrs) do
 				:shadowlength(2, 2)
 				:diffuse(color('#FFFF9900'))
 		end)
-		:SetCommand('Ready'..ToEnumShortString(k), function(self)
+		:SetCommand('Ready'..PN, function(self)
 			self
 				:stoptweening()
 				:zoom(2)
@@ -222,7 +237,7 @@ for k in pairs(plrs) do
 				:diffusealpha(1)
 				:glow(1, 1, 1, 0.5)
 		end)
-		:SetCommand('NotReady'..ToEnumShortString(k), function(self)
+		:SetCommand('NotReady'..PN, function(self)
 			self
 				:stoptweening()
 				:zoom(1)
@@ -246,6 +261,7 @@ for k in pairs(plrs) do
 				:addy(PositionPerPlayer(k, -y, y))
 				:visible(plrs[k])
 		end)
+		:AddChild(previewAF, 'Preview'..PN)
 		:AddChild(backPanel, 'BackPanel')
 		:AddChild(meterPanel, 'MeterPanel')
 		:AddChild(meterText, 'Meter')
@@ -255,7 +271,7 @@ for k in pairs(plrs) do
 		:AddChild(readyText, 'ReadyText')
 	end
 
-	af:AddChild(diffAF, 'Difficulty'..ToEnumShortString(k))
+	af:AddChild(diffAF, 'Difficulty'..PN)
 end
 
 do af

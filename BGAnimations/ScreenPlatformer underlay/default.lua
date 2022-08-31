@@ -6,9 +6,9 @@ local SuperActor = LoadModule('Konko.SuperActor.lua')
 
 local FRAMERATE = 0
 
-local GRAVITY = 6
-local JUMP_HEIGHT = 1
-local MAX_VELOCITY = 0.6
+local GRAVITY = 5
+local JUMP_HEIGHT = 1.25
+local MAX_VELOCITY = 1
 local FRICTION = 6
 local APEX_TIME = 0.75
 local ACCEL = 8
