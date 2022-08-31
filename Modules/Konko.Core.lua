@@ -101,7 +101,7 @@ if not _G.Tweens.instant then
 	_G.Tweens.instant = function(x) return 1 end
 end
 
-Def.KonkoAF = Def.KonkoAF or function(t)
+KonkoAF = KonkoAF or function(t)
 	local env = getfenv(2)
 	local af = Def.ActorFrame(t)
 
@@ -109,6 +109,9 @@ Def.KonkoAF = Def.KonkoAF or function(t)
 	local on = af.OnCommand
 	af.InitCommand = function(self)
 		if init then init(self) end
+		if env.init then
+			env.init()
+		end
 		KonkoAF = self
 	end
 	af.OnCommand = function(self)
@@ -121,6 +124,7 @@ Def.KonkoAF = Def.KonkoAF or function(t)
 			if env.ready then
 				env.ready()
 			end
+			self:SetDrawFunction(env.draw)
 		end,
 		UpdateCommand = function(self)
 			DT = self:GetEffectDelta()
@@ -129,6 +133,11 @@ Def.KonkoAF = Def.KonkoAF or function(t)
 			SPB = 1 / BPS
 			if env.update then
 				env.update(DT)
+			end
+		end,
+		InputMessageCommand = function(self, event)
+			if env.input then
+				env.input(event)
 			end
 		end,
 	}

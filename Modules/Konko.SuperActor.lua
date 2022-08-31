@@ -130,7 +130,7 @@ local function SetName(self, name)
 end
 local function AddChild(self, child, idx, name)
 	--print('SuperActor:AddChild')
-	if not _G[self.Type].GetChildren then
+	if self.Type ~= 'KonkoAF' and not _G[self.Type].GetChildren then
 		printerr('SuperActor.AddChild: Cannot add child to type '..self.Type)
 		return
 	end
