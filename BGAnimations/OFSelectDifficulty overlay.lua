@@ -61,7 +61,7 @@ for k in pairs(plrs) do
 	do previewAF
 		:SetCommand('On', function(self)
 			local a = self
-			lua.RunWithThreadVariable(function()
+			lua.RunWithThreadVariables(function()
 				-- Currently crashes the game
 				--a:AddChildFromPath(GetModule('Chart.Preview.lua'))
 			end, {Player = k})
