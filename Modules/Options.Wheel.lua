@@ -14,6 +14,7 @@ local SuperActor = LoadModule('Konko.SuperActor.lua')
 		end}
 	}
 --]]
+
 return function(t, index)
 
 	local Index = index or 1
@@ -27,6 +28,7 @@ return function(t, index)
 		local aux = Index - 1
 		if offset ~= 0 then
 			self:stoptweening():easeoutexpo(0.2):aux(aux)
+			SOUND:PlayOnce(THEME:GetPathS('Common', 'value'), true)
 		else
 			self:aux(aux)
 		end
@@ -95,6 +97,7 @@ return function(t, index)
 		end)
 		:SetCommand('Start', function(self)
 			t[Index][2](self)
+			SCREENMAN:PlayStartSound()
 		end)
 	end
 
