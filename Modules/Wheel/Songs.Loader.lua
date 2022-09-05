@@ -14,6 +14,7 @@ return function(Style)
 		-- Set the first value to be Current Looped Song, In the Temp Current Song Container.
 		local CurSongCon = {CurSong}
 		
+
 		-- For all the playable steps in Current looped Song.
 		for CurStep in ivalues(SongUtil.GetPlayableSteps(CurSong)) do
 			-- Find if Steps supports current selected Style.
@@ -38,7 +39,7 @@ return function(Style)
 					Meter = "0"..CurStep:GetMeter()
 				end
 				-- Add the Difficulty to the Temp Difficulty Contrainer.
-				DiffCon[Type.."_"..tonumber(Difficulty:Reverse()[CurStep:GetDifficulty()] + 1).."_"..Meter] = CurStep	
+				DiffCon[Type.."_"..tonumber(Difficulty:Reverse()[CurStep:GetDifficulty()] + 1).."_"..Meter] = CurStep
 			end
 		end
 
@@ -52,6 +53,7 @@ return function(Style)
 			if DiffCon[k] then
 				CurSongCon[#CurSongCon+1] = DiffCon[k]
 			end
+
 		end
 
 		-- If a Difficulty exist for song using Style, Add it to All Compatible Songs.

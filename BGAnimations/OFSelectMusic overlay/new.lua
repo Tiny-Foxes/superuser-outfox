@@ -40,6 +40,7 @@ Index = Index or {
 	Group = 1,
 	Song = 1,
 }
+
 -- Wheel offsets.
 -- Size, increment offset, decrement offset, center offset.
 local sorts = {
@@ -74,6 +75,9 @@ local style = TF_WHEEL.QuickStyleDB[GAMESTATE:GetCurrentGame():GetName()]
 local AllSongs = LoadModule('Wheel/Songs.Loader.lua')(style)
 local AllGroups = LoadModule('Wheel/Group.List.lua')(AllSongs, TF_WHEEL.PreferredSort)
 local SongList = LoadModule('Wheel/Group.Sort.lua')(AllSongs, TF_WHEEL.PreferredSort)
+
+while Index.Group > #AllGroups do Index.Group = Index.Group - #AllGroups end
+while Index.Group < 1 do Index.Group = Index.Group + #AllGroups end
 
 local CurGroup = AllGroups[Index.Group]
 local CurSongs = SongList[CurGroup]
