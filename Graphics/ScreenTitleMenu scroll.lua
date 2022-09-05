@@ -5,6 +5,11 @@ local splash = false
 
 local hovered = false
 
+local id = ProductID()
+if string.find(id, 'StepMania') and not string.find(id, '5.3') then
+	return Def.Actor {}
+end
+
 local function UpdateMouse(self)
 	local mouseX, mouseY = INPUTFILTER:GetMouseX(), INPUTFILTER:GetMouseY()
 	local targetX, targetY = self:GetParent():GetX() + self:GetDestX(), self:GetParent():GetY() + self:GetDestY()
