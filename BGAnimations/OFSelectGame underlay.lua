@@ -8,7 +8,7 @@ local gameinfo = {
 	"Dance\n\nSingle (4 Panel)\nSolo (6 Panel)\nThree (3 Panel)\nDouble (8 Panel)",
 	"Pump\n\nSingle (5 Panel)\nHalfDouble (6 Panel)\nDouble (10 Panel)",
 	"SMX\n\nSingle (5 Panel)\nDual (6 Panel)\nDouble (10 Panel)",
-	"Keyboard7\n\nSingle (7 Button)",
+	"Keyboard\n\nSingle (1-19 Button)",
 	"ez2\n\nSingle (3 Panel 2 Hand)\nReal(3 Panel 4 Hand)\nDouble(6 Panel 4 Hand)",
 	"Para\n\nSingle (5 Sensor)",
 	"DS3DDX\n\nSingle (4 Panel 4 Hand)",
@@ -27,7 +27,7 @@ local games = {
 	"dance",
 	"pump",
 	"smx",
-	"kb7",
+	"kbx",
 	"ez2",
 	"para",
 	"ds3ddx",
@@ -52,7 +52,9 @@ for i, v in ipairs(games) do
 	if v == GAMESTATE:GetCurrentGame():GetName() then index = i end
 end
 
-local wheel = LoadModule('Options.Wheel.lua')(options, index)
+options.StartIndex = index
+
+local wheel = LoadModule('Options.Wheel.lua')(options)
 
 local info = SuperActor.new('BitmapText')
 

@@ -5,7 +5,8 @@ local ThemeColor = LoadModule('Theme.Colors.lua')
 local SuperActor = LoadModule('Konko.SuperActor.lua')
 
 --[[
-	{
+	local options = {
+		StartIndex = 1,
 		{'Option1', function(self)
 			-- this one goes to next screen
 		end},
@@ -13,11 +14,12 @@ local SuperActor = LoadModule('Konko.SuperActor.lua')
 			-- this one shaves your leggies
 		end}
 	}
+	local optwheel = LoadModule('Options.Wheel.lua')(options)
 --]]
 
-return function(t, index)
+return function(t)
 
-	local Index = index or 1
+	local Index = t.StartIndex or 1
 
 	local function MoveSelection(self, offset)
 		Index = Index + offset
