@@ -5,40 +5,44 @@ local SuperActor = LoadModule('Konko.SuperActor.lua')
 
 
 local gameinfo = {
-	"Dance\n\nSingle (4 Panel)\nSolo (6 Panel)\nThree (3 Panel)\nDouble (8 Panel)",
-	"Pump\n\nSingle (5 Panel)\nHalfDouble (6 Panel)\nDouble (10 Panel)",
-	"SMX\n\nSingle (5 Panel)\nDual (6 Panel)\nDouble (10 Panel)",
-	"Keyboard\n\nSingle (1-19 Button)",
-	"ez2\n\nSingle (3 Panel 2 Hand)\nReal(3 Panel 4 Hand)\nDouble(6 Panel 4 Hand)",
-	"Para\n\nSingle (5 Sensor)",
-	"DS3DDX\n\nSingle (4 Panel 4 Hand)",
-	"Be-Mu\n\nSingle5 (5 Button 1 Scratch)\nSingle7 (7 Button 1 Scratch)\nDouble5 (10 Button 2 Scratch)\nDouble7 (14 Button 2 Scratch)",
-	"DMX\n\nSingle (4 Sensor)\nDouble (8 Sensor)",
-	"TechnoMotion\n\nSingle4 (4 Panel)\nSingle5 (5 Panel)\nSingle8 (8 Panel)\nDouble4 (8 Panel)\nDouble5 (10 Panel)\nDouble8 (16 Panel)",
-	"Po-Mu\n\nFive (5 Button)\nSeven (7 Button)\nNine (9 Button)",
-	"GDDM\n\nSingle (9 Parts)",
-	"GDGF\n\n5 Guitar (5 Fret)\n5 Bass (5 Fret 1 Snare)\n3 Guitar (3 Fret)\n3 Bass (3 Fret 1 Snare)",
-	"Guitarh\n\n6 Guitar (5 Fret 1 Snare)\n6 Bass (5 Fret 1 Snare)\n(6 Guitar 1 Snare)\n(6 Bass 1 Snare)",
+	"Dance\n\nSingle (4 panels)\nSolo (6 panels)\nThree (3 panels)\nDouble (8 panels)\nSolo Double (12 panels)\nThree Double (6 panels)",
+	"Pump\n\nSingle (5 panels)\nHalfDouble (6 panels)\nDouble (10 panels)",
+	"SMX\n\nSingle (5 panels)\nDual (6 panels)\nDouble (10 panels)",
+	"Techno\n\nCross (4 panels)\nDiagonal (5 panels)\nSquare (8 panels)\nSquare+ (9 panels)\nCross Double (8 panels)\nDiagonal Double (10 panels)\nSquare Double (16 panels)\nSquare+ Double (18 panels)",
+	"Be-Mu\n\nSingle 5 (5 buttons, 1 turntable)\nSingle 7 (7 buttons, 1 turntable)\nDouble 10 (10 buttons, 2 turntables)\nDouble 14 (14 buttons, 2 turntables)",
+	"Po-Mu\n\n3 buttons\n4 buttons\n5 buttons\n7 buttons\n9 buttons\n18 buttons",
+	"GDDM\n\n10-piece (8 drums, bass pedal, hi-hat pedal)\n9-piece (7 drums, bass pedal, hi-hat pedal)\n6-piece (5 drums, bass pedal)",
+	"GDGF\n\nGuitar 5 (5 frets)\nBass 5 (5 frets, open strum)\nGuitar 6 (6 frets)\nGuitar 3 (3 frets)\nBass 3 (3 frets, open strum)",
+	"GH\n\nSolo, Bass, Rhythm (5 frets)",
+	"Taitai\n\nSingle (drumhead/red, rim/blue)",
+	"Para\n\nSingle (5 sensors)\nDouble (10 sensors)",
+	"KBX\n\n1 to 19 buttons",
+	"Ez2Dancer\n\nSingle (3 panels, 2 sensors)\nReal (3 panels, 2 upper sensors, 2 lower sensors)\nDouble (6 panels, 4 sensors)",
+	"3DDX\n\nSingle (4 panels, 4 sensors)\nSingle (5 panels, 4 sensors)\nDual (8 panels, 8 sensors)\nDual (10 panels, 8 sensors)",
+	"DMX\n\nSingle (4 sensors)\nDouble (8 sensors)",
+	"StepStage\n\nTwin (3 panel rows)\nSingle (6 panels)",
 	--"lights",
-	"KickBox\n\nHuman (4 Panel)\nQuadarm (4 Panel\nInsect (6 Panel)\nArachnid (8 Panel)"
+	"KickBox\n\nHuman\nQuadarm\nInsect\nArachnid"
 }
 
 local games = {
 	"dance",
 	"pump",
 	"smx",
-	"kbx",
-	"ez2",
-	"para",
-	"ds3ddx",
-	"be-mu",
-	"maniax",
 	"techno",
+	"be-mu",
 	"po-mu",
 	"gddm",
 	"gdgf",
-	"guitarh",
-	--"lights", -- should change this to another screen option.
+	"gh",
+	"taiko",
+	"para",
+	"kbx",
+	"ez2",
+	"ds3ddx",
+	"maniax",
+	"stepstage",
+	--"lights",
 	"kickbox"
 }
 
