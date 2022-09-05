@@ -2,9 +2,6 @@
 -- Accepts Style.
 return function(Style)
 
-	-- We also need to match the current game. ~Sudo
-	local Game = GAMESTATE:GetCurrentGame():GetName()
-
 	-- All the Compatible Songs Container.
 	local AllCompSongs = {}
 		
