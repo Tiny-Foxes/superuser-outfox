@@ -141,6 +141,9 @@ for i,v in ipairs( Name ) do
 			BobCommand=function(self)
 				self:bob():effectperiod(8):effectmagnitude(4, 0, 0)
 			end,
+			BeginCommand=function(self)
+				self:settext(GetJLineValue(v, p))
+			end,
 		}
 	}
 	Con[#Con+1] = Def.BitmapText {
@@ -160,6 +163,9 @@ for i,v in ipairs( Name ) do
 		end,
 		BobCommand=function(self)
 			self:bob():effectperiod(8):effectmagnitude(4, 0, 0)
+		end,
+		BeginCommand=function(self)
+			self:settext(ToUpper(THEME:GetString( CurPrefTiming or "Original" , "Judgment"..v )))
 		end,
 	}
 	t[#t+1] = Con

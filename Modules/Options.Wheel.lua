@@ -30,13 +30,17 @@ return function(t)
 		local aux = Index - 1
 		if offset ~= 0 then
 			self:stoptweening():easeoutexpo(0.2):aux(aux)
-			SOUND:PlayOnce(THEME:GetPathS('Common', 'value'), true)
+			if not t.Mute then
+				SOUND:PlayOnce(THEME:GetPathS('Common', 'value'), true)
+			end
 		else
 			self:aux(aux)
 		end
 	end
 
 	local wheel = SuperActor.new('ActorScroller')
+
+	local InputHandler = TF_WHEEL.Input(self)
 
 	do wheel
 		:SetAttribute('UseScroller', true)
@@ -64,12 +68,12 @@ return function(t)
 		:SetCommand('Init', function(self)
 			self
 				:xy(SR - 210, SCY)
-				:SetLoop(false)
+				:SetLoop(t.Loop or false)
 				:SetFastCatchup(true)
 				:aux(0)
 		end)
 		:SetCommand('On', function(self)
-			SCREENMAN:GetTopScreen():AddInputCallback(TF_WHEEL.Input(self))
+			SCREENMAN:GetTopScreen():AddInputCallback(InputHandler)
 			self:SetUpdateFunction(function(self)
 				self:SetCurrentAndDestinationItem(self:getaux())
 			end)
@@ -77,6 +81,7 @@ return function(t)
 			self:addx(SCX):easeoutexpo(0.5):addx(-SCX)
 		end)
 		:SetCommand('Off', function(self)
+			SCREENMAN:GetTopScreen():RemoveInputCallback(InputHandler)
 			self:easeoutexpo(0.5):addx(SCX)
 		end)
 		:SetCommand('StartTransitioning', function(self)

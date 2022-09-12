@@ -25,7 +25,7 @@ end
 return Def.ActorFrame {
 	Name = gc:GetText(),
 	InitCommand = function(self)
-		self:SetUpdateFunction(UpdateMouse)
+		if ProductVersion():find('0.5') then self:SetUpdateFunction(UpdateMouse) end
 		self
 			:SetSize(item_width, item_height)
 			:diffusealpha(0.75)

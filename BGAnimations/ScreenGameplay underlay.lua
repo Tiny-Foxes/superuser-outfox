@@ -14,6 +14,9 @@ if GAMESTATE:IsHumanPlayer(PLAYER_2) then
 	end
 end
 
+local song = GAMESTATE:GetCurrentSong()
+local songPos = GAMESTATE:GetSongPosition()
+
 return Def.ActorFrame {
 	OnCommand=function(self) self:playcommand("UpdateDiscordInfo") end,
 	UpdateDiscordInfoCommand=function(s)
@@ -184,8 +187,8 @@ return Def.ActorFrame {
 					:luaeffect('SongTime')
 			end,
 			SongTimeCommand = function(self)
-				local cur = GAMESTATE:GetSongPosition():GetMusicSeconds()
-				local last = GAMESTATE:GetCurrentSong():GetLastSecond()
+				local cur = songPos:GetMusicSeconds()
+				local last = song:GetLastSecond()
 				self:cropright(0.99 - (cur / (last * 1.01)))
 			end,
 		},
@@ -193,7 +196,6 @@ return Def.ActorFrame {
 		Def.BitmapText {
 			Font = 'Common Normal',
 			InitCommand = function(self)
-				local song = GAMESTATE:GetCurrentSong()
 				if song then
 					self:settext(song:GetDisplayFullTitle())
 				end
@@ -206,7 +208,6 @@ return Def.ActorFrame {
 		Def.BitmapText {
 			Font = 'Common Normal',
 			InitCommand = function(self)
-				local song = GAMESTATE:GetCurrentSong()
 				if song then
 					self:settext(song:GetDisplayArtist())
 				end

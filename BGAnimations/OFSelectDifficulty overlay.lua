@@ -326,8 +326,8 @@ do af
 		MoveDifficulty(self, 1, AllDiffs)
 	end)
 	:SetCommand('MenuDown', function(self)
-		MESSAGEMAN:Broadcast('EnterOptions')
-		self:queuecommand('Off')
+		self:stoptweening():playcommand('Off')
+		MESSAGEMAN:Broadcast('EnterOptions', CurDiff)
 	end)
 	:SetCommand('Back', function(self)
 		if (plrs[PLAYER_1] and plrs[PLAYER_2]) then
@@ -358,13 +358,13 @@ do af
 				self:queuecommand('Ready'..ToEnumShortString(self.pn))
 			elseif PlayerReady[PLAYER_1] and PlayerReady[PLAYER_2] then
 				SOUND:PlayOnce(THEME:GetPathS('Common', 'Start'), true)
-				MESSAGEMAN:Broadcast('EnterGameplay')
-				self:queuecommand('Off')
+				self:stoptweening():playcommand('Off')
+				MESSAGEMAN:Broadcast('EnterGameplay', CurDiff)
 			end
 		else
 			SOUND:PlayOnce(THEME:GetPathS('Common', 'Start'), true)
-			MESSAGEMAN:Broadcast('EnterGameplay')
-			self:queuecommand('Off')
+			self:stoptweening():playcommand('Off')
+			MESSAGEMAN:Broadcast('EnterGameplay', CurDiff)
 		end
 	end)
 	:AddToTree('DifficultyFrame')

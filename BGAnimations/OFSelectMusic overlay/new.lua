@@ -31,6 +31,10 @@ PlayersJoined = PlayersJoined or {
 	[PLAYER_1] = false,
 	[PLAYER_2] = false,
 }
+local profiles = {
+	PROFILEMAN:GetProfile(PLAYER_1),
+	PROFILEMAN:GetProfile(PLAYER_2),
+}
 for k in pairs(PlayersJoined) do
 	PlayersJoined[k] = GAMESTATE:IsSideJoined(k)
 end
@@ -347,6 +351,11 @@ do songWheel
 	end)
 	:SetCommand('On', function(self)
 		SCREENMAN:GetTopScreen():AddInputCallback(function(event)
+			if GAMESTATE:GetNumPlayersEnabled() > 1 then
+				GAMESTATE:SetCurrentStyle('versus')
+			else
+				GAMESTATE:SetCurrentStyle(style)
+			end
 			if wheel.Focus == 'Song' then
 				TF_WHEEL.Input(self)(event)
 			end
@@ -400,6 +409,7 @@ do songWheel
 		-- If this player is not joined, join them.
 		if not PlayersJoined[self.pn] then
 			GAMESTATE:JoinPlayer(self.pn)
+			GAMESTATE:LoadProfiles(true)
 			PlayersJoined[self.pn] = true
 		-- Otherwise, select the current song.
 		else
@@ -591,6 +601,7 @@ do groupWheel
 		-- If both players are joined, unjoin the player at input.
 		if PlayersJoined[PLAYER_1] and PlayersJoined[PLAYER_2] then
 			GAMESTATE:UnjoinPlayer(self.pn)
+			GAMESTATE:SetCurrentStyle(style)
 			PlayersJoined[self.pn] = false
 		-- Otherwise, if this player is still joined, cancel to the previous screen.
 		elseif PlayersJoined[self.pn] then
@@ -607,6 +618,8 @@ do groupWheel
 		-- If this player is not joined, join them.
 		if not PlayersJoined[self.pn] then
 			GAMESTATE:JoinPlayer(self.pn)
+			GAMESTATE:LoadProfiles(true)
+			GAMESTATE:SetCurrentStyle('versus')
 			PlayersJoined[self.pn] = true
 		-- Otherwise, select the current group.
 		else

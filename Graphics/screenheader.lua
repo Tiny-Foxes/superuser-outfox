@@ -1,5 +1,8 @@
 local ThemeColor = LoadModule('Theme.Colors.lua')
 
+local header = THEME:GetString(Var 'LoadingScreen', 'HeaderText')
+local subheader = THEME:GetString(Var 'LoadingScreen', 'HeaderSubText')
+
 return Def.ActorFrame {
 	InitCommand = function(self)
 		self
@@ -54,7 +57,7 @@ return Def.ActorFrame {
 				:zoom(0.5)
 				:horizalign('left')
 				:vertalign('bottom')
-				:settext(THEME:GetString(Var 'LoadingScreen', 'HeaderText'))
+				:settext(header)
 		end,
 		OffCommand = function(self)
 		end,
@@ -69,7 +72,7 @@ return Def.ActorFrame {
 				:zoom(0.5)
 				:horizalign('left')
 				:vertalign('bottom')
-				:settext(THEME:GetString(Var 'LoadingScreen', 'HeaderSubText'))
+				:settext(subheader)
 		end,
 		OffCommand = function(self)
 		end,

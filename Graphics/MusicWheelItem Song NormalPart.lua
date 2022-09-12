@@ -16,7 +16,7 @@ local ret = Def.ActorFrame {
 
 local function get_diffs(song, b)
 	local doubs = b or false
-	if not song then return end
+	if not song then return {} end
 	local ret, charts = {}, {}
 	if GAMESTATE:IsCourseMode() then
 		charts = song:GetAllTrails()
