@@ -3,6 +3,7 @@ if _G._su then return _G._su end
 _G._su = {}
 local _su = setmetatable(_su, _su)
 _su.__index = _G
+_su.SetMeFree = _su.SetMeFree or false
 local function nop() end
 function envcall(self, f, name)
 	if type(f) == 'string' then
@@ -143,5 +144,7 @@ KonkoAF = KonkoAF or function(t)
 	}
 	return af
 end
+
+_su = _su
 
 return _su

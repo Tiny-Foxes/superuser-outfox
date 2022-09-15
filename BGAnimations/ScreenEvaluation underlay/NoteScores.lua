@@ -1,6 +1,7 @@
 local ThemeColor = LoadModule('Theme.Colors.lua')
 
 local t = Def.ActorFrame {
+	Name = 'NoteScoreFrame',
 }
 
 local plr = ...
@@ -44,6 +45,7 @@ local function GetPlrDiff()
 end
 
 t[#t + 1] = Def.ActorFrame {
+	Name = 'NoteScore',
 	InitCommand = function(self)
 	end,
 	Def.Quad {
@@ -69,6 +71,7 @@ t[#t + 1] = Def.ActorFrame {
 		end,
 	},
 	GAMESTATE:IsSideJoined(plr) and Def.BitmapText {
+		Name = 'Grade',
 		Font = '_xiaxide 80px',
 		Text = GetPlrGrade(),
 		InitCommand = function(self)
@@ -105,10 +108,12 @@ t[#t + 1] = Def.ActorFrame {
 		end,
 	},
 	GAMESTATE:IsSideJoined(plr) and Def.ActorFrame {
+		Name = 'ScoreFrame',
 		InitCommand = function(self)
 			self:xy(SCREEN_CENTER_X * 0.3, 30)
 		end,
 		Def.BitmapText {
+			Name = 'Score',
 			Font = '_xide/40px',
 			Text = GetPlrScore(),
 			InitCommand = function(self)

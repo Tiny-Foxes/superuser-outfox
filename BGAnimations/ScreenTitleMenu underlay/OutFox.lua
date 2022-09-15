@@ -1,6 +1,7 @@
 -- Load Konko core module and initialize environment
 local konko = LoadModule('Konko.Core.lua')
 konko()
+if not SetMeFree then SetMeFree = false end
 
 -- Load SuperActor module
 local SuperActor = LoadModule('Konko.SuperActor.lua')
@@ -134,7 +135,7 @@ end
 -- MascotFrame
 do mascotAF
 	:SetCommand('Init', function(self)
-		self:Center():diffusealpha(0)
+		self:Center():diffusealpha(0):visible(not SetMeFree)
 	end)
 	:SetCommand('On', function(self)
 		self:linear(0.5):diffusealpha(1)
@@ -183,10 +184,36 @@ end
 
 -- UIWrap
 do uiWrap
-	:SetCommand('Init', Actor.Center)
+	:SetAttribute('FOV', 90)
+	:SetCommand('Init', function(self)
+		self:Center():fardistz(9e9)
+	end)
+	:SetCommand('On', function(self)
+		local start, switched = Second(), false
+		self:SetUpdateFunction(function(self)
+			if not switched and (Second() - start + 1) % 5 == 0 then
+				switched = true
+				self:queuecommand('RandomAngle')
+			end
+		end)
+	end)
+	:SetMessage('DropBeats', function(self)
+		self
+			:stoptweening()
+			:zoomz(1.5)
+			:easeoutquint(0.77)
+			:zoomz(1)
+			:sleep(0.77)
+			:zoomz(3)
+			:easeoutquint(0.385)
+			:zoomz(1)
+			:easeinquint(0.385)
+			:zoomz(3)
+	end)
 end
 -- UIWrap.UI
 do uiAF
+	:SetAttribute('FOV', 90)
 	:SetCommand('Init', function(self)
 		self:y(SCY - 192)
 	end)
@@ -235,8 +262,9 @@ do uiPanel
 end
 -- UIWrap.UI.Text
 do uiText
+	:SetAttribute('FOV', 90)
 	:SetCommand('Init', function(self)
-		self:xy(20, -10)
+		self:xy(20, -10):vanishpoint(SCX - 200, SCY - 182)
 	end)
 end
 -- UIWrap.UI.Text.PoweredBy
@@ -265,6 +293,56 @@ do uiPoweredBy
 			:cropright(1)
 	end)
 end
+
+local uiTitleBack = SuperActor.new('Model')
+do uiTitleBack
+	--:SetAttribute('Texture', THEME:GetPathG('ScreenTitleMenu', 'supertext'))
+	:SetAttribute('Materials', THEME:GetPathG('ScreenTitleMenu', 'logo'))
+	:SetAttribute('Meshes', THEME:GetPathG('ScreenTitleMenu', 'logo'))
+	:SetAttribute('Bones', THEME:GetPathG('ScreenTitleMenu', 'logo'))
+	:SetCommand('Init', function(self)
+		self
+			:rotationx(-360)
+			:basezoomz(0.5)
+			:CelShading(true)
+			:visible(SetMeFree)
+			:bob()
+			:effectmagnitude(0, -5, 0)
+			:effectperiod(20)
+	end)
+	:SetCommand('On', function(self)
+		self
+			:zoom(5)
+			:y(0)
+			:z(1000)
+			:easeoutquint(0.77)
+			:zoom(0.75)
+			:y(-30)
+			:z(200)
+			:rotationx(-15)
+	end)
+	:SetCommand('RandomAngle', function(self)
+		self
+			:stoptweening()
+			:zoom(0.75 + math.random() * 0.5)
+			:x(-SW * 0.3 + math.random() * SW * 0.6)
+			:y(-SH * 0.1 + math.random() * SH * 0.15)
+			:rotationx(-30 + math.random() * 60)
+			:rotationy(-30 + math.random() * 60)
+			:rotationz(-10 + math.random() * 20)
+			:linear(4)
+			:addrotationy((self:GetRotationY() / math.abs(self:GetRotationY())) * -25)
+			:addrotationz((self:GetRotationZ() / math.abs(self:GetRotationZ())) * -5)
+			:queuecommand('RandomAngle')
+	end)
+	:SetCommand('Off', function(self)
+		self
+			:stoptweening()
+			:linear(0.5)
+			:diffusealpha(0)
+	end)
+end
+
 -- UIWrap.UI.Text.Title
 do uiTitle
 	:SetAttribute('Texture', THEME:GetPathG('ScreenTitleMenu', 'supertext'))
@@ -274,6 +352,7 @@ do uiTitle
 			:zoom(0.45)
 			:shadowlengthy(4)
 			:cropright(1)
+			:rotationx(SetMeFree and -60 or 0)
 	end)
 	:SetCommand('On', function(self)
 		self
@@ -313,6 +392,10 @@ do uiTagline
 			:cropright(1)
 	end)
 	:SetCommand('SetTagline', function(self)
+		if SetMeFree then
+			self:settext('"Set Me Free."')
+			return
+		end
 		-- I'm working on translating these titles, but getting some translators
 		-- is pretty much essential at this point.
 		-- Taglines default to English if there aren't any for that language.
@@ -427,6 +510,33 @@ do uiText
 	:AddChild(uiAuthor, 'Author')
 	:AddChild(uiVersion, 'Version')
 	:AddChild(uiSocial, 'Social')
+	:AddChild(SuperActor.new('Sprite')
+		:SetAttribute('Texture', THEME:GetPathG('', 'karen'))
+		:SetCommand('Init', function(self)
+			self
+				:xy(-60, 70)
+				:zoom(0.05)
+				:rotationz(-10)
+				:bob()
+				:effectmagnitude(0, 4, 0)
+				:effectperiod(8)
+				:visible(SetMeFree)
+				:diffusealpha(0)
+		end)
+		:SetCommand('On', function(self)
+			self
+				:diffusealpha(0)
+				:sleep(0.25)
+				:linear(0.5)
+				:diffusealpha(1)
+		end)
+		:SetCommand('Off', function(self)
+			self
+				:diffusealpha(1)
+				:linear(0.5)
+				:diffusealpha(0)
+		end)
+	)
 end
 do uiAF
 	:AddChild(uiShadow, 'Shadow')
@@ -434,6 +544,7 @@ do uiAF
 	:AddChild(uiText, 'Text')
 end
 do uiWrap
+	:AddChild(uiTitleBack, 'TitleBack')
 	:AddChild(uiAF, 'UI')
 	:AddToTree('UIWrap')
 end
