@@ -63,8 +63,12 @@ return function(Style)
 	end
 
 	local function compare(a, b)
-		if not a:GetDisplayFullTitle():sub(1, 1):find('%w') and b:GetDisplayFullTitle():sub(1, 1):find('%w') then return false end
-		return a:GetDisplayFullTitle():lower() < b:GetDisplayFullTitle():lower()
+		a, b = a:GetDisplayFullTitle():lower(), b:GetDisplayFullTitle():lower()
+		local a1, b1 = a:sub(1, 1), b:sub(1, 1)
+		if a1:find('%W') and b1:find('%w') then return false
+		elseif a1:find('%w') and b1:find('%W') then return true
+		end
+		return a < b
     end
 
 	table.sort(AllCompSongs, compare)
