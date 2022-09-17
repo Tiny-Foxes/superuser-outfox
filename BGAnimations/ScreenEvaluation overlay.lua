@@ -34,24 +34,20 @@ return Def.ActorFrame {
 		end,
 		MenuUpCommand = function(self)
 			local plr = self.pn
+			--[[
+			if not gs.IsPadPlayer(plr) then
+				SCREENMAN:SystemMessage('Cannot submit score for non-pad players.')
+			end
+			--]]
 			local pn = PlayerNumber:Reverse()[plr] + 1
 			local prof = PROFILEMAN:GetProfile(plr)
 			if not prof then
 				SCREENMAN:SystemMessage('No profile loaded.')
 				return
 			end
-			local path = PROFILEMAN:GetProfileDir(ProfileSlot[pn])
-			if not path then
-				SCREENMAN:SystemMessage('Profile path not found.')
-				return
-			end
-			local gsData = IniFile.ReadFile(path..'GrooveStats.ini')
-			if not gsData.GrooveStats then
-				SCREENMAN:SystemMessage('No GrooveStats metrics detected.')
-				return
-			end
-			if not gsData.GrooveStats.ApiKey then
-				SCREENMAN:SystemMessage('No API key for profile.')
+			local api = gs.GetAPI(plr)
+			if not api then
+				SCREENMAN:SystemMessage('No API key found.')
 				return
 			end
 			SCREENMAN:SystemMessage('Submitting score to GrooveStats, please wait...')
@@ -66,9 +62,9 @@ return Def.ActorFrame {
 				if v ~= 'Miss' then total = total + jlines[v] end
 			end
 			jlines.totalSteps = total
-			local res = gs.submit {
+			gs.submit {
 				['player'..pn] = {
-					apiKey = gsData.GrooveStats.ApiKey,
+					apiKey = api,
 					profileName = prof:GetDisplayName(),
 					chartHash = gs.ChartHash(plr),
 					rate = GAMESTATE:GetSongOptionsObject('ModsLevel_Preferred'):MusicRate() * 100,
@@ -78,6 +74,8 @@ return Def.ActorFrame {
 					--usedCMod = (GAMESTATE:GetPlayerState(plr):GetPlayerOptions('ModsLevel_Preferred'):CMod() ~= nil),
 				},
 			}
+		end,
+		ScoreSubmitMessageCommand = function(self, res)
 			if not res then
 				SCREENMAN:SystemMessage('Failed to submit score: no response from server.')
 				return

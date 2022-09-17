@@ -1,6 +1,8 @@
 local gs = {}
 local path = '/Save/GrooveStats/'
 
+local timeout = 10
+
 -- Reduce the chart to it's smallest unique representable form.
 local MinimizeChart = function(chartString)
 	local function MinimizeMeasure(measure)
@@ -108,6 +110,35 @@ local NormalizeFloatDigits = function(param)
 	return table.concat(paramParts, ',')
 end
 
+local function GSPrefs(plr)
+	local ret = {}
+	local pn = PlayerNumber:Reverse()[plr] + 1
+	local path = PROFILEMAN:GetProfileDir(ProfileSlot[pn])
+	if not path then return ret end
+	local data = IniFile.ReadFile(path..'GrooveStats.ini')
+	if not data or not data.GrooveStats then return ret end
+	return data.GrooveStats
+end
+
+function gs.GetAPI(plr)
+	local gsData = GSPrefs(plr)
+	return gsData.ApiKey
+end
+
+function gs.IsPadPlayer(plr)
+	local ret = false
+	local gsData = GSPrefs(plr)
+	if gsData.IsPadPlayer then
+		ret = (tonumber(gsData.IsPadPlayer) == 1 and true) or false
+	end
+	return ret
+end
+
+function gs.timeout(s)
+	if not s then return timeout end
+	timeout = s
+end
+
 function gs.ChartHash(plr)
 	local song = GAMESTATE:GetCurrentSong()
 	local filepath = song:GetSongFilePath()
@@ -167,18 +198,16 @@ function gs.ChartHash(plr)
 			end
 		end
 	else
-		lua.ReportScriptError('Unsupported file type.')
 		return
 	end
 	if ndstring and bpms then
-		local hash = CRYPTMAN:SHA1String(MinimizeChart(ndstring)..NormalizeFloatDigits(bpms)):sub(1, 16)
+		local hash = CRYPTMAN:SHA1String(MinimizeChart(ndstring)..NormalizeFloatDigits(bpms))
 		local bytes = {}
 		for i = 1, string.len(hash), 1 do
 			table.insert(bytes, string.format('%02x', string.byte(hash, i)))
 		end
-		return table.concat(bytes, '')
+		return table.concat(bytes, ''):sub(1, 16)
 	else
-		lua.ReportScriptError('No note data or BPMs found.')
 		return
 	end
 end
@@ -187,7 +216,7 @@ function gs.request(type, data)
 	local id = CRYPTMAN:GenerateRandomUUID()
 	local now = GetTimeSinceStart()
 	local time = 0
-	local timeout = 10
+	local timeout = gs.timeout()
 	if type == 'ping' then
 		id = type
 		data = {
@@ -216,32 +245,33 @@ function gs.request(type, data)
 		end
 	end)
 	local s, ret = coroutine.resume(req, data)
+	MESSAGEMAN:Broadcast(type, ret)
 	return ret
 end
 
 function gs.ping()
-	return gs.request('ping', {
+	return gs.request('Ping', {
 		action = 'ping',
 		protocol = 1,
 	})
 end
 function gs.session()
-	return gs.request('session', {
+	return gs.request('Session', {
 		action = 'groovestats/new-session',
 		chartHashVersion = 3
 	})
 end
 function gs.scores(data)
 	data.action = 'groovestats/player-scores'
-	return gs.request('player-scores', data)
+	return gs.request('PlayerScores', data)
 end
 function gs.leaderboards(data)
 	data.action = 'groovestats/player-leaderboards'
-	return gs.request('player-leaderboards', data)
+	return gs.request('PlayerLeaderboards', data)
 end
 function gs.submit(data)
 	data.action = 'groovestats/score-submit'
-	return gs.request('score-submit', data)
+	return gs.request('ScoreSubmit', data)
 end
 
 return gs
