@@ -6,7 +6,7 @@ function gs.request(type, data)
 	local id = CRYPTMAN:GenerateRandomUUID()
 	local now = GetTimeSinceStart()
 	local time = 0
-	local timeout = 59
+	local timeout = 10
 	if type == 'ping' then
 		id = type
 		data = {
