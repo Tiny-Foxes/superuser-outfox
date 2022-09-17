@@ -6,6 +6,34 @@ if not SetMeFree then SetMeFree = false end
 -- Load SuperActor module
 local SuperActor = LoadModule('Konko.SuperActor.lua')
 
+-- Load GrooveStats Handler module
+local gs = LoadModule('GrooveStats.Handler.lua')
+
+local function ReportTable(t, ind)
+	ind = ind or 0
+	local indent = ''
+	for i = 1, ind do
+		indent = indent..' '
+	end
+	for k, v in pairs(t) do
+		local vtype = type(v)
+		local str = k..': '..tostring(v)
+		if vtype == 'table' then str = str..' ('..#v..')' end
+		lua.ReportScriptError(str)
+		if vtype == 'table' then ReportTable(v, ind + 2) end
+	end
+end
+
+local pingres = gs.ping()
+if pingres then
+	local gsver = pingres.version.major..'.'..pingres.version.minor..'.'..pingres.version.patch
+	SCREENMAN:SystemMessage('GrooveStats version '..gsver)
+else
+	SCREENMAN:SystemMessage('GrooveStats connection timed out.')
+end
+
+_GSSESSION = gs.session()
+
 -- Define local variables and functions
 local scale = SH /480
 local splash = false
@@ -547,6 +575,91 @@ do uiWrap
 	:AddChild(uiTitleBack, 'TitleBack')
 	:AddChild(uiAF, 'UI')
 	:AddToTree('UIWrap')
+end
+
+local timeout = 59
+local path = '/Save/GrooveStats/'
+local ping = SuperActor.new('ActorFrame')
+do ping
+	:SetCommand('Init', function(self)
+		self.request_id = nil
+		self.request_time = nil
+		self.params = nil
+		self.callback = nil
+		self:xy(SR - 72, SB - 72)
+	end)
+	:SetCommand('On', function(self)
+		MESSAGEMAN:Broadcast('Ping', {
+			data = {
+				action = 'ping',
+				protocol = 1,
+			},
+			callback = function(data, params)
+				SCREENMAN:SystemMessage(#data)
+				for k, v in pairs(data) do
+					lua.ReportScriptError(k..': '..tostring(v))
+				end
+			end
+		})
+	end)
+	:SetCommand('Wait', function(self)
+		local function reset(self)
+			self.request_id = nil
+			self.request_time = nil
+			self.params = nil
+			self.callback = nil
+			SuperActor.GetTree().Pinger.SpinnyBoi:visible(false)
+		end
+		local now = GetTimeSinceStart()
+		local time_left = timeout - (now - self.request_time)
+		self:playcommand('UpdateSpinner', {time = time_left})
+		if self.request_id ~= nil then
+			local json = File.Read(path..'responses/'..self.request_id..'.json')
+			if not json then
+				self:sleep(0.5):queuecommand('Wait')
+				return
+			end
+			local data = {}
+			if #json > 0 then
+				data = JsonDecode(json)
+			end
+			self.callback(data, self.params)
+			reset(self)
+		elseif time_left < 0 then
+			self.callback(nil, self.params)
+			reset(self)
+		end
+		if self.request_id ~= nil then
+			self:sleep(0.5):queuecommand('Wait')
+		end
+	end)
+	:SetMessage('Ping', function(self, params)
+		local id = CRYPTMAN:GenerateRandomUUID()
+		if params.data.action == 'ping' then
+			id = 'ping'
+		end
+		File.Write(path..'requests/'..id..'.json', JsonEncode(params.data))
+		self:stoptweening()
+		self.request_id = id
+		self.request_time = GetTimeSinceStart()
+		self.params = params.params
+		self.callback = params.callback
+		SuperActor.GetTree().Pinger.SpinnyBoi:visible(false)
+		self:sleep(0.1):queuecommand('Wait')
+	end)
+	:AddChild(SuperActor.new('Quad')
+		:SetCommand('Init', function(self)
+			self
+				:SetSize(64, 64)
+				:spin()
+				:visible(false)
+		end)
+		:SetCommand('UpdateSpinner', function(self)
+			self:visible(true)
+		end),
+		'SpinnyBoi'
+	)
+	--:AddToTree('Pinger')
 end
 --[[
 	Current tree structure:
