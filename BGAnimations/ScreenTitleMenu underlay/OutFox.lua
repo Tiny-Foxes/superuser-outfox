@@ -32,7 +32,7 @@ else
 	SCREENMAN:SystemMessage('GrooveStats connection timed out.')
 end
 
-_GSSESSION = gs.session()
+_GSSESSION = _GSSESSION or gs.session()
 
 -- Define local variables and functions
 local scale = SH /480

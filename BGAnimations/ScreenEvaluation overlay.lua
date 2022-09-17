@@ -15,6 +15,17 @@ local function ReportTable(t, ind)
 	end
 end
 
+local function GetJLineValue(line, pl)
+	if line == "Held" then
+		return STATSMAN:GetCurStageStats():GetPlayerStageStats(pl):GetHoldNoteScores("HoldNoteScore_Held")
+	elseif line == "MaxCombo" then
+		return STATSMAN:GetCurStageStats():GetPlayerStageStats(pl):MaxCombo()
+	else
+		return STATSMAN:GetCurStageStats():GetPlayerStageStats(pl):GetTapNoteScores("TapNoteScore_" .. line)
+	end
+	return "???"
+end
+
 return Def.ActorFrame {
 	LoadActorWithParams(THEME:GetPathG('', 'screenheader'), {}),
 	Def.Actor {
@@ -44,25 +55,37 @@ return Def.ActorFrame {
 				return
 			end
 			SCREENMAN:SystemMessage('Submitting score to GrooveStats, please wait...')
+			local jlines = {}
+			local names, length = LoadModule('Options.SmartTapNoteScore.lua')
+			names = names()
+			table.sort(names)
+			names[#names + 1] = 'Miss'
+			local total = 0
+			for i, v in ipairs(names) do
+				jlines[v] = GetJLineValue(v, plr)
+				if v ~= 'Miss' then total = total + jlines[v] end
+			end
+			jlines.totalSteps = total
 			local res = gs.submit {
 				['player'..pn] = {
 					apiKey = gsData.GrooveStats.ApiKey,
 					profileName = prof:GetDisplayName(),
-					chartHash = GAMESTATE:GetCurrentSteps(plr):GetHash(),
+					chartHash = gs.ChartHash(plr),
 					rate = GAMESTATE:GetSongOptionsObject('ModsLevel_Preferred'):MusicRate() * 100,
 					comment = GAMESTATE:GetPlayerState(plr):GetPlayerOptionsString('ModsLevel_Preferred'),
-					score = STATSMAN:GetCurStageStats():GetPlayerStageStats(plr):GetActualDancePoints() * 100,
-				}
+					score = math.floor(STATSMAN:GetCurStageStats():GetPlayerStageStats(plr):GetPercentDancePoints() * 10000),
+					--judgmentCounts = jlines,
+					--usedCMod = (GAMESTATE:GetPlayerState(plr):GetPlayerOptions('ModsLevel_Preferred'):CMod() ~= nil),
+				},
 			}
-			if res then
-				if res.status ~= 'success' then
-					SCREENMAN:SystemMessage('Failed to submit score: connection '..res.status..'.')
-					return
-				end
-				SCREENMAN:SystemMessage('Submitted score to GrooveStats.')
+			if not res then
+				SCREENMAN:SystemMessage('Failed to submit score: no response from server.')
+				return
+			elseif res.status ~= 'success' then
+				SCREENMAN:SystemMessage('Failed to submit score: connection '..res.status..'.')
 				return
 			end
-			SCREENMAN:SystemMessage('Failed to submit score: no response from server.')
+			SCREENMAN:SystemMessage('Submitted score to GrooveStats.')
 		end,
 	}
 }

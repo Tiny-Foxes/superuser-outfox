@@ -4,6 +4,7 @@ _G._su = {}
 local _su = setmetatable(_su, _su)
 _su.__index = _G
 _su.SetMeFree = _su.SetMeFree or false
+
 local function nop() end
 function envcall(self, f, name)
 	if type(f) == 'string' then
