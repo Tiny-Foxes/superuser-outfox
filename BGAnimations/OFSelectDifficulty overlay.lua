@@ -327,7 +327,7 @@ do af
 	end)
 	:SetCommand('MenuDown', function(self)
 		self:stoptweening():playcommand('Off')
-		MESSAGEMAN:Broadcast('EnterOptions', CurDiff)
+		SCREENMAN:GetTopScreen():queuemessage('EnterOptions', CurDiff)
 	end)
 	:SetCommand('Back', function(self)
 		if (plrs[PLAYER_1] and plrs[PLAYER_2]) then
@@ -359,12 +359,12 @@ do af
 			elseif PlayerReady[PLAYER_1] and PlayerReady[PLAYER_2] then
 				SOUND:PlayOnce(THEME:GetPathS('Common', 'Start'), true)
 				self:stoptweening():playcommand('Off')
-				MESSAGEMAN:Broadcast('EnterGameplay', CurDiff)
+				SCREENMAN:GetTopScreen():queuemessage('EnterGameplay', CurDiff)
 			end
 		else
 			SOUND:PlayOnce(THEME:GetPathS('Common', 'Start'), true)
 			self:stoptweening():playcommand('Off')
-			MESSAGEMAN:Broadcast('EnterGameplay', CurDiff)
+			SCREENMAN:GetTopScreen():queuemessage('EnterGameplay', CurDiff)
 		end
 	end)
 	:AddToTree('DifficultyFrame')
