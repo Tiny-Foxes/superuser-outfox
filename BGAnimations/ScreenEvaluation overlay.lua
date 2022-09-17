@@ -28,6 +28,41 @@ end
 
 return Def.ActorFrame {
 	LoadActorWithParams(THEME:GetPathG('', 'screenheader'), {}),
+	Def.ActorFrame {
+		InitCommand = function(self)
+		end,
+		OnCommand = function(self)
+		end,
+		Def.BitmapText {
+			Font = 'Common Normal',
+			InitCommand = function(self)
+				self:align(0, 0):xy(12, 48):diffusealpha(0.5)
+			end,
+			OnCommand = function(self)
+				gs.leaderboards {
+					maxLeaderboardResults = 10,
+					player1 = {
+						chartHash = gs.ChartHash(PlayerNumber[1]),
+						apiKey = gs.GetAPI(PlayerNumber[1]),
+					}
+				}
+			end,
+			PlayerLeaderboardsMessageCommand = function(self, res)
+				if not res then
+					SCREENMAN:SystemMessage('Failed to get leaderboard: no respons from server.')
+					return
+				elseif res.status ~= 'success' then
+					SCREENMAN:SystemMessage('Failed to get leaderboard: connection '..res.status..'.')
+					return
+				end
+				local scores = {}
+				for v in ivalues(res.data.player1.gsLeaderboard) do
+					scores[tonumber(v.rank)] = v.rank..': '..v.name..' - '..(tonumber(v.score) * 0.01)..'%'
+				end
+				self:settext(table.concat(scores, '\n'))
+			end,
+		}
+	},
 	Def.Actor {
 		OnCommand = function(self)
 			SCREENMAN:GetTopScreen():AddInputCallback(LoadModule('Lua.InputSystem.lua')(self))
