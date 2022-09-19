@@ -1,7 +1,7 @@
 local gs = {}
 local path = '/Save/GrooveStats/'
 
-local timeout = 10
+local timeout = 5
 
 -- Reduce the chart to it's smallest unique representable form.
 local MinimizeChart = function(chartString)
@@ -45,7 +45,7 @@ local MinimizeChart = function(chartString)
 
 				-- index: 1 2 3
 				-- value: a a a
-				for i=2, #measure/2+1 do
+				for i = 2, #measure * 0.5 + 1 do
 					table.remove(measure, i)
 				end
 			else
@@ -70,9 +70,12 @@ local MinimizeChart = function(chartString)
 			table.insert(finalChartData, ',')
 			-- Just keep removing the first element to clear the table.
 			-- This way we don't need to wait for the GC to cleanup the unused values.
+			--[[
 			for i=1, #curMeasure do
 				table.remove(curMeasure, 1)
 			end
+			--]]
+			curMeasure = {}
 		else
 			table.insert(curMeasure, line)
 		end
@@ -88,6 +91,65 @@ local MinimizeChart = function(chartString)
 	end
 
 	return table.concat(finalChartData, '\n')
+end
+
+-- NoteData: {10, 1, 'TapNoteType_Mine', 'TapNote_4th', length = nil}
+-- TimeSignature: {10, 4, 4}
+local function NoteDataToChartString(nd, ts)
+	local minichart = {}
+	local start_i, cur_i = 1, 1
+	local line_len = GAMESTATE:GetCurrentStyle():ColumnsPerPlayer()
+	local allZero = true
+	while charttable[cur_i] ~= ';' do
+		local line = charttable[cur_i]
+		if line ~= string.rep('0', line_len) then
+			allZero = false
+		end
+		if line == ',' then
+		end
+	end
+end
+
+local function minify(charttable)
+	local function minifymeasure(m)
+		local finished = false
+		while not finished and #m % 2 == 0 do
+			local allzero = true
+			for i = 2, #m, 2 do
+				if m[i] ~= string.rep('0', m[i]:len()) then
+					allzero = false
+					break
+				end
+			end
+			if allzero then
+				for i = 2, #m * 0.5 + 1 do
+					table.remove(m, i)
+				end
+			else
+				finished = true
+			end
+		end
+	end
+	local curMeasure, finalData = {}, {}
+	for line in ivalues(charttable) do
+		if line == ',' then
+			minifymeasure(curMeasure)
+			for row in ivalues(curMeasure) do
+				table.insert(finalData, row)
+			end
+			table.insert(finalData, ',')
+			curMeasure = {}
+		else
+			table.insert(curMeasure, line)
+		end
+	end
+	if #curMeasure > 0 then
+		minifymeasure(curMeasure)
+		for row in ivalues(curMeasure) do
+			table.insert(finalData, row)
+		end
+	end
+	return table.concat(finalData, '\n')
 end
 
 local NormalizeFloatDigits = function(param)
@@ -110,6 +172,10 @@ local NormalizeFloatDigits = function(param)
 	return table.concat(paramParts, ',')
 end
 
+local function CharReplace(str, pos, char)
+	return str:sub(1, pos - 1)..char..str:sub(pos + 1)
+end
+
 local function GSPrefs(plr)
 	local ret = {}
 	local pn = PlayerNumber:Reverse()[plr] + 1
@@ -118,6 +184,10 @@ local function GSPrefs(plr)
 	local data = IniFile.ReadFile(path..'GrooveStats.ini')
 	if not data or not data.GrooveStats then return ret end
 	return data.GrooveStats
+end
+
+function gs.Enabled()
+	return (#FILEMAN:GetDirListing(path, true, false) > 0)
 end
 
 function gs.GetAPI(plr)
@@ -150,6 +220,57 @@ function gs.ChartHash(plr)
 	local diff = ToEnumShortString(chart:GetDifficulty()):lower()
 	local desc = chart:GetDescription()
 	local data = File.Read(filepath)
+	local nd
+	for i, v in ipairs(song:GetAllSteps()) do
+		if v == chart then
+			nd = song:GetNoteData(i)
+		end
+	end
+	
+	-- i give up. ~Sudo
+	--[[
+	local ndtable = {}
+	local last_beat = math.ceil(nd[#nd][1] + (nd[#nd].length or 0)) + 1
+	local last_line = last_beat * 64
+	local line_len = GAMESTATE:GetCurrentStyle():ColumnsPerPlayer()
+	-- First, pad our notedata table with all zeroes.
+	for i = 1, last_line do
+		table.insert(ndtable, string.rep('0', line_len))
+	end
+	-- Next, fill in with our notedata.
+
+	for v in ivalues(nd) do
+		local beat = math.ceil(v[1] * 64) + 1 -- align with our index in ndtable
+		local col = v[2]
+		local type = v[3]
+		local len = math.ceil((v.length or 0) * 64)
+		if type:find('Sub') then
+			if type == TapNoteSubType[1] then -- 'TapNoteSubType_Hold'
+				type = '2'
+			elseif type == TapNoteSubType[2] then -- 'TapNoteSubType_Roll'
+				type = '4'
+			end
+		elseif type:find('Mine') then
+			type = 'M'
+		else
+			type = tostring(TapNoteType:Reverse()[type])
+		end
+		ndtable[beat] = CharReplace(ndtable[beat], col, type)
+		if len > 0 then
+			ndtable[beat + len] = CharReplace(ndtable[beat + len], col, '3')
+		end
+	end
+	local ndtablemeasures = {}
+	for i, v in ipairs(ndtable) do
+		table.insert(ndtablemeasures, v)
+		if i % 256 == 0 and i ~= #ndtable then
+			table.insert(ndtablemeasures, ',')
+		end
+	end
+
+	local ndstring = minify(ndtablemeasures)
+	--]]
+	---[[
 	local ndstring
 	if filetype == 'ssc' then
 		for nd in data:gmatch('#NOTEDATA.-#NOTES2?:[^;]*') do
@@ -200,6 +321,7 @@ function gs.ChartHash(plr)
 	else
 		return
 	end
+	--]]
 	if ndstring and bpms then
 		local hash = CRYPTMAN:SHA1String(MinimizeChart(ndstring)..NormalizeFloatDigits(bpms))
 		local bytes = {}
@@ -213,6 +335,12 @@ function gs.ChartHash(plr)
 end
 
 function gs.request(type, data)
+	if not gs.Enabled() then
+		return {
+			status = 'inactive',
+			data = {}
+		}
+	end
 	local id = CRYPTMAN:GenerateRandomUUID()
 	local now = GetTimeSinceStart()
 	local time = 0

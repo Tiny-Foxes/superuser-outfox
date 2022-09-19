@@ -39,13 +39,15 @@ return Def.ActorFrame {
 				self:align(0, 0):xy(12, 48):diffusealpha(0.5)
 			end,
 			OnCommand = function(self)
-				gs.leaderboards {
-					maxLeaderboardResults = 10,
-					player1 = {
-						chartHash = gs.ChartHash(PlayerNumber[1]),
-						apiKey = gs.GetAPI(PlayerNumber[1]),
+				if gs.Enabled() then
+					gs.leaderboards {
+						maxLeaderboardResults = 10,
+						player1 = {
+							chartHash = gs.ChartHash(PlayerNumber[1]),
+							apiKey = gs.GetAPI(PlayerNumber[1]),
+						}
 					}
-				}
+				end
 			end,
 			PlayerLeaderboardsMessageCommand = function(self, res)
 				if not res then
@@ -57,9 +59,12 @@ return Def.ActorFrame {
 				end
 				local scores = {}
 				for v in ivalues(res.data.player1.gsLeaderboard) do
-					scores[tonumber(v.rank)] = v.rank..': '..v.name..' - '..(tonumber(v.score) * 0.01)..'%'
+					scores[tonumber(v.rank)] = v.rank..': '..v.name..' - '..FormatPercentScore(tonumber(v.score) * 0.0001)
 				end
 				self:settext(table.concat(scores, '\n'))
+				if self:GetText() == '' then
+					self:settext('No leaderboard for song')
+				end
 			end,
 		}
 	},
@@ -68,6 +73,10 @@ return Def.ActorFrame {
 			SCREENMAN:GetTopScreen():AddInputCallback(LoadModule('Lua.InputSystem.lua')(self))
 		end,
 		MenuUpCommand = function(self)
+			if not gs.Enabled() then
+				SCREENMAN:SystemMessage('GrooveStats is not enabled.')
+				return
+			end
 			local plr = self.pn
 			--[[
 			if not gs.IsPadPlayer(plr) then

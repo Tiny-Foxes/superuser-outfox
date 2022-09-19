@@ -17,22 +17,23 @@ local function ReportTable(t, ind)
 	end
 	for k, v in pairs(t) do
 		local vtype = type(v)
-		local str = k..': '..tostring(v)
+		local str = indent..k..': '..tostring(v)
 		if vtype == 'table' then str = str..' ('..#v..')' end
 		lua.ReportScriptError(str)
 		if vtype == 'table' then ReportTable(v, ind + 2) end
 	end
 end
 
-local pingres = gs.ping()
-if pingres then
-	local gsver = pingres.version.major..'.'..pingres.version.minor..'.'..pingres.version.patch
-	SCREENMAN:SystemMessage('GrooveStats version '..gsver)
-else
-	SCREENMAN:SystemMessage('GrooveStats connection timed out.')
+if gs.Enabled() then
+	local pingres = gs.ping()
+	if not pingres then
+		SCREENMAN:SystemMessage('GrooveStats connection timed out.')
+	elseif pingres.status ~= 'inactive' then
+		local gsver = pingres.version.major..'.'..pingres.version.minor..'.'..pingres.version.patch
+		SCREENMAN:SystemMessage('Running GrooveStats version '..gsver)
+	end
+	_GSSESSION = _GSSESSION or gs.session()
 end
-
-_GSSESSION = _GSSESSION or gs.session()
 
 -- Define local variables and functions
 local scale = SH /480
