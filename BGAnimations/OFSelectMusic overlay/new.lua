@@ -22,7 +22,6 @@
 
 --]]
 
-
 local ThemeColor = LoadModule('Theme.Colors.lua')
 local konko = LoadModule('Konko.Core.lua')
 konko()
@@ -76,7 +75,8 @@ local wheel = {
 }
 
 local style = TF_WHEEL.QuickStyleDB[GAMESTATE:GetCurrentGame():GetName()]
-local AllSongs = LoadModule('Wheel/Songs.Loader.lua')(style)
+TF_WHEEL.AllSongs = TF_WHEEL.AllSongs or LoadModule('Wheel/Songs.Loader.lua')(style)
+local AllSongs = TF_WHEEL.AllSongs
 local AllGroups = LoadModule('Wheel/Group.List.lua')(AllSongs, TF_WHEEL.PreferredSort)
 local SongList = LoadModule('Wheel/Group.Sort.lua')(AllSongs, TF_WHEEL.PreferredSort)
 

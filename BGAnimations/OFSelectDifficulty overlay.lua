@@ -56,6 +56,7 @@ for k in pairs(plrs) do
 	local diffTitle = SuperActor.new('BitmapText')
 	local diffInfo = SuperActor.new('ActorFrame')
 	local diffScore = SuperActor.new('BitmapText')
+	local diffAward = SuperActor.new('BitmapText')
 	local readyText = SuperActor.new('BitmapText')
 
 	do previewAF
@@ -140,6 +141,63 @@ for k in pairs(plrs) do
 			if title == '' then title = THEME:GetString('CustomDifficulty', ToEnumShortString(CurDiff[k]:GetDifficulty())) end
 			self
 				:settext(title)
+				:stoptweening()
+				:cropright(1)
+				:linear(0.05)
+				:cropright(0)
+		end)
+	end
+
+	do diffScore
+		:SetCommand('Init', function(self)
+			self
+				:halign(1)
+				:valign(1)
+				:addx(300)
+				:addy(-60)
+				:zoom(0.6)
+		end)
+		:SetCommand('SetDifficulty'..PN, function(self)
+			self:settext('')
+			local scorelist = PROFILEMAN:GetProfile(k):GetHighScoreListIfExists(CurSong, CurDiff[k])
+			if scorelist then
+				local highscore = scorelist:GetHighScores()[1]
+				if not highscore then return end
+				self:settext(FormatPercentScore(highscore:GetPercentDP()))
+			end
+			self
+				:stoptweening()
+				:cropright(1)
+				:sleep(0.05)
+				:linear(0.05)
+				:cropright(0)
+		end)
+	end
+
+	do diffAward
+		:SetCommand('Init', function(self)
+			self
+				:halign(1)
+				:valign(1)
+				:addx(240)
+				:addy(-60)
+				:zoom(0.6)
+		end)
+		:SetCommand('SetDifficulty'..PN, function(self)
+			self:settext('')
+			local scorelist = PROFILEMAN:GetProfile(k):GetHighScoreListIfExists(CurSong, CurDiff[k])
+			if scorelist then
+				local highscore = scorelist:GetHighScores()[1]
+				if not highscore then return end
+				local award = highscore:GetStageAward()
+				if not award then return end
+				if not award:find('Percent') then
+					award = ToEnumShortString(award)
+					local fc = award:sub(award:find('W'), -1)
+					self:settext('FC'):diffuse(ThemeColor[fc]):diffusebottomedge(ColorDarkTone(ThemeColor[fc]))
+				end
+			end
+			self
 				:stoptweening()
 				:cropright(1)
 				:linear(0.05)
@@ -267,6 +325,8 @@ for k in pairs(plrs) do
 		:AddChild(meterText, 'Meter')
 		:AddChild(diffText, 'DiffName')
 		:AddChild(diffTitle, 'DiffTitle')
+		:AddChild(diffScore, 'DiffScore')
+		:AddChild(diffAward, 'DiffAward')
 		:AddChild(diffInfo, 'DiffInfo')
 		:AddChild(readyText, 'ReadyText')
 	end
@@ -327,7 +387,7 @@ do af
 	end)
 	:SetCommand('MenuDown', function(self)
 		self:stoptweening():playcommand('Off')
-		MESSAGEMAN:Broadcast('EnterOptions', CurDiff)
+		SCREENMAN:GetTopScreen():queuemessage('EnterOptions', CurDiff)
 	end)
 	:SetCommand('Back', function(self)
 		if (plrs[PLAYER_1] and plrs[PLAYER_2]) then
@@ -359,12 +419,12 @@ do af
 			elseif PlayerReady[PLAYER_1] and PlayerReady[PLAYER_2] then
 				SOUND:PlayOnce(THEME:GetPathS('Common', 'Start'), true)
 				self:stoptweening():playcommand('Off')
-				MESSAGEMAN:Broadcast('EnterGameplay', CurDiff)
+				SCREENMAN:GetTopScreen():queuemessage('EnterGameplay', CurDiff)
 			end
 		else
 			SOUND:PlayOnce(THEME:GetPathS('Common', 'Start'), true)
 			self:stoptweening():playcommand('Off')
-			MESSAGEMAN:Broadcast('EnterGameplay', CurDiff)
+			SCREENMAN:GetTopScreen():queuemessage('EnterGameplay', CurDiff)
 		end
 	end)
 	:AddToTree('DifficultyFrame')

@@ -83,10 +83,10 @@ return Def.ActorFrame {
 		Font = 'Stylized Large',
 		InitCommand = function(self)
 			self
-				:x(SCREEN_CENTER_X - 180)
+				:halign(0)
+				:x(SCREEN_CENTER_X - 280)
 				:skewx(0.5)
 				:zoom(0.5)
-				:halign(1)
 		end,
 		OnCommand = function(self)
 			self:queuecommand('ShowSort')

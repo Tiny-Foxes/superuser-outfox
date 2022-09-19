@@ -1,9 +1,24 @@
 -- Load Konko core module and initialize environment
 local konko = LoadModule('Konko.Core.lua')
 konko()
+if not SetMeFree then SetMeFree = false end
 
 -- Load SuperActor module
 local SuperActor = LoadModule('Konko.SuperActor.lua')
+
+-- Load GrooveStats Handler module
+local gs = LoadModule('GrooveStats.Handler.lua')
+
+if gs.Enabled() then
+	local pingres = gs.ping()
+	if not pingres then
+		SCREENMAN:SystemMessage('GrooveStats connection timed out.')
+	elseif pingres.status ~= 'inactive' then
+		local gsver = pingres.version.major..'.'..pingres.version.minor..'.'..pingres.version.patch
+		SCREENMAN:SystemMessage('Running GrooveStats version '..gsver)
+	end
+	_GSSESSION = _GSSESSION or gs.session()
+end
 
 -- Define local variables and functions
 local scale = SH /480
@@ -134,7 +149,7 @@ end
 -- MascotFrame
 do mascotAF
 	:SetCommand('Init', function(self)
-		self:Center():diffusealpha(0)
+		self:Center():diffusealpha(0):visible(not SetMeFree)
 	end)
 	:SetCommand('On', function(self)
 		self:linear(0.5):diffusealpha(1)
@@ -183,10 +198,14 @@ end
 
 -- UIWrap
 do uiWrap
-	:SetCommand('Init', Actor.Center)
+	:SetAttribute('FOV', 90)
+	:SetCommand('Init', function(self)
+		self:Center():fardistz(9e9)
+	end)
 end
 -- UIWrap.UI
 do uiAF
+	:SetAttribute('FOV', 90)
 	:SetCommand('Init', function(self)
 		self:y(SCY - 192)
 	end)
@@ -235,8 +254,9 @@ do uiPanel
 end
 -- UIWrap.UI.Text
 do uiText
+	:SetAttribute('FOV', 90)
 	:SetCommand('Init', function(self)
-		self:xy(20, -10)
+		self:xy(20, -10):vanishpoint(SCX - 200, SCY - 182)
 	end)
 end
 -- UIWrap.UI.Text.PoweredBy
@@ -265,6 +285,74 @@ do uiPoweredBy
 			:cropright(1)
 	end)
 end
+
+local uiTitleBack = SuperActor.new('Model')
+do uiTitleBack
+	--:SetAttribute('Texture', THEME:GetPathG('ScreenTitleMenu', 'supertext'))
+	:SetAttribute('Materials', THEME:GetPathG('ScreenTitleMenu', 'logo'))
+	:SetAttribute('Meshes', THEME:GetPathG('ScreenTitleMenu', 'logo'))
+	:SetAttribute('Bones', THEME:GetPathG('ScreenTitleMenu', 'logo'))
+	:SetCommand('Init', function(self)
+		self
+			:rotationx(-360)
+			:basezoomz(0.5)
+			:CelShading(true)
+			:visible(SetMeFree)
+			:bob()
+			:effectmagnitude(0, -5, 0)
+			:effectperiod(20)
+	end)
+	:SetCommand('On', function(self)
+		self
+			:zoom(5)
+			:y(0)
+			:z(1000)
+			:easeoutquint(0.77)
+			:zoom(0.75)
+			:y(-30)
+			:z(200)
+			:rotationx(-15)
+	end)
+	:SetCommand('RandomAngle', function(self)
+		self
+			:stoptweening()
+			:zoom(0.75 + math.random() * 0.5)
+			:x(-SW * 0.3 + math.random() * SW * 0.6)
+			:y(-SH * 0.1 + math.random() * SH * 0.15)
+			:rotationx(-30 + math.random() * 60)
+			:rotationy(-30 + math.random() * 60)
+			:rotationz(-10 + math.random() * 20)
+			:linear(4)
+			:addrotationy((self:GetRotationY() / math.abs(self:GetRotationY())) * -25)
+			:addrotationz((self:GetRotationZ() / math.abs(self:GetRotationZ())) * -5)
+			:queuecommand('RandomAngle')
+	end)
+	:SetCommand('Off', function(self)
+		self
+			:stoptweening()
+			:linear(0.5)
+			:diffusealpha(0)
+	end)
+end
+
+local uiTitleBackAF = SuperActor.new('ActorFrame')
+do uiTitleBackAF
+	:SetAttribute('FOV', 90)
+	:SetCommand('Init', function(self)
+		self:Center():fardistz(9e9)
+	end)
+	:SetCommand('On', function(self)
+		local start, switched = Second(), false
+		self:SetUpdateFunction(function(self)
+			if not switched and (Second() - start + 1) % 5 == 0 then
+				switched = true
+				self:queuecommand('RandomAngle')
+			end
+		end)
+	end)
+	:AddChild(uiTitleBack, 'TitleBack')
+end
+
 -- UIWrap.UI.Text.Title
 do uiTitle
 	:SetAttribute('Texture', THEME:GetPathG('ScreenTitleMenu', 'supertext'))
@@ -274,6 +362,7 @@ do uiTitle
 			:zoom(0.45)
 			:shadowlengthy(4)
 			:cropright(1)
+			:rotationx(SetMeFree and -60 or 0)
 	end)
 	:SetCommand('On', function(self)
 		self
@@ -313,6 +402,10 @@ do uiTagline
 			:cropright(1)
 	end)
 	:SetCommand('SetTagline', function(self)
+		if SetMeFree then
+			self:settext('"Set Me Free."')
+			return
+		end
 		-- I'm working on translating these titles, but getting some translators
 		-- is pretty much essential at this point.
 		-- Taglines default to English if there aren't any for that language.
@@ -427,6 +520,33 @@ do uiText
 	:AddChild(uiAuthor, 'Author')
 	:AddChild(uiVersion, 'Version')
 	:AddChild(uiSocial, 'Social')
+	:AddChild(SuperActor.new('Sprite')
+		:SetAttribute('Texture', THEME:GetPathG('', 'karen'))
+		:SetCommand('Init', function(self)
+			self
+				:xy(-60, 70)
+				:zoom(0.05)
+				:rotationz(-10)
+				:bob()
+				:effectmagnitude(0, 4, 0)
+				:effectperiod(8)
+				:visible(SetMeFree)
+				:diffusealpha(0)
+		end)
+		:SetCommand('On', function(self)
+			self
+				:diffusealpha(0)
+				:sleep(0.25)
+				:linear(0.5)
+				:diffusealpha(1)
+		end)
+		:SetCommand('Off', function(self)
+			self
+				:diffusealpha(1)
+				:linear(0.5)
+				:diffusealpha(0)
+		end)
+	)
 end
 do uiAF
 	:AddChild(uiShadow, 'Shadow')
@@ -434,8 +554,94 @@ do uiAF
 	:AddChild(uiText, 'Text')
 end
 do uiWrap
+	:AddChild(uiTitleBackAF, 'TitleBackAF')
 	:AddChild(uiAF, 'UI')
 	:AddToTree('UIWrap')
+end
+
+local timeout = 59
+local path = '/Save/GrooveStats/'
+local ping = SuperActor.new('ActorFrame')
+do ping
+	:SetCommand('Init', function(self)
+		self.request_id = nil
+		self.request_time = nil
+		self.params = nil
+		self.callback = nil
+		self:xy(SR - 72, SB - 72)
+	end)
+	:SetCommand('On', function(self)
+		MESSAGEMAN:Broadcast('Ping', {
+			data = {
+				action = 'ping',
+				protocol = 1,
+			},
+			callback = function(data, params)
+				SCREENMAN:SystemMessage(#data)
+				for k, v in pairs(data) do
+					lua.ReportScriptError(k..': '..tostring(v))
+				end
+			end
+		})
+	end)
+	:SetCommand('Wait', function(self)
+		local function reset(self)
+			self.request_id = nil
+			self.request_time = nil
+			self.params = nil
+			self.callback = nil
+			SuperActor.GetTree().Pinger.SpinnyBoi:visible(false)
+		end
+		local now = GetTimeSinceStart()
+		local time_left = timeout - (now - self.request_time)
+		self:playcommand('UpdateSpinner', {time = time_left})
+		if self.request_id ~= nil then
+			local json = File.Read(path..'responses/'..self.request_id..'.json')
+			if not json then
+				self:sleep(0.5):queuecommand('Wait')
+				return
+			end
+			local data = {}
+			if #json > 0 then
+				data = JsonDecode(json)
+			end
+			self.callback(data, self.params)
+			reset(self)
+		elseif time_left < 0 then
+			self.callback(nil, self.params)
+			reset(self)
+		end
+		if self.request_id ~= nil then
+			self:sleep(0.5):queuecommand('Wait')
+		end
+	end)
+	:SetMessage('Ping', function(self, params)
+		local id = CRYPTMAN:GenerateRandomUUID()
+		if params.data.action == 'ping' then
+			id = 'ping'
+		end
+		File.Write(path..'requests/'..id..'.json', JsonEncode(params.data))
+		self:stoptweening()
+		self.request_id = id
+		self.request_time = GetTimeSinceStart()
+		self.params = params.params
+		self.callback = params.callback
+		SuperActor.GetTree().Pinger.SpinnyBoi:visible(false)
+		self:sleep(0.1):queuecommand('Wait')
+	end)
+	:AddChild(SuperActor.new('Quad')
+		:SetCommand('Init', function(self)
+			self
+				:SetSize(64, 64)
+				:spin()
+				:visible(false)
+		end)
+		:SetCommand('UpdateSpinner', function(self)
+			self:visible(true)
+		end),
+		'SpinnyBoi'
+	)
+	--:AddToTree('Pinger')
 end
 --[[
 	Current tree structure:

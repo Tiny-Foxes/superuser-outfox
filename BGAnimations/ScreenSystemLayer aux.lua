@@ -1,8 +1,7 @@
 -- This isn't ready and might just be Alpha 4 exclusive. ~Sudo
 local allow_cursor = false
 
-if Var 'LoadingScreen' == 'ScreenInit' or not allow_cursor then return Def.Actor {} end
-return Def.Quad {
+local mouse = Def.Quad {
 	Name = 'Cursor',
 	InitCommand = function(self)
 		self
@@ -12,4 +11,9 @@ return Def.Quad {
 	UpdateCommand = function(self)
 		self:xy(INPUTFILTER:GetMouseX(), INPUTFILTER:GetMouseY())
 	end,
+}
+if Var 'LoadingScreen' == 'ScreenInit' or not allow_cursor then mouse = Def.Actor {} end
+
+return Def.ActorFrame {
+	mouse
 }

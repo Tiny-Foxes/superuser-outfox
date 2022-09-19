@@ -51,7 +51,10 @@ local index = 1
 local options = {}
 for i, v in ipairs(games) do
 	options[#options + 1] = {v, function(self)
+		local game = GAMESTATE:GetCurrentGame():GetName()
 		GAMEMAN:SetGame(v:lower())
+		-- Release cache of the song table. ~Sudo
+		if v:lower() ~= game then TF_WHEEL.AllSongs = nil end
 	end}
 	if v == GAMESTATE:GetCurrentGame():GetName() then index = i end
 end

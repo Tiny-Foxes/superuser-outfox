@@ -1,6 +1,7 @@
 local ThemeColor = LoadModule('Theme.Colors.lua')
 
 return Def.ActorFrame {
+	Name = 'EvalUnderlay',
 	-- TODO: Fill this with Discord RCP including scores. ~Sudo
 	OnCommand = function(self)
 	end,
@@ -24,6 +25,7 @@ return Def.ActorFrame {
 			end,
 			OnCommand = function(self)
 				self
+					:cropbottom(1)
 					:easeinoutexpo(0.25)
 					:cropbottom(0)
 			end,
@@ -44,6 +46,7 @@ return Def.ActorFrame {
 			end,
 			OnCommand = function(self)
 				self
+					:cropbottom(1)
 					:easeinoutexpo(0.25)
 					:cropbottom(0)
 			end,
@@ -76,6 +79,7 @@ return Def.ActorFrame {
 			end,
 			OnCommand = function(self)
 				self
+					:croptop(1)
 					:sleep(0.125)
 					:easeinoutexpo(0.25)
 					:croptop(0)
@@ -97,6 +101,7 @@ return Def.ActorFrame {
 			end,
 			OnCommand = function(self)
 				self
+					:croptop(1)
 					:sleep(0.125)
 					:easeinoutexpo(0.25)
 					:croptop(0)
@@ -111,6 +116,7 @@ return Def.ActorFrame {
 		loadfile(THEME:GetPathB('ScreenEvaluation', 'underlay/NoteScores.lua'))(PLAYER_2)
 	},
 	Def.ActorFrame {
+		Name = 'BannerFrame',
 		InitCommand = function(self)
 			self
 				:xy(SCREEN_CENTER_X, 120)
@@ -128,6 +134,7 @@ return Def.ActorFrame {
 			end,
 			OnCommand = function(self)
 				self
+					:cropleft(1)
 					:easeinoutexpo(0.5)
 					:cropleft(0)
 			end,
@@ -149,6 +156,7 @@ return Def.ActorFrame {
 			end,
 			OnCommand = function(self)
 				self
+					:cropleft(1)
 					:easeinoutexpo(0.5)
 					:cropleft(0)
 			end,
@@ -159,6 +167,7 @@ return Def.ActorFrame {
 			end,
 		},
 		Def.Banner {
+			Name = 'Banner',
 			InitCommand = function(self)
 				self
 					:scaletoclipped(402,160)
@@ -177,6 +186,7 @@ return Def.ActorFrame {
 					self:LoadFromSongGroup(target:GetGroupName())
 				end
 				self
+					:diffusealpha(0)
 					:sleep(0.5)
 					:easeoutexpo(0.25)
 					:diffusealpha(1)
@@ -198,6 +208,7 @@ return Def.ActorFrame {
 			end,
 			OnCommand = function(self)
 				self
+					:diffusealpha(0)
 					:sleep(0.5)
 					:easeoutexpo(0.25)
 					:diffusealpha(1)

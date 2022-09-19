@@ -1,10 +1,7 @@
-local song = GAMESTATE:GetCurrentSong()
-local plrs = GAMESTATE:GetEnabledPlayers()
-
 return Def.ActorFrame {
 	FOV = 45,
 	OnCommand = function(self)
-		SCREENMAN:GetTopScreen():fardistz(10000):fov(45)
+		SCREENMAN:GetTopScreen():fardistz(9e9):fov(45)
 		for v in ivalues(plrs) do
 			SCREENMAN:GetTopScreen():AddChildFromPath(THEME:GetPathG('OFGameplay', 'Player'..ToEnumShortString(v)))
 		end
@@ -44,9 +41,14 @@ return Def.ActorFrame {
 				:y(plry)
 		end
 		SCREENMAN:GetTopScreen():AddInputCallback(LoadModule('Lua.InputSystem.lua')(self))
-		self:sleep(2):queuecommand('ScreenReady')
+		self:queuecommand('AddLayers')
 	end,
-	ScreenReadyCommand = function(self)
+	AddLayersCommand = function(self)
+		SCREENMAN:GetTopScreen():AddChildFromPath(THEME:GetPathB('OFGameplay', 'SongForeground'))
+		SCREENMAN:GetTopScreen():queuecommand('ScreenReady')
+		self:sleep(2):queuecommand('PlayMusic')
+	end,
+	PlayMusicCommand = function(self)
 		SOUND:PlayMusicPart(
 			song:GetMusicPath(),
 			0,
@@ -65,45 +67,6 @@ return Def.ActorFrame {
 	LoadActor(THEME:GetPathB('ScreenGameplay', 'overlay')),
 	Def.ActorFrame {
 		Name = 'Modfiles',
-		ScreenReadyCommand = function(self)
-			for k, v in pairs(song:GetBGChanges()) do
-			end
-			--for k, v in pairs(song:GetFGChanges()) do
-			local fgchanges = {}
-			local file = RageFileUtil.CreateRageFile()
-			local data = ''
-			if file:Open(song:GetSongFilePath(), 1) then
-				data = file:Read()
-			end
-			file:Close()
-			file:destroy()
-			local idx = data:find('#FGCHANGES') + string.len('#FGCHANGES:')
-			local start = data:sub(idx, data:find('=', idx) - 1)
-			idx = data:find('=', idx) + 1
-			local path = data:sub(idx, data:find('=', idx) - 1)
-			fgchanges[#fgchanges + 1] = {start_beat = start, file1 = path, rate = 1}
-			for k, v in pairs(fgchanges) do
-				if v.file1 ~= '' then
-					local file = v.file1
-					if not loadfile(song:GetSongDir()..file) then
-						file = file..'/default.lua'
-					end
-					if assert(loadfile(song:GetSongDir()..file)) then
-						local offset = (v.start_beat * GAMESTATE:GetSongBPS())
-						self:AddChildFromPath(song:GetSongDir()..file)
-						self:fardistz(1000000):fov(45)
-						self:GetChildAt(self:GetNumChildren())
-							--:SetUpdateRate(v.rate or 1)
-							:playcommand('Init')
-							:playcommand('On')
-							:GetChildAt(1)
-								:effectclock('bgm')
-								:set_tween_uses_effect_delta()
-								--:effectoffset(offset)
-					end
-				end
-			end
-		end,
 		UpdateCommand = function(self)
 			--[[
 			for v in ivalues {PLAYER_1, PLAYER_2} do

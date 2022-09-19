@@ -6,7 +6,7 @@ local splash = false
 local hovered = false
 
 local id = ProductID()
-if string.find(id, 'StepMania') and not string.find(id, '5.3') then
+if not string.find(id, 'OutFox') then
 	return Def.Actor {}
 end
 
