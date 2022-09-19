@@ -1,6 +1,3 @@
-local song = GAMESTATE:GetCurrentSong()
-local plrs = GAMESTATE:GetEnabledPlayers()
-
 return Def.ActorFrame {
 	FOV = 45,
 	OnCommand = function(self)

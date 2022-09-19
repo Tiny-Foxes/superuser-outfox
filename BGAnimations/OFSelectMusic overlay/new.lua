@@ -22,7 +22,6 @@
 
 --]]
 
-
 local ThemeColor = LoadModule('Theme.Colors.lua')
 local konko = LoadModule('Konko.Core.lua')
 konko()
@@ -76,9 +75,12 @@ local wheel = {
 }
 
 local style = TF_WHEEL.QuickStyleDB[GAMESTATE:GetCurrentGame():GetName()]
+local start = GetTimeSinceStart()
 local AllSongs = LoadModule('Wheel/Songs.Loader.lua')(style)
+local fetched = GetTimeSinceStart()
 local AllGroups = LoadModule('Wheel/Group.List.lua')(AllSongs, TF_WHEEL.PreferredSort)
 local SongList = LoadModule('Wheel/Group.Sort.lua')(AllSongs, TF_WHEEL.PreferredSort)
+local sorted = GetTimeSinceStart()
 
 while Index.Group > #AllGroups do Index.Group = Index.Group - #AllGroups end
 while Index.Group < 1 do Index.Group = Index.Group + #AllGroups end
@@ -348,6 +350,10 @@ do songWheel
 			:SetFastCatchup(true)
 			:aux(0)
 		MoveSong(self, 0, CurSongs)
+		local finished = GetTimeSinceStart()
+		lua.ReportScriptError('Time to fetch songs: '..(fetched - start))
+		lua.ReportScriptError('Time to sort songs: '..(sorted - fetched))
+		lua.ReportScriptError('Time to load wheel: '..(finished - sorted))
 	end)
 	:SetCommand('On', function(self)
 		SCREENMAN:GetTopScreen():AddInputCallback(function(event)

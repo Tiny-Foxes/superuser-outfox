@@ -9,21 +9,6 @@ local SuperActor = LoadModule('Konko.SuperActor.lua')
 -- Load GrooveStats Handler module
 local gs = LoadModule('GrooveStats.Handler.lua')
 
-local function ReportTable(t, ind)
-	ind = ind or 0
-	local indent = ''
-	for i = 1, ind do
-		indent = indent..' '
-	end
-	for k, v in pairs(t) do
-		local vtype = type(v)
-		local str = indent..k..': '..tostring(v)
-		if vtype == 'table' then str = str..' ('..#v..')' end
-		lua.ReportScriptError(str)
-		if vtype == 'table' then ReportTable(v, ind + 2) end
-	end
-end
-
 if gs.Enabled() then
 	local pingres = gs.ping()
 	if not pingres then
@@ -217,28 +202,6 @@ do uiWrap
 	:SetCommand('Init', function(self)
 		self:Center():fardistz(9e9)
 	end)
-	:SetCommand('On', function(self)
-		local start, switched = Second(), false
-		self:SetUpdateFunction(function(self)
-			if not switched and (Second() - start + 1) % 5 == 0 then
-				switched = true
-				self:queuecommand('RandomAngle')
-			end
-		end)
-	end)
-	:SetMessage('DropBeats', function(self)
-		self
-			:stoptweening()
-			:zoomz(1.5)
-			:easeoutquint(0.77)
-			:zoomz(1)
-			:sleep(0.77)
-			:zoomz(3)
-			:easeoutquint(0.385)
-			:zoomz(1)
-			:easeinquint(0.385)
-			:zoomz(3)
-	end)
 end
 -- UIWrap.UI
 do uiAF
@@ -370,6 +333,24 @@ do uiTitleBack
 			:linear(0.5)
 			:diffusealpha(0)
 	end)
+end
+
+local uiTitleBackAF = SuperActor.new('ActorFrame')
+do uiTitleBackAF
+	:SetAttribute('FOV', 90)
+	:SetCommand('Init', function(self)
+		self:Center():fardistz(9e9)
+	end)
+	:SetCommand('On', function(self)
+		local start, switched = Second(), false
+		self:SetUpdateFunction(function(self)
+			if not switched and (Second() - start + 1) % 5 == 0 then
+				switched = true
+				self:queuecommand('RandomAngle')
+			end
+		end)
+	end)
+	:AddChild(uiTitleBack, 'TitleBack')
 end
 
 -- UIWrap.UI.Text.Title
@@ -573,7 +554,7 @@ do uiAF
 	:AddChild(uiText, 'Text')
 end
 do uiWrap
-	:AddChild(uiTitleBack, 'TitleBack')
+	:AddChild(uiTitleBackAF, 'TitleBackAF')
 	:AddChild(uiAF, 'UI')
 	:AddToTree('UIWrap')
 end
