@@ -58,7 +58,7 @@ return Def.ActorFrame {
 					self
 						:visible(true)
 						:xy(plr:GetX(), plr:GetY())
-						:SetSize(96 * GAMESTATE:GetCurrentStyle():ColumnsPerPlayer(), SCREEN_HEIGHT)
+						:SetSize(GAMESTATE:GetCurrentStyle():GetWidth(PLAYER_1) * SCREEN_HEIGHT / 480, SCREEN_HEIGHT)
 					local c = tonumber(LoadModule('Config.Load.lua')('ScreenFilterColor', PROFILEMAN:GetProfileDir(0)..'/OutFoxPrefs.ini'))
 					local colors = {
 						{
@@ -102,7 +102,7 @@ return Def.ActorFrame {
 					self
 						:visible(true)
 						:xy(plr:GetX(), plr:GetY())
-						:SetSize(96 * GAMESTATE:GetCurrentStyle():ColumnsPerPlayer(), SCREEN_HEIGHT)
+						:SetSize(GAMESTATE:GetCurrentStyle():GetWidth(PLAYER_1) * SCREEN_HEIGHT / 480, SCREEN_HEIGHT)
 					local c = tonumber(LoadModule('Config.Load.lua')('ScreenFilterColor', PROFILEMAN:GetProfileDir(1)..'/OutFoxPrefs.ini'))
 					local colors = {
 						{
@@ -150,7 +150,7 @@ return Def.ActorFrame {
 			self
 				:easeoutexpo(0.5)
 				:addy(120)
-				:luaeffect('ReportCursor')
+				--:luaeffect('ReportCursor')
 		end,
 		OffCommand = function(self)
 			self
@@ -194,13 +194,13 @@ return Def.ActorFrame {
 		},
 		--Text
 		Def.BitmapText {
-			Font = 'Common Normal',
+			Font = 'Common Large',
 			InitCommand = function(self)
 				if song then
 					self:settext(song:GetDisplayFullTitle())
 				end
 				self
-					:zoom(1.5)
+					:zoom(0.75)
 					:vertalign('bottom')
 					:maxwidth(SCREEN_CENTER_X * 0.5)
 			end,

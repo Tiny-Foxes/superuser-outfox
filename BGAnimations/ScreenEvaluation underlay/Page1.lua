@@ -150,7 +150,7 @@ for i,v in ipairs( Name ) do
 		Font = "Common Normal",
 		Text=ToUpper(THEME:GetString( CurPrefTiming or "Original" , "Judgment"..v )),
 		InitCommand=function(self)
-			self:skewx(0.25):diffuse(BoostColor((JudgmentLineToColor("JudgmentLine_" .. v)),1.3))
+			self:skewx(0.25):diffuse(BoostColor(ThemeColor[v], 1.1))
 			self:xy((eval_part_offs-150),-80+((44-(Length*2))*i)):zoom(1.475-(Length*0.075)):halign(0)
 		end,
 		OnCommand=function(self)
