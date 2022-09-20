@@ -116,6 +116,9 @@ return Def.ActorFrame {
 		Def.BitmapText {
 			Font = 'Common Normal',
 			Text = THEME:GetString('ScreenTitleMenu', gc:GetText()),
+			InitCommand = function(self)
+				self:shadowlengthy(1)
+			end
 		},
 		Def.Quad {
 			InitCommand = function(self)

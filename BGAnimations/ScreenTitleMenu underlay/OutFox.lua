@@ -383,6 +383,7 @@ do uiTagline
 		self
 			:playcommand('SetTagline')
 			:zoom(0.75)
+			:shadowlengthy(1)
 			:xy(-480, 64)
 			:halign(0)
 			:valign(0)
@@ -422,6 +423,7 @@ do uiAuthor
 	:SetCommand('Init', function(self)
 		self
 			:zoom(0.5)
+			:shadowlengthy(1)
 			:xy(40, 0)
 			:halign(1)
 			:valign(1)
@@ -449,6 +451,7 @@ do uiVersion
 	:SetCommand('Init', function(self)
 		self
 			:zoom(0.75)
+			:shadowlengthy(1)
 			:xy(40, 64)
 			:halign(1)
 			:valign(0)
@@ -474,6 +477,7 @@ do uiSocial
 	:SetCommand('Init', function(self)
 		self
 			:zoom(0.5)
+			:shadowlengthy(1)
 			:xy(420, 76)
 			:halign(1)
 			:valign(1)
@@ -566,6 +570,7 @@ do OFVersion
 		self
 			:align(0, 0)
 			:zoom(0.5)
+			:shadowlengthy(1)
 			:xy(SL + 12, ST + 12)
 			:settext(ver)
 	end)
