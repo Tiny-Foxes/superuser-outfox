@@ -1,3 +1,5 @@
+local ThemeColor = LoadModule('Theme.Colors.lua')
+
 local t = LoadFallbackB()
 
 local profileid = GAMESTATE:GetEditLocalProfileID()
@@ -80,7 +82,7 @@ sp[#sp+1] = Def.ActorFrame {
             };
             -- Number
             Def.BitmapText {
-                Font="_Plex Numbers 40px";
+                Font="Common Large";
                 InitCommand=function(self)
                     self:zoom(0.8):horizalign(center):maxwidth(40/0.8):y(-2)
                     end;
@@ -105,7 +107,7 @@ sp[#sp+1] = Def.ActorFrame {
 };
 
 sp[#sp+1] = Def.BitmapText{
-    Font="_Condensed Medium",
+    Font="Common Normal",
     OnCommand=function(s)
         s:xy( -130,85 )
         s:halign(0):playcommand("Set")
@@ -121,7 +123,7 @@ sp[#sp+1] = Def.BitmapText{
 }
 
 sp[#sp+1] = Def.BitmapText{
-    Font="_Condensed Medium",
+    Font="Common Normal",
     OnCommand=function(s)
         s:xy( -130,115 ):visible(false)
         s:halign(0):playcommand("Set")
@@ -367,7 +369,7 @@ sp[#sp+1] = Def.ActorFrame{
 }
 
 sp[#sp+1] = Def.BitmapText{
-    Font="_Condensed Medium",
+    Font="Common Normal",
     OnCommand=function(s)
         s:visible( UserOptions.labelnps )
         s:settext( string.format( THEME:GetString("ScreenGameplay","MaxNPS"), maxnps )  )
@@ -403,10 +405,10 @@ Length = Length + 2
 for i,v in ipairs( Name ) do
 	local Con = Def.ActorFrame{
 		Def.BitmapText {
-			Font = "_Bold",
+			Font = "Common Normal",
 			Text=math.random( 300 ),
 			InitCommand=function(self)
-				self:diffuse(ColorLightTone(PlayerColor(player))):diffusetopedge(ColorLightTone(PlayerCompColor(player)))
+				self:diffuse(ThemeColor[ToEnumShortString(player)]):diffusetopedge(ColorLightTone(ThemeColor[ToEnumShortString(player)]))
 	        	self:xy(70,SCREEN_CENTER_Y+(UserOptions.judgmenty)+((44-(Length*2))*i)):halign(0):zoom(1.475-(Length*0.075)):halign(1)
             end,
             judgmentyChangeMessageCommand=function(s,param)
@@ -429,7 +431,7 @@ for i,v in ipairs( Name ) do
 		}
 	}
 	Con[#Con+1] = Def.BitmapText {
-        Font = "_Bold",
+        Font = "Common Normal",
         Text=ToUpper(THEME:GetString( CurPrefTiming or "Original" , "Judgment"..v )),
         InitCommand=function(self)
             self:diffuse(BoostColor((JudgmentLineToColor("JudgmentLine_" .. v)),1.3))
@@ -479,7 +481,7 @@ for i, rc_type in ipairs(eval_radar) do
         end,
 			-- Item name
 			Def.BitmapText {
-				Font = "_Bold",
+				Font = "Common Normal",
 				InitCommand=function(self)
 					self:zoom(0.6):horizalign(left):diffuse(color("#FFFFFF")):y(18):maxwidth(120)
 				end;
@@ -489,9 +491,9 @@ for i, rc_type in ipairs(eval_radar) do
 			};
 			-- Value
 			Def.BitmapText {
-			Font = "_Bold",
+			Font = "Common Normal",
 			InitCommand=function(self)
-				self:diffuse(ColorLightTone(PlayerColor(player))):diffusetopedge(ColorLightTone(PlayerCompColor(player)))
+				self:diffuse(ThemeColor[ToEnumShortString(player)]):diffusetopedge(ColorLightTone(ThemeColor[ToEnumShortString(player)]))
 				self:zoom(0.6):diffusealpha(1.0):shadowlength(1):maxwidth(120):horizalign(left)
 			end;
 			BeginCommand=function(self)

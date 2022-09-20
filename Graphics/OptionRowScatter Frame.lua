@@ -19,7 +19,7 @@ Judges[#Judges+1] = Def.ActorFrame {
 	Def.Quad {InitCommand=function(self) self:zoomto(item_width,4):vertalign(bottom):y(52/2):diffuse(color("#FF8D47")):diffuseleftedge(color("#FFC447")) end,},
 }
 
-Judges[#Judges+1] = LoadActor(THEME:GetPathG('_StepsDisplayListRow', 'Cursor') .. {
+Judges[#Judges+1] = LoadActor(THEME:GetPathG('_StepsDisplayListRow', 'Cursor')) .. {
 	OnCommand=function(s)
 		s:x( -WideScale(722,526) )
 		:diffuse( PlayerColor(master) ):diffusealpha(0)
