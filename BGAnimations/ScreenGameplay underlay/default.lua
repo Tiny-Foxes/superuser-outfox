@@ -90,6 +90,7 @@ return Def.ActorFrame {
 	stats,
 	-- Filter
 	Def.ActorFrame {
+		FOV = 45,
 		-- Player 1
 		Def.Quad {
 			OnCommand = function(self)
