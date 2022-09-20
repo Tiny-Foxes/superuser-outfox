@@ -267,7 +267,7 @@ do uiPoweredBy
 		self
 			:xy(-370, -32)
 			:halign(1)
-			:shadowlength(4)
+			:shadowlengthy(4)
 			:diffuse(ThemeColor.Yellow)
 			:diffusebottomedge(ThemeColor.Orange)
 			:cropright(1)
@@ -338,7 +338,7 @@ local uiTitleBackAF = SuperActor.new('ActorFrame')
 do uiTitleBackAF
 	:SetAttribute('FOV', 90)
 	:SetCommand('Init', function(self)
-		self:Center():fardistz(9e9)
+		self:fardistz(9e9)
 	end)
 	:SetCommand('On', function(self)
 		local start, switched = Second(), false
@@ -558,90 +558,22 @@ do uiWrap
 	:AddToTree('UIWrap')
 end
 
-local timeout = 59
-local path = '/Save/GrooveStats/'
-local ping = SuperActor.new('ActorFrame')
-do ping
+local OFVersion = SuperActor.new('BitmapText')
+do OFVersion
+	:SetAttribute('Font', 'Common Normal')
 	:SetCommand('Init', function(self)
-		self.request_id = nil
-		self.request_time = nil
-		self.params = nil
-		self.callback = nil
-		self:xy(SR - 72, SB - 72)
+		local ver = ProductVersion()
+		self
+			:align(0, 0)
+			:zoom(0.5)
+			:xy(SL + 12, ST + 12)
+			:settext(ver)
 	end)
-	:SetCommand('On', function(self)
-		MESSAGEMAN:Broadcast('Ping', {
-			data = {
-				action = 'ping',
-				protocol = 1,
-			},
-			callback = function(data, params)
-				SCREENMAN:SystemMessage(#data)
-				for k, v in pairs(data) do
-					lua.ReportScriptError(k..': '..tostring(v))
-				end
-			end
-		})
-	end)
-	:SetCommand('Wait', function(self)
-		local function reset(self)
-			self.request_id = nil
-			self.request_time = nil
-			self.params = nil
-			self.callback = nil
-			SuperActor.GetTree().Pinger.SpinnyBoi:visible(false)
-		end
-		local now = GetTimeSinceStart()
-		local time_left = timeout - (now - self.request_time)
-		self:playcommand('UpdateSpinner', {time = time_left})
-		if self.request_id ~= nil then
-			local json = File.Read(path..'responses/'..self.request_id..'.json')
-			if not json then
-				self:sleep(0.5):queuecommand('Wait')
-				return
-			end
-			local data = {}
-			if #json > 0 then
-				data = JsonDecode(json)
-			end
-			self.callback(data, self.params)
-			reset(self)
-		elseif time_left < 0 then
-			self.callback(nil, self.params)
-			reset(self)
-		end
-		if self.request_id ~= nil then
-			self:sleep(0.5):queuecommand('Wait')
-		end
-	end)
-	:SetMessage('Ping', function(self, params)
-		local id = CRYPTMAN:GenerateRandomUUID()
-		if params.data.action == 'ping' then
-			id = 'ping'
-		end
-		File.Write(path..'requests/'..id..'.json', JsonEncode(params.data))
-		self:stoptweening()
-		self.request_id = id
-		self.request_time = GetTimeSinceStart()
-		self.params = params.params
-		self.callback = params.callback
-		SuperActor.GetTree().Pinger.SpinnyBoi:visible(false)
-		self:sleep(0.1):queuecommand('Wait')
-	end)
-	:AddChild(SuperActor.new('Quad')
-		:SetCommand('Init', function(self)
-			self
-				:SetSize(64, 64)
-				:spin()
-				:visible(false)
-		end)
-		:SetCommand('UpdateSpinner', function(self)
-			self:visible(true)
-		end),
-		'SpinnyBoi'
-	)
-	--:AddToTree('Pinger')
+	:AddToTree('OFVersion')
 end
+
+
+
 --[[
 	Current tree structure:
 
