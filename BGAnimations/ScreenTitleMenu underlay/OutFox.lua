@@ -288,7 +288,6 @@ end
 
 local uiTitleBack = SuperActor.new('Model')
 do uiTitleBack
-	--:SetAttribute('Texture', THEME:GetPathG('ScreenTitleMenu', 'supertext'))
 	:SetAttribute('Materials', THEME:GetPathG('ScreenTitleMenu', 'logo'))
 	:SetAttribute('Meshes', THEME:GetPathG('ScreenTitleMenu', 'logo'))
 	:SetAttribute('Bones', THEME:GetPathG('ScreenTitleMenu', 'logo'))

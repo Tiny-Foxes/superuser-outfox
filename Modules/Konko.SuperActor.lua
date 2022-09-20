@@ -60,6 +60,16 @@ local function new(obj)
 	setmetatable(t, SuperActor)
 	return t
 end
+local function FromFile(path)
+	local obj = LoadActor(path)
+	local t = {}
+	for k, v in pairs(obj) do
+		t[k] = v
+	end
+	actor_idx = actor_idx + 1
+	setmetatable(t, SuperActor)
+	return t
+end
 local function SetAttribute(self, attr, val)
 	--print('SuperActor:SetAttribute')
 	self[attr] = val
@@ -221,6 +231,7 @@ end
 SuperActor = {
 	VERSION = VERSION,
 	new = new,
+	FromFile = FromFile,
 	SetAttribute = SetAttribute,
 	GetAttribute = GetAttribute,
 	SetCommand = SetCommand,
