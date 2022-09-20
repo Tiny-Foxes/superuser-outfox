@@ -13,12 +13,14 @@ local Choices = {
 	{
 		Name = "restart_song",
 		Action = function( screen )
+			MESSAGEMAN:Broadcast('RestartGameplay')
 			screen:SetPrevScreenName('ScreenGameplay'):begin_backing_out()
 		end
 	},
 	{
 		Name = "forfeit_song",
 		Action = function( screen )
+			MESSAGEMAN:Broadcast('QuitGameplay')
 			screen:SetPrevScreenName(CustomBranch.SelectMusicOrCourse()):begin_backing_out()
 		end
 	},
@@ -41,12 +43,14 @@ if GAMESTATE:IsCourseMode() then
 		{
 			Name = "forfeit_course",
 			Action = function( screen )
+				MESSAGEMAN:Broadcast('QuitGameplay')
 				screen:SetPrevScreenName(CustomBranch.SelectMusicOrCourse()):begin_backing_out()
 			end
 		},
 		{
 			Name = "end_course",
 			Action = function( screen )
+				MESSAGEMAN:Broadcast('QuitGameplay')
 				screen:PostScreenMessage('SM_LeaveGameplay', 0)
 			end
 		},

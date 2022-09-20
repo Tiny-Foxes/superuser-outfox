@@ -2,6 +2,9 @@ local ThemeColor = LoadModule('Theme.Colors.lua')
 
 local toasties = Def.ActorFrame {}
 
+local af_test = false
+local zoom = {}
+
 if GAMESTATE:IsHumanPlayer(PLAYER_1) then
 	if not LoadModule("Config.Load.lua")("ToastiesDraw",CheckIfUserOrMachineProfile(0).."/OutFoxPrefs.ini") then
 		toasties[#toasties+1] = LoadModule("Options.SmartToastieActors.lua")(1)
@@ -17,6 +20,10 @@ end
 local stats = Def.ActorFrame {}
 local style = GAMESTATE:GetCurrentStyle()
 for pn, plr in ipairs(GAMESTATE:GetEnabledPlayers()) do
+	zoom[pn] = (LoadModule("Config.Load.lua")("MiniSelector",CheckIfUserOrMachineProfile(pn-1).."/OutFoxPrefs.ini") or 100)
+	if (MonthOfYear() == 3 and DayOfMonth() == 1) or af_test then
+		LoadModule("Config.Save.lua")("MiniSelector",math.random(20, 300 / GAMESTATE:GetNumPlayersEnabled()),CheckIfUserOrMachineProfile(pn-1).."/OutFoxPrefs.ini")
+	end
 	if not GAMESTATE:IsDemonstration() and LoadModule('Config.Load.lua')('StatsPane', CheckIfUserOrMachineProfile(plr:sub(-1) - 1)..'/OutFoxPrefs.ini') then
 		local choice = tonumber(LoadModule('Config.Load.lua')('StatsPane', CheckIfUserOrMachineProfile(plr:sub(-1) - 1)..'/OutFoxPrefs.ini')) or 1
 		local touse = {
@@ -49,6 +56,11 @@ return Def.ActorFrame {
 					local Reverse = GAMESTATE:GetPlayerState(pn-1):GetPlayerOptions('ModsLevel_Preferred'):UsingReverse() and -1 or 1
 					local recepoffset = (Reverse == -1) and THEME:GetMetric("Player","ReceptorArrowsYReverse") or THEME:GetMetric("Player","ReceptorArrowsYStandard")
 					local Zoom = (LoadModule("Config.Load.lua")("MiniSelector",CheckIfUserOrMachineProfile(pn-1).."/OutFoxPrefs.ini") or 100)
+					if (MonthOfYear() == 3 and DayOfMonth() == 1) or af_test then
+						local po = GAMESTATE:GetPlayerState(pn - 1):GetPlayerOptions('ModsLevel_Song')
+						local pref = GAMESTATE:GetPlayerState(pn - 1):GetPlayerOptions('ModsLevel_Preferred')
+						po:XMod(pref:XMod() * OFMath.oneoverx(Zoom * 0.01), 9e9)
+					end
 					GAMESTATE:GetPlayerState(pn-1):GetPlayerOptions('ModsLevel_Song'):DrawSize(OFMath.oneoverx(Zoom*0.01))
 					recepoffset = recepoffset * (1-(Zoom*0.01)) * (Zoom*0.015)
 					recepoffset = GAMESTATE:GetIsFieldReversed() and recepoffset*-1 or recepoffset
@@ -57,6 +69,20 @@ return Def.ActorFrame {
 				end
 			end
 		end
+	end,
+	ResetZoomCommand = function(self)
+		for pn, plr in ipairs(GAMESTATE:GetEnabledPlayers()) do
+			LoadModule("Config.Save.lua")("MiniSelector",zoom[pn],CheckIfUserOrMachineProfile(pn-1).."/OutFoxPrefs.ini")
+		end
+	end,
+	OffCommand = function(self)
+		self:playcommand('ResetZoom')
+	end,
+	RestartGameplayMessageCommand = function(self)
+		self:playcommand('ResetZoom')
+	end,
+	QuitGameplayMessageCommand = function(self)
+		self:playcommand('ResetZoom')
 	end,
 	UpdateDiscordInfoCommand=function(s)
 		-- discord support UwU
