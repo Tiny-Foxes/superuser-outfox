@@ -8,10 +8,10 @@
 		X Add difficulty select subscreen.
 		X Allow dynamic player join and unjoin.
 		X Add song elements to music select screen.
-		- Add chart preview on difficulty select screen.
-		- Add player option select subscreen.
 		- Pretty up music select screen.
 		- Add difficulty pips to song wheel.
+		- Add chart preview on difficulty select screen.
+		- Add player option select subscreen.
 		- Preview player option modifiers.
 		- Allow custom sorting on wheel and groups.
 		- Add song and group search.
@@ -26,6 +26,8 @@ local ThemeColor = LoadModule('Theme.Colors.lua')
 local konko = LoadModule('Konko.Core.lua')
 konko()
 
+local SuperActor = LoadModule('Konko.SuperActor.lua')
+
 PlayersJoined = PlayersJoined or {
 	[PLAYER_1] = false,
 	[PLAYER_2] = false,
@@ -39,10 +41,11 @@ for k in pairs(PlayersJoined) do
 end
 -- Song list indices.
 -- Group, song, and difficulty. Difficulty has one for each player.
-Index = Index or {
+GAMESTATE:Env().Index = GAMESTATE:Env().Index or {
 	Group = 1,
 	Song = 1,
 }
+local Index = GAMESTATE:Env().Index
 
 -- Wheel offsets.
 -- Size, increment offset, decrement offset, center offset.
@@ -75,8 +78,87 @@ local wheel = {
 }
 
 local style = TF_WHEEL.QuickStyleDB[GAMESTATE:GetCurrentGame():GetName()]
-TF_WHEEL.AllSongs = TF_WHEEL.AllSongs or LoadModule('Wheel/Songs.Loader.lua')(style)
-local AllSongs = TF_WHEEL.AllSongs
+GAMESTATE:Env().AllSongs = GAMESTATE:Env().AllSongs or LoadModule('Wheel/Songs.Loader.lua')(style)
+local AllSongs = GAMESTATE:Env().AllSongs
+if #AllSongs < 1 then
+	local af = SuperActor.new('ActorFrame')
+	local image = SuperActor.new('Sprite')
+	local top = SuperActor.new('BitmapText')
+	local bottom = SuperActor.new('BitmapText')
+	local prompt = SuperActor.new('BitmapText')
+	local msg = {
+		'You know, the game\'s a lot more fun',
+		'when you have some songs to play! But',
+		'don\'t worry, I know a few places you',
+		'can get some. Check out OutFox\'s pack',
+		'series, Project OutFox Serenity! You can',
+		'get the pack from projectoutfox.com. You',
+		'can also use any of the content you have',
+		'on other StepMania builds! And if you have',
+		'any song files from other games like osu!,',
+		'Taikojiro, Lunatic Rave, etc., you can use',
+		'those, too! Try it out! Once you\'ve got some',
+		'charts, come back here. I\'ll be waiting.',
+		'',
+		'- Sudo',
+	}
+	do image
+		:SetAttribute('Texture', THEME:GetPathG('', 'what'))
+		:SetCommand('Init', function(self)
+			self
+				:align(0, 1)
+				:xy(SL, SB)
+				:glow(0, 0, 0, 0.75)
+		end)
+		:AddToTree()
+	end
+	do top
+		:SetAttribute('Font', 'Common Large')
+		:SetAttribute('Text', 'Hey, wait a second!')
+		:SetCommand('Init', function(self)
+			self
+				:valign(1)
+				:y(-220)
+		end)
+	end
+	do bottom
+		:SetAttribute('Font', 'Sudo/Bold 36px')
+		:SetAttribute('Text', table.concat(msg, '\n'))
+		:SetCommand('Init', function(self)
+			self
+				:valign(0)
+				:halign(0)
+				:zoom(0.75)
+				:xy(-210, -180)
+		end)
+	end
+	do prompt
+		:SetAttribute('Font', 'Common Large')
+		:SetAttribute('Text', 'Got some songs? Press &START; to reload!')
+		:SetCommand('Init', function(self)
+			self
+				:valign(0)
+				:y(220)
+		end)
+		:SetCommand('On', function(self)
+			SCREENMAN:GetTopScreen():AddInputCallback(LoadModule('Lua.InputSystem.lua')(self))
+		end)
+		:SetCommand('Start', function(self)
+			SCREENMAN:SetNewScreen('ScreenReloadSongs')
+		end)
+		:SetCommand('Back', function(self)
+			SCREENMAN:GetTopScreen():Cancel()
+		end)
+	end
+	do af
+		:SetCommand('Init', Actor.Center)
+		:AddChild(top)
+		:AddChild(bottom)
+		:AddChild(prompt)
+		:AddToTree()
+	end
+	return SuperActor.GetTree()
+end
 local AllGroups = LoadModule('Wheel/Group.List.lua')(AllSongs, TF_WHEEL.PreferredSort)
 local SongList = LoadModule('Wheel/Group.Sort.lua')(AllSongs, TF_WHEEL.PreferredSort)
 
@@ -231,9 +313,6 @@ local function MoveGroup(self, offset, Groups, reset)
 	CurGroup = AllGroups[Index.Group]
 	CurSongs = SongList[CurGroup]
 end
-
-
-local SuperActor = LoadModule('Konko.SuperActor.lua')
 
 
 local songWheel = SuperActor.new('ActorScroller')
