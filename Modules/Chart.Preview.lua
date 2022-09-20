@@ -1,4 +1,4 @@
-local plr = lua.GetThreadVariable('Player')
+local plr = lua.GetThreadVariable('Player') or ...
 if not plr then return Def.Actor {} end
 
 local konko = LoadModule('Konko.Core.lua')
@@ -68,9 +68,12 @@ end
 
 do preview
 	:SetAttribute('FOV', 45)
+	:SetCommand('On', function(self)
+		self:queuecommand('Setup')
+	end)
 	:SetCommand('Setup', function(self)
 		self:fardistz(9e9)
-		local po = self.NoteField:GetPlayerOptions('ModsLevel_Current')
+		local po = self:GetChild('NoteField'):GetPlayerOptions('ModsLevel_Current')
 		function self:vanishpointx(n)
 			local offset = scale(po:Skew(), 0, 1, self:GetX(), SCREEN_CENTER_X)
 			return ActorFrame.vanishpointx(self, offset + n)

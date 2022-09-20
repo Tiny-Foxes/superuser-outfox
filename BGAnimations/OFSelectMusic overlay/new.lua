@@ -766,4 +766,26 @@ do varControl
 	:AddToTree()
 end
 
+local previewAF = SuperActor.new('ActorFrame')
+
+for plr in ivalues(GAMESTATE:GetEnabledPlayers()) do
+	local PN = ToEnumShortString(plr)
+	local preview = LoadModule('Chart.Preview.lua', plr)
+	-- Wait until next alpha 5 release to add this. ~Sudo
+	--previewAF:AddChild(preview, 'Preview'..PN)
+end
+
+do previewAF
+	:SetCommand('Init', function(self)
+		--self:y(SH)
+	end)
+	:SetCommand('SongSelect', function(self)
+		self:sleep(0.25):easeoutexpo(0.5):y(0)
+	end)
+	:SetCommand('SongUnselect', function(self)
+		--self:easeinexpo(0.5):y(SH)
+	end)
+	:AddToTree('PreviewFrame')
+end
+
 return SuperActor.GetTree()

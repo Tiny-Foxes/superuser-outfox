@@ -41,13 +41,11 @@ local function MoveDifficulty(self, offset, Diffs)
 	end
 end
 
-
 local af = SuperActor.new('ActorFrame')
 for k in pairs(plrs) do
 
 	local PN = ToEnumShortString(k)
 
-	local previewAF = SuperActor.new('ActorFrame')
 	local diffAF = SuperActor.new('ActorFrame')
 	local backPanel = SuperActor.new('Quad')
 	local meterPanel = SuperActor.new('Quad')
@@ -58,16 +56,6 @@ for k in pairs(plrs) do
 	local diffScore = SuperActor.new('BitmapText')
 	local diffAward = SuperActor.new('BitmapText')
 	local readyText = SuperActor.new('BitmapText')
-
-	do previewAF
-		:SetCommand('On', function(self)
-			local a = self
-			lua.RunWithThreadVariables(function()
-				-- Currently crashes the game
-				--a:AddChildFromPath(GetModule('Chart.Preview.lua'))
-			end, {Player = k})
-		end)
-	end
 
 	do backPanel
 		:SetCommand('Init', function(self)
@@ -159,7 +147,8 @@ for k in pairs(plrs) do
 		end)
 		:SetCommand('SetDifficulty'..PN, function(self)
 			self:settext('')
-			local scorelist = PROFILEMAN:GetProfile(k):GetHighScoreListIfExists(CurSong, CurDiff[k])
+			local prof = (PROFILEMAN:IsPersistentProfile(k) and PROFILEMAN:GetProfile(k)) or PROFILEMAN:GetMachineProfile()
+			local scorelist = prof:GetHighScoreListIfExists(CurSong, CurDiff[k])
 			if scorelist then
 				local highscore = scorelist:GetHighScores()[1]
 				if not highscore then return end
@@ -185,7 +174,8 @@ for k in pairs(plrs) do
 		end)
 		:SetCommand('SetDifficulty'..PN, function(self)
 			self:settext('')
-			local scorelist = PROFILEMAN:GetProfile(k):GetHighScoreListIfExists(CurSong, CurDiff[k])
+			local prof = (PROFILEMAN:IsPersistentProfile(k) and PROFILEMAN:GetProfile(k)) or PROFILEMAN:GetMachineProfile()
+			local scorelist = prof:GetHighScoreListIfExists(CurSong, CurDiff[k])
 			if scorelist then
 				local highscore = scorelist:GetHighScores()[1]
 				if not highscore then return end
@@ -319,7 +309,6 @@ for k in pairs(plrs) do
 				:addy(PositionPerPlayer(k, -y, y))
 				:visible(plrs[k])
 		end)
-		:AddChild(previewAF, 'Preview'..PN)
 		:AddChild(backPanel, 'BackPanel')
 		:AddChild(meterPanel, 'MeterPanel')
 		:AddChild(meterText, 'Meter')
@@ -430,4 +419,6 @@ do af
 	:AddToTree('DifficultyFrame')
 end
 
-return SuperActor.GetTree()
+return Def.ActorFrame {
+	SuperActor.GetTree()
+}
