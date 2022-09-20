@@ -29,7 +29,7 @@ return function(t)
 		MESSAGEMAN:Broadcast('MoveOptions', params)
 		local aux = Index - 1
 		if offset ~= 0 then
-			self:stoptweening():easeoutexpo(0.2):aux(aux)
+			self:stoptweening():easeoutexpo(0.15):aux(aux)
 			if not t.Mute then
 				SOUND:PlayOnce(THEME:GetPathS('Common', 'value'), true)
 			end

@@ -170,7 +170,6 @@ return Def.ActorFrame {
 			Name = 'Banner',
 			InitCommand = function(self)
 				self
-					:scaletoclipped(402,160)
 					:skewx(0.5)
 					:fadeleft(1)
 					:faderight(1)
@@ -185,7 +184,9 @@ return Def.ActorFrame {
 				else
 					self:LoadFromSongGroup(target:GetGroupName())
 				end
+				local w, h = self:GetWidth(), self:GetHeight()
 				self
+					:zoomto(160 * w/h, 160)
 					:diffusealpha(0)
 					:sleep(0.5)
 					:easeoutexpo(0.25)

@@ -1,8 +1,8 @@
 local ThemeColor = LoadModule('Theme.Colors.lua')
 local p = ...
 local t = Def.ActorFrame{}
-local pane_x_position = string.find(p, "P1") and -GAMESTATE:GetCurrentStyle():GetWidth(p)+20 or GAMESTATE:GetCurrentStyle():GetWidth(p)-20
-local pane_align = string.find(p, "P1") and right or left
+local pane_x_position = string.find(p, "P1") and (GAMESTATE:GetCurrentStyle():GetWidth(p)*SCREEN_HEIGHT/480*0.5)+5 or -(GAMESTATE:GetCurrentStyle():GetWidth(p)*SCREEN_HEIGHT/480*0.5)-5
+local pane_align = string.find(p, "P1") and left or right
 local DLW = LoadModule("Config.Load.lua")("DisableLowerWindows","Save/OutFoxPrefs.ini") or false
 
 if GAMESTATE:IsHumanPlayer(p) then
@@ -15,7 +15,48 @@ if GAMESTATE:IsHumanPlayer(p) then
 	-- max 12
 	local yspacing = Length == 12 and 24 or 32
 	local fontzoom = Length == 12 and 0.6 or 0.75
-	local backupy = Length < 12 and scale( Length, 1, 12, 360, -160 ) or 32
+	local backupy = (Length < 12 and scale( Length, 1, 12, 360, -160 ) or 32) - 60
+	t[#t+1] = Def.Quad {
+		OnCommand = function(self)
+			local plr = SCREENMAN:GetTopScreen():GetChild('Player'..ToEnumShortString(p))
+			self:xy(plr:GetX()+pane_x_position+(p:find('P1') and -5 or 5),(SCREEN_CENTER_Y+backupy)-10)
+			:horizalign(pane_align):SetSize(120, SCREEN_HEIGHT * 0.75):skewy(p:find('P1') and 0.5 or -0.5):valign(0)
+			if (IsGame('dance') or IsGame('pump')) then
+				local c = tonumber(LoadModule('Config.Load.lua')('ScreenFilterColor', PROFILEMAN:GetProfileDir(0)..'/OutFoxPrefs.ini'))
+				local colors = {
+					{
+						ThemeColor.Black,
+						ColorDarkTone(ThemeColor[ToEnumShortString(p)]),
+					},
+					{
+						ThemeColor.Black,
+						ThemeColor.Black,
+					},
+					{
+						ThemeColor[ToEnumShortString(p)],
+						ColorDarkTone(ThemeColor[ToEnumShortString(p)]),
+					},
+					{
+						ThemeColor.White,
+						ThemeColor.White,
+					},
+					{
+						ThemeColor.Gray,
+						ThemeColor.Gray,
+					}
+				}
+				local a = LoadModule('Config.Load.lua')('ScreenFilter', PROFILEMAN:GetProfileDir(0)..'/OutFoxPrefs.ini')
+				if a then
+					self:diffuse(ColorDarkTone(BoostColor(colors[c][2], 0.97)))
+					self:diffusebottomedge(ColorLightTone(BoostColor(colors[c][2], 0.8)))
+					self:diffusealpha(a)
+				else
+					self:visible(false)
+				end
+			end
+			if p:find('P1') then self:cropright(0.5):faderight(0.25) else self:cropleft(0.5):fadeleft(0.25) end
+		end,
+	}
 	for i, v in ipairs( Name ) do
 		local JudgVar = 0
 		t[#t+1] = Def.ActorFrame {

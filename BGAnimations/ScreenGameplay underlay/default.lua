@@ -14,6 +14,28 @@ if GAMESTATE:IsHumanPlayer(PLAYER_2) then
 	end
 end
 
+local stats = Def.ActorFrame {}
+local style = GAMESTATE:GetCurrentStyle()
+for pn, plr in ipairs(GAMESTATE:GetEnabledPlayers()) do
+	if not GAMESTATE:IsDemonstration() and LoadModule('Config.Load.lua')('StatsPane', CheckIfUserOrMachineProfile(plr:sub(-1) - 1)..'/OutFoxPrefs.ini') then
+		local choice = tonumber(LoadModule('Config.Load.lua')('StatsPane', CheckIfUserOrMachineProfile(plr:sub(-1) - 1)..'/OutFoxPrefs.ini')) or 1
+		local touse = {
+			[1] = 'StatDisplay',
+			[2] = (
+				style:GetStyleType() ~= 'StyleType_OnePlayerTwoSides'
+				and style:GetName() ~= 'solo'
+				and style:ColumnsPerPlayer() < 7
+				and GAMESTATE:GetNumPlayersEnabled() == 1
+				and (not PREFSMAN:GetPreference('Center1Player'))
+				and 'DetailedStats' or 'StatDisplay'
+			) or 'StatDisplay'
+		}
+		if choice > 0 and choice <= #touse then
+			stats[#stats + 1] = LoadActor(touse[choice], plr)
+		end
+	end
+end
+
 local song = GAMESTATE:GetCurrentSong()
 local songPos = GAMESTATE:GetSongPosition()
 
@@ -47,6 +69,8 @@ return Def.ActorFrame {
 	CurrentSongChangedMessageCommand=function(s) s:playcommand("UpdateDiscordInfo") end,
 	-- Toasties
 	toasties,
+	-- Detailed Stats
+	stats,
 	-- Filter
 	Def.ActorFrame {
 		-- Player 1
@@ -202,7 +226,7 @@ return Def.ActorFrame {
 				self
 					:zoom(0.75)
 					:vertalign('bottom')
-					:maxwidth(SCREEN_CENTER_X * 0.5)
+					:maxwidth(SCREEN_CENTER_X)
 			end,
 		},
 		Def.BitmapText {
