@@ -1,7 +1,8 @@
 local ThemeColor = LoadModule('Theme.Colors.lua')
 local p = ...
 local t = Def.ActorFrame{}
-local pane_x_position = string.find(p, "P1") and (GAMESTATE:GetCurrentStyle():GetWidth(p)*SCREEN_HEIGHT/480*0.5)+5 or -(GAMESTATE:GetCurrentStyle():GetWidth(p)*SCREEN_HEIGHT/480*0.5)-5
+local zoom = (LoadModule("Config.Load.lua")("MiniSelector",CheckIfUserOrMachineProfile(PlayerNumber:Reverse()[p]).."/OutFoxPrefs.ini") or 100)
+local pane_x_position = string.find(p, "P1") and (GAMESTATE:GetCurrentStyle():GetWidth(p)*SCREEN_HEIGHT/480*zoom*0.01*0.5)+5 or -(GAMESTATE:GetCurrentStyle():GetWidth(p)*SCREEN_HEIGHT/480*zoom*0.01*0.5)-5
 local pane_align = string.find(p, "P1") and left or right
 local DLW = LoadModule("Config.Load.lua")("DisableLowerWindows","Save/OutFoxPrefs.ini") or false
 

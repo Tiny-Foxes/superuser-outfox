@@ -40,7 +40,24 @@ local song = GAMESTATE:GetCurrentSong()
 local songPos = GAMESTATE:GetSongPosition()
 
 return Def.ActorFrame {
-	OnCommand=function(self) self:playcommand("UpdateDiscordInfo") end,
+	OnCommand=function(self)
+		self:playcommand("UpdateDiscordInfo")
+		for pn = 1,2 do
+			if GAMESTATE:IsPlayerEnabled("PlayerNumber_P"..pn) then
+				if SCREENMAN:GetTopScreen():GetChild("PlayerP"..pn) and SCREENMAN:GetTopScreen():GetChild("PlayerP"..pn):GetChild("NoteField") then
+					SCREENMAN:GetTopScreen():GetChild("PlayerP"..pn):rotationz(LoadModule("Config.Load.lua")("RotateFieldZ",CheckIfUserOrMachineProfile(pn-1).."/OutFoxPrefs.ini") or 0)
+					local Reverse = GAMESTATE:GetPlayerState(pn-1):GetPlayerOptions('ModsLevel_Preferred'):UsingReverse() and -1 or 1
+					local recepoffset = (Reverse == -1) and THEME:GetMetric("Player","ReceptorArrowsYReverse") or THEME:GetMetric("Player","ReceptorArrowsYStandard")
+					local Zoom = (LoadModule("Config.Load.lua")("MiniSelector",CheckIfUserOrMachineProfile(pn-1).."/OutFoxPrefs.ini") or 100)
+					GAMESTATE:GetPlayerState(pn-1):GetPlayerOptions('ModsLevel_Song'):DrawSize(OFMath.oneoverx(Zoom*0.01))
+					recepoffset = recepoffset * (1-(Zoom*0.01)) * (Zoom*0.015)
+					recepoffset = GAMESTATE:GetIsFieldReversed() and recepoffset*-1 or recepoffset
+					SCREENMAN:GetTopScreen():GetChild("PlayerP"..pn):rotationx(LoadModule("Config.Load.lua")("RotateFieldX",CheckIfUserOrMachineProfile(pn-1).."/OutFoxPrefs.ini") or 0):addy((Zoom == 0) and 0 or recepoffset/(Zoom/100))
+					SCREENMAN:GetTopScreen():GetChild("PlayerP"..pn):zoom(Zoom/(200/3))
+				end
+			end
+		end
+	end,
 	UpdateDiscordInfoCommand=function(s)
 		-- discord support UwU
 		local player = GAMESTATE:GetMasterPlayerNumber()
@@ -81,8 +98,8 @@ return Def.ActorFrame {
 				if ((IsGame('dance') or IsGame('pump')) and plr) then
 					self
 						:visible(true)
-						:xy(plr:GetX(), plr:GetY())
-						:SetSize(GAMESTATE:GetCurrentStyle():GetWidth(PLAYER_1) * SCREEN_HEIGHT / 480, SCREEN_HEIGHT)
+						:xy(plr:GetX(), SCREEN_CENTER_Y)
+						:SetSize(GAMESTATE:GetCurrentStyle():GetWidth(PLAYER_1) * plr:GetZoom(), SCREEN_HEIGHT)
 					local c = tonumber(LoadModule('Config.Load.lua')('ScreenFilterColor', PROFILEMAN:GetProfileDir(0)..'/OutFoxPrefs.ini'))
 					local colors = {
 						{
@@ -125,8 +142,8 @@ return Def.ActorFrame {
 				if ((IsGame('dance') or IsGame('pump')) and plr) then
 					self
 						:visible(true)
-						:xy(plr:GetX(), plr:GetY())
-						:SetSize(GAMESTATE:GetCurrentStyle():GetWidth(PLAYER_1) * SCREEN_HEIGHT / 480, SCREEN_HEIGHT)
+						:xy(plr:GetX(), SCREEN_CENTER_Y)
+						:SetSize(GAMESTATE:GetCurrentStyle():GetWidth(PLAYER_1) * plr:GetZoom(), SCREEN_HEIGHT)
 					local c = tonumber(LoadModule('Config.Load.lua')('ScreenFilterColor', PROFILEMAN:GetProfileDir(1)..'/OutFoxPrefs.ini'))
 					local colors = {
 						{
