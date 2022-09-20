@@ -288,5 +288,17 @@ return Def.ActorFrame {
 				end,
 			},
 		},
+		Def.Sprite {
+			Texture = THEME:GetPathG('', '_StepsType/'..ToEnumShortString(GAMESTATE:GetCurrentStyle():GetStepsType())),
+			InitCommand = function(self)
+				self:align(0, 0):x(-SCREEN_CENTER_X):skewx(0.5):basezoom(4):diffuse(0.25, 0.25, 0.25, 0)
+			end,
+			OnCommand = function(self)
+				self:sleep(0.3):linear(0.25):diffuse(0.25, 0.25, 0.25, 1):sleep(0.25):linear(0.5):glow(1, 1, 1, 1)
+			end,
+			OffCommand = function(self)
+				self:linear(0.1):glow(1, 1, 1, 0):linear(0.1):diffusealpha(0)
+			end,
+		}
 	}
 }

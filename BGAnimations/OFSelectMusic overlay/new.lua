@@ -205,7 +205,7 @@ local function MoveSong(self, offset, Songs, reset)
 			while pos < 1 do pos = pos + songCount end
 
 			local aux = self:getaux() + offset
-			self:stoptweening():easeoutexpo(0.2):aux(aux)
+			self:stoptweening():easeoutexpo(0.15):aux(aux)
 
 			if (i == wheel.Song.Inc and offset < 0) or (i == wheel.Song.Dec and offset > 0) then
 				local contAF = self:GetChild('Container'..i)
@@ -284,7 +284,7 @@ local function MoveGroup(self, offset, Groups, reset)
 			while pos < 1 do pos = #Groups + pos end
 
 			local aux = self:getaux() + offset
-			self:stoptweening():easeoutexpo(0.2):aux(aux)
+			self:stoptweening():easeoutexpo(0.15):aux(aux)
 
 			if (i == wheel.Group.Inc and offset < 0) or (i == wheel.Group.Dec and offset > 0) then
 				local contAF = self:GetChild('Container'..i)
