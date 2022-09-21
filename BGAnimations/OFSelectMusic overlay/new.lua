@@ -871,8 +871,8 @@ do varControl
 		SongList = LoadModule('Wheel/Group.Sort.lua')(AllSongs, TF_WHEEL.PreferredSort)
 		CurGroup = AllGroups[Index.Group]
 		CurSongs = SongList[CurGroup]
-		MoveGroup(SuperActor.GetTree():GetChild('GroupWheel'), 0, AllGroups, true)
-		MoveSong(SuperActor.GetTree():GetChild('SongWheel'), 0, CurSongs, true)
+		MoveGroup(SuperActor.GetTree().GroupWheel, 0, AllGroups, true)
+		MoveSong(SuperActor.GetTree().SongWheel, 0, CurSongs, true)
 	end)
 	:SetMessage('EnterOptions', function(self)
 		wheel.NextScreen = 'ScreenPlayerOptions'
