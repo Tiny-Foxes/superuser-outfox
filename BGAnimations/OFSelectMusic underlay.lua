@@ -35,7 +35,7 @@ return Def.ActorFrame {
 			if not GAMESTATE:IsCourseMode() and song:GetPreviewVidPath() then
 				self:Load(song:GetPreviewVidPath())
 			else
-				self:LoadFromSongBackground(song)
+				self:LoadFromCurrentSongBackground()
 			end
 			self
 				:easeinoutsine(0.3)
@@ -65,7 +65,7 @@ return Def.ActorFrame {
 				end
 				local w, h = self:GetWidth(), self:GetHeight()
 				self:zoomto(160 * w/h, 160)
-				self:easeinoutsine(0.2):diffusealpha(1)
+				self:easeinoutsine(0.1):diffusealpha(1)
 			end,
 		},
 	},

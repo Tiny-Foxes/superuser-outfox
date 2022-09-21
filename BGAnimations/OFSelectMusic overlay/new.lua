@@ -221,6 +221,7 @@ local function MoveSong(self, offset, Songs, reset)
 			end
 
 		end
+		MESSAGEMAN:Broadcast('MoveWheel')
 	else
 		for i = 1, wheel.Song.Size do
 
@@ -291,6 +292,7 @@ local function MoveGroup(self, offset, Groups, reset)
 				contAF:GetChild('Title'):settext(Groups[pos]):zoom(0.5):maxwidth(540)
 			end
 		end
+		MESSAGEMAN:Broadcast('MoveWheel')
 	else
 		for i = 1, wheel.Group.Size do
 
@@ -448,30 +450,26 @@ do songWheel
 	end)
 	:SetMessage('SongUnselect', function(self)
 		self:finishtweening():sleep(0.25):easeinoutexpo(0.25):addx(-640)
-		SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'expand'), true)
+		MESSAGEMAN:Broadcast('UnselectWheel')
 	end)
 	:SetCommand('MenuUp', function(self)
 		if PlayersJoined[self.pn] then
 			MoveSong(self, -1, CurSongs)
-			SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'change'), true)
 		end
 	end)
 	:SetCommand('MenuDown', function(self)
 		if PlayersJoined[self.pn] then
 			MoveSong(self, 1, CurSongs)
-			SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'change'), true)
 		end
 	end)
 	:SetCommand('MenuLeft', function(self)
 		if PlayersJoined[self.pn] then
 			MoveSong(self, -1, CurSongs)
-			SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'change'), true)
 		end
 	end)
 	:SetCommand('MenuRight', function(self)
 		if PlayersJoined[self.pn] then
 			MoveSong(self, 1, CurSongs)
-			SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'change'), true)
 		end
 	end)
 	:SetCommand('Back', function(self)
@@ -642,38 +640,34 @@ do groupWheel
 	end)
 	:SetMessage('GroupSelect', function(self)
 		self:finishtweening():easeinoutexpo(0.25):addx(-640)
-		SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'collapse'), true)
+		MESSAGEMAN:Broadcast('SelectWheel')
 	end)
 	:SetMessage('GroupUnselect', function(self)
 		self:finishtweening():sleep(0.25):easeinoutexpo(0.25):addx(640)
-		SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'expand'), true)
+		MESSAGEMAN:Broadcast('UnselectWheel')
 	end)
 	:SetCommand('MenuUp', function(self)
 		if PlayersJoined[self.pn] then
 			MoveGroup(self, -1, AllGroups)
-			MoveSong(SuperActor.GetTree():GetChild('SongWheel'), 0, CurSongs, true)
-			SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'change'), true)
+			MoveSong(SuperActor.GetTree().SongWheel, 0, CurSongs, true)
 		end
 	end)
 	:SetCommand('MenuDown', function(self)
 		if PlayersJoined[self.pn] then
 			MoveGroup(self, 1, AllGroups)
-			MoveSong(SuperActor.GetTree():GetChild('SongWheel'), 0, CurSongs, true)
-			SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'change'), true)
+			MoveSong(SuperActor.GetTree().SongWheel, 0, CurSongs, true)
 		end
 	end)
 	:SetCommand('MenuLeft', function(self)
 		if PlayersJoined[self.pn] then
 			MoveGroup(self, -1, AllGroups)
-			MoveSong(SuperActor.GetTree():GetChild('SongWheel'), 0, CurSongs, true)
-			SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'change'), true)
+			MoveSong(SuperActor.GetTree().SongWheel, 0, CurSongs, true)
 		end
 	end)
 	:SetCommand('MenuRight', function(self)
 		if PlayersJoined[self.pn] then
 			MoveGroup(self, 1, AllGroups)
-			MoveSong(SuperActor.GetTree():GetChild('SongWheel'), 0, CurSongs, true)
-			SOUND:PlayOnce(THEME:GetPathS('MusicWheel', 'change'), true)
+			MoveSong(SuperActor.GetTree().SongWheel, 0, CurSongs, true)
 		end
 	end)
 	:SetCommand('Back', function(self)
@@ -802,6 +796,58 @@ do songPreview
 		end
 	end)
 	:AddToTree('SongPreview')
+end
+
+local changeSound = SuperActor.new('Sound')
+local expandSound = SuperActor.new('Sound')
+local collapseSound = SuperActor.new('Sound')
+
+do changeSound
+	:SetAttribute('File', THEME:GetPathS('MusicWheel', 'change'))
+	:SetAttribute('IsAction', true)
+	:SetAttribute('Precache', true)
+	:SetCommand('Init', function(self)
+		if not self:get() then
+			self:load(THEME:GetPathS('MusicWheel', 'change'))
+		end
+		self:stop()
+	end)
+	:SetMessage('MoveWheel', function(self)
+		self:play()
+	end)
+	:AddToTree()
+end
+
+do expandSound
+	:SetAttribute('File', THEME:GetPathS('MusicWheel', 'expand'))
+	:SetAttribute('IsAction', true)
+	:SetAttribute('Precache', true)
+	:SetCommand('Init', function(self)
+		if not self:get() then
+			self:load(THEME:GetPathS('MusicWheel', 'expand'))
+		end
+		self:stop()
+	end)
+	:SetMessage('SelectWheel', function(self)
+		self:play()
+	end)
+	:AddToTree()
+end
+
+do collapseSound
+	:SetAttribute('File', THEME:GetPathS('MusicWheel', 'collapse'))
+	:SetAttribute('IsAction', true)
+	:SetAttribute('Precache', true)
+	:SetCommand('Init', function(self)
+		if not self:get() then
+			self:load(THEME:GetPathS('MusicWheel', 'collapse'))
+		end
+		self:stop()
+	end)
+	:SetMessage('UnselectWheel', function(self)
+		self:play()
+	end)
+	:AddToTree()
 end
 
 do varControl
