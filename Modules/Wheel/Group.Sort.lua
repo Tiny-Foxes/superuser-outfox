@@ -8,7 +8,6 @@
 -- 				- Song 1
 -- 				- Song 2
 -- 				- Song 3
--- TODO: Add support for actual sorting. ~Sudo
 
 return function(Songs, Sort)
 

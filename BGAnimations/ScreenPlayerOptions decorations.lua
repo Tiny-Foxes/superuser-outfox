@@ -97,6 +97,14 @@ t[#t+1] = Def.ActorFrame {
 					local mult = poptions:AMod() / baseAvg -- mega gamer moment
 					bpm1 = bpm1 * mult
 					bpm2 = bpm2 * mult
+				elseif poptions:CAMod() then
+					local mult = poptions:CAMod() * 0.005
+					bpm1 = bpm1 * mult
+					bpm2 = bpm2 * mult
+				elseif poptions:AVMod() then
+					local perc = bpm1 / bpm2
+					bpm1 = poptions:AVMod() * perc
+					bpm2 = poptions:AVMod()
 				end
 				local bpmtext = ''
 				if bpm2 and bpm1 ~= bpm2 then
@@ -116,6 +124,10 @@ t[#t+1] = Def.ActorFrame {
 						bpmtext = poptions:MMod()
 					elseif poptions:AMod() then
 						bpmtext = poptions:AMod()
+					elseif poptions:CAMod() then
+						bpmtext = poptions:CAMod()
+					elseif poptions:AVMod() then
+						bpmtext = poptions:AVMod()
 					end
 				end
 
@@ -140,6 +152,14 @@ t[#t+1] = Def.ActorFrame {
 					local mult = param.speed / baseAvg
 					bpm1 = bpm1 * mult
 					bpm2 = bpm2 * mult
+				elseif param.mode == 'ca' then
+					local mult = param.speed * 0.005
+					bpm1 = bpm1 * mult
+					bpm2 = bpm2 * mult
+				elseif param.mode == 'av' then
+					local mult = bpm1 / bpm2
+					bpm1 = param.speed * mult
+					bpm2 = param.speed
 				end
 				local bpmtext = ''
 				if bpm2 and bpm1 ~= bpm2 then

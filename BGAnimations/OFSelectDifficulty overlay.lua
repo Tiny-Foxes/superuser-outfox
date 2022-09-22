@@ -350,7 +350,8 @@ do af
 			elseif CurDiff[pn]:GetStepsType():lower():find('double') then
 				GAMESTATE:SetCurrentStyle('double')
 			else
-				GAMESTATE:SetCurrentStyle('single')
+				local type = CurDiff[pn]:GetStepsType()
+				GAMESTATE:SetCurrentStyle(type:sub(1 - type:reverse():find('_'), -1))
 			end
 			GAMESTATE:SetCurrentSteps(pn, CurDiff[pn])
 		end

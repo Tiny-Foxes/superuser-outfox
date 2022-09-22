@@ -1,5 +1,12 @@
 local st = StepsType:Reverse()
 
+local game = GAMESTATE:GetCurrentGame():GetName()
+
+local game_remap = {
+	['be-mu'] = 'bm',
+	['po-mu'] = 'popn',
+}
+
 local function compare(a, b)
 	if st[a:GetStepsType()] == st[b:GetStepsType()] then
 		if TF_WHEEL.DiffTab[a:GetDifficulty()] == TF_WHEEL.DiffTab[b:GetDifficulty()] then
@@ -17,9 +24,9 @@ return function(Song)
 	local compat = {}
 	for chart in ivalues(diffs) do
 		local match = chart:GetStepsType():lower()
-		if match:find(GAMESTATE:GetCurrentGame():GetName()) then
+		if match:find((game_remap[game] or game)) then
 			if not (
-				match:find('double') and (
+				(match:find('double') or not match:find('couple')) and (
 					GAMESTATE:IsSideJoined(PLAYER_1) and
 					GAMESTATE:IsSideJoined(PLAYER_2)
 				)
