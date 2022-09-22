@@ -403,7 +403,7 @@ do uiTagline
 	end)
 	:SetCommand('SetTagline', function(self)
 		if SetMeFree then
-			self:settext('"Set Me Free."')
+			self:settext('Set Me Free.')
 			return
 		end
 		-- I'm working on translating these titles, but getting some translators
@@ -412,7 +412,7 @@ do uiTagline
 		local langtags = taglines[THEME:GetCurLanguage()]
 		if not langtags then langtags = taglines.en end
 		local rng = math.ceil(OFMath.randomfloat() * #langtags)
-		self:settext('"'..langtags[rng]..'"')
+		self:settext(langtags[rng])
 		if splash then self:settext('Hello, World.') end
 	end)
 end
@@ -456,6 +456,7 @@ do uiVersion
 			:halign(1)
 			:valign(0)
 			:cropright(1)
+			:visible(not splash)
 	end)
 	:SetCommand('On', function(self)
 		self

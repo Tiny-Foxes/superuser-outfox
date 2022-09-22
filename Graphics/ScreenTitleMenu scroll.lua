@@ -1,8 +1,8 @@
 local gc = Var("GameCommand")
 local item_width = 260
 local item_height = 48
-local splash = false
 
+local splash = false
 local hovered = false
 
 local id = ProductID()

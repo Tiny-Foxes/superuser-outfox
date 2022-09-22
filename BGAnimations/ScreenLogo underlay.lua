@@ -54,7 +54,7 @@ local function aftsprite(aft, sprite)
 end
 
 -- Now she's *really* a Superuser.
-local t = Def.KonkoAF {
+local t = Def.ActorFrame {
 	InitCommand = function(self)
 		self:Center()
 	end,
