@@ -26,10 +26,11 @@ return function(Song)
 		local match = chart:GetStepsType():lower()
 		if match:find((game_remap[game] or game)) then
 			if not (
-				(match:find('double') or not match:find('couple')) and (
-					GAMESTATE:IsSideJoined(PLAYER_1) and
-					GAMESTATE:IsSideJoined(PLAYER_2)
-				)
+				match:find('double') and
+				GAMESTATE:GetNumPlayersEnabled() > 1
+			) or not (
+				match:find('couple') and
+				GAMESTATE:GetNumPlayersEnabled() < 2
 			) then
 				compat[#compat + 1] = chart
 			end
