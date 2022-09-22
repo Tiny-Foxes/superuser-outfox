@@ -72,7 +72,7 @@ return Def.ActorFrame {
 	Def.ActorFrame {
 		Name = 'InfoFrame',
 		InitCommand = function(self)
-			self:xy(290, 440)
+			self:xy(290, 420)
 		end,
 		Def.BitmapText {
 			Font = 'Common Large',

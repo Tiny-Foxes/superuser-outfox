@@ -419,6 +419,36 @@ do af
 	:AddToTree('DifficultyFrame')
 end
 
-return Def.ActorFrame {
-	SuperActor.GetTree()
-}
+local diffControl = SuperActor.new('ActorFrame')
+do diffControl
+	:SetCommand('Init', function(self)
+		self:xy(SL + 20, SB - 80):diffusealpha(0)
+	end)
+	:SetCommand('On', function(self)
+		self:sleep(0.5):linear(0.1):diffusealpha(1)
+	end)
+	:SetMessage('SongUnselect', function(self)
+		self:linear(0.1):diffusealpha(0)
+	end)
+	:AddChild(
+		SuperActor.new('Quad')
+			:SetCommand('Init', function(self)
+				self:halign(0.25):valign(1)
+					:SetSize(480, 100)
+					:y(20)
+					:diffuse(0, 0, 0, 0.75)
+					:skewx(-0.5)
+			end)
+	)
+	:AddChild(
+		SuperActor.new('BitmapText')
+			:SetAttribute('Font', 'Common Normal')
+			:SetAttribute('Text', '&LEFT;&RIGHT;: Change Difficulty\n&DOWN;: Go to Player Options\n&START;: Select Difficulty\n&BACK;: Switch to Song')
+			:SetCommand('Init', function(self)
+				self:halign(0):y(-30)
+			end)
+	)
+	:AddToTree('DiffControl')
+end
+
+return SuperActor.GetTree()

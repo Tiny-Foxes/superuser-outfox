@@ -499,6 +499,44 @@ do songWheel
 	:AddToTree('SongWheel')
 end
 
+local songControl = SuperActor.new('ActorFrame')
+do songControl
+	:SetCommand('Init', function(self)
+		self:xy(SL + 20, SB - 80)
+	end)
+	:SetMessage('SongUnselect', function(self)
+		self:sleep(0.25):linear(0.25):diffusealpha(1)
+	end)
+	:SetMessage('SongSelect', function(self)
+		self:linear(0.25):diffusealpha(0)
+	end)
+	:SetMessage('GroupUnselect', function(self)
+		self:linear(0.25):diffusealpha(0)
+	end)
+	:SetMessage('GroupSelect', function(self)
+		self:sleep(0.25):linear(0.25):diffusealpha(1)
+	end)
+	:AddChild(
+		SuperActor.new('Quad')
+			:SetCommand('Init', function(self)
+				self:halign(0.25):valign(1)
+					:SetSize(480, 100)
+					:y(20)
+					:diffuse(0, 0, 0, 0.75)
+					:skewx(-0.5)
+			end)
+	)
+	:AddChild(
+		SuperActor.new('BitmapText')
+			:SetAttribute('Font', 'Common Normal')
+			:SetAttribute('Text', '&LEFT;&DOWN;&UP;&RIGHT;: Change Song\n&START;: Select Song\n&BACK;: Switch to Group')
+			:SetCommand('Init', function(self)
+				self:halign(0):y(-30)
+			end)
+	)
+	:AddToTree('SongControl')
+end
+
 do songSelect
 	:SetCommand('Init', function(self)
 		self:xy(SR - 290, SCY):zoom(2):visible(false):queuecommand('Setup')
@@ -703,6 +741,40 @@ do groupWheel
 		self:SetCurrentAndDestinationItem(self:getaux())
 	end)
 	:AddToTree('GroupWheel')
+end
+
+SuperActor.FromFile(THEME:GetPathG('OFSelectMusic', 'GroupInfo')):AddToTree('GroupInfo')
+
+local groupControl = SuperActor.new('ActorFrame')
+do groupControl
+	:SetCommand('Init', function(self)
+		self:xy(SL + 20, SB - 80):diffusealpha(0)
+	end)
+	:SetMessage('GroupUnselect', function(self)
+		self:sleep(0.5):linear(0.1):diffusealpha(1)
+	end)
+	:SetMessage('GroupSelect', function(self)
+		self:linear(0.1):diffusealpha(0)
+	end)
+	:AddChild(
+		SuperActor.new('Quad')
+			:SetCommand('Init', function(self)
+				self:halign(0.25):valign(1)
+					:SetSize(480, 100)
+					:y(20)
+					:diffuse(0, 0, 0, 0.75)
+					:skewx(-0.5)
+			end)
+	)
+	:AddChild(
+		SuperActor.new('BitmapText')
+			:SetAttribute('Font', 'Common Normal')
+			:SetAttribute('Text', '&LEFT;&DOWN;&UP;&RIGHT;: Change Group\n&START;: Select Group\n&BACK;: Exit to Title')
+			:SetCommand('Init', function(self)
+				self:halign(0):y(-30)
+			end)
+	)
+	:AddToTree('GroupControl')
 end
 
 do groupSelect
