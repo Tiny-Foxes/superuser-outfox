@@ -72,7 +72,7 @@ return Def.ActorFrame {
 	Def.ActorFrame {
 		Name = 'InfoFrame',
 		InitCommand = function(self)
-			self:xy(290, 420)
+			self:xy(290, 450)
 		end,
 		Def.BitmapText {
 			Font = 'Common Large',
@@ -96,6 +96,9 @@ return Def.ActorFrame {
 				if not GAMESTATE:IsCourseMode() then
 					if song:GetDisplaySubTitle() and song:GetDisplaySubTitle() ~= '' then
 						title = song:GetDisplayMainTitle()..'\n'..song:GetDisplaySubTitle()
+						self:GetParent():y(450)
+					elseif song:GetDisplaySubTitle() == '' then
+						self:GetParent():y(425)
 					end
 				end
 				self

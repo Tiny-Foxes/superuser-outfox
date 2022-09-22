@@ -345,6 +345,13 @@ do af
 	:SetCommand('Off', function(self)
 		for pn in ivalues(GAMESTATE:GetHumanPlayers()) do
 			if PROFILEMAN:GetProfile(pn) then PROFILEMAN:SaveProfile(pn) end
+			if  plrs[PLAYER_1] and plrs[PLAYER_2] then
+				GAMESTATE:SetCurrentStyle('versus')
+			elseif CurDiff[pn]:GetStepsType():lower():find('double') then
+				GAMESTATE:SetCurrentStyle('double')
+			else
+				GAMESTATE:SetCurrentStyle('single')
+			end
 			GAMESTATE:SetCurrentSteps(pn, CurDiff[pn])
 		end
 		if not PROFILEMAN:GetProfile(PLAYER_1) and not PROFILEMAN:GetProfile(PLAYER_2) then

@@ -124,7 +124,7 @@ t[#t+1] = Def.ActorFrame {
 			end,
 			SpeedChoiceChangedMessageCommand = function(self, param)
 				if not selection then return end
-				if param.pn ~= num_players[1] then return end
+				if param.pn ~= PlayerNumber[1] then return end
 				local bpm1, bpm2 = bpm1, bpm2
 				if param.mode == 'x' then
 					bpm1 = bpm1 * (param.speed * 0.01)
@@ -224,7 +224,7 @@ t[#t+1] = Def.ActorFrame {
 			end,
 			SpeedChoiceChangedMessageCommand = function(self, param)
 				if not selection then return end
-				if param.pn ~= num_players[2] then return end
+				if param.pn ~= PlayerNumber[2] then return end
 				local bpm1, bpm2 = bpm1, bpm2
 				if param.mode == 'x' then
 					bpm1 = bpm1 * (param.speed * 0.01)
@@ -286,8 +286,8 @@ if getenv("NewOptions") == "Main" or getenv("NewOptions") == nil then
 		end
 	end
 
-	for i=1,#num_players do
-		t[#t+1] = loadfile( THEME:GetPathG("","SpeedModUpdate") )( num_players[i] )
+	for pn in ivalues(GAMESTATE:GetEnabledPlayers()) do
+		t[#t+1] = loadfile( THEME:GetPathG("","SpeedModUpdate") )( pn )
 	end
 end
 

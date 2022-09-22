@@ -4,7 +4,7 @@ local t = Def.ActorFrame{}
 
 local speed = {}
 speed[pn] = {0,""}
-local col = pn == PLAYER_2 and 2 or 1
+local col = (pn == PlayerNumber[2] and 2) or 1
 local Speedmargin = LoadModule("Config.Load.lua")("SpeedMargin","Save/OutFoxPrefs.ini") and LoadModule("Config.Load.lua")("SpeedMargin","Save/OutFoxPrefs.ini")*100 or 25
 local ORNum = 1
 
