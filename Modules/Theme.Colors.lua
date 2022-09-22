@@ -40,6 +40,15 @@ local Colors = {
 	Magenta = color('#FF00FF'),
 	Fuchsia = color('#FF80FF'),
 	Pink = color('#FF0080'),
+	
+	W1	= color("#bfeaff"),
+	W2	= color("#fff568"),
+	W3	= color("#a4ff00"),
+	W4	= color("#34bfff"),
+	W5	= color("#e44dff"),
+	Held = color("#FFFFFF"),
+	Miss = color("#ff3c3c"),
+	MaxCombo = color("#ffc600"),
 
 }
 

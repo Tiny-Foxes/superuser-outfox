@@ -1,6 +1,7 @@
 local ThemeColor = LoadModule('Theme.Colors.lua')
 
 local t = Def.ActorFrame {
+	Name = 'NoteScoreFrame',
 }
 
 local plr = ...
@@ -44,6 +45,7 @@ local function GetPlrDiff()
 end
 
 t[#t + 1] = Def.ActorFrame {
+	Name = 'NoteScore',
 	InitCommand = function(self)
 	end,
 	Def.Quad {
@@ -69,6 +71,7 @@ t[#t + 1] = Def.ActorFrame {
 		end,
 	},
 	GAMESTATE:IsSideJoined(plr) and Def.BitmapText {
+		Name = 'Grade',
 		Font = '_xiaxide 80px',
 		Text = GetPlrGrade(),
 		InitCommand = function(self)
@@ -105,16 +108,18 @@ t[#t + 1] = Def.ActorFrame {
 		end,
 	},
 	GAMESTATE:IsSideJoined(plr) and Def.ActorFrame {
+		Name = 'ScoreFrame',
 		InitCommand = function(self)
 			self:xy(SCREEN_CENTER_X * 0.3, 30)
 		end,
 		Def.BitmapText {
-			Font = '_xide/40px',
+			Name = 'Score',
+			Font = 'Common Large',
 			Text = GetPlrScore(),
 			InitCommand = function(self)
 				self
 					:skewx(0.25)
-					:horizalign('right')
+					:halign(1)
 					:zoom(1.5)
 					:diffuse(ColorLightTone(PlayerColor(plr)))
 					:addx(-40)
@@ -143,6 +148,48 @@ t[#t + 1] = Def.ActorFrame {
 			end,
 		},
 	},
+	GAMESTATE:IsSideJoined(plr) and Def.BitmapText {
+		Font = 'Common Normal',
+		InitCommand = function(self)
+			self
+				:skewx(0.25)
+				:xy(-160, 33)
+				:addx(-10)
+				:diffusealpha(0)
+		end,
+		OnCommand = function(self)
+			if playerstats:FullCombo() then
+				local c = ThemeColor.W3
+				if playerstats:FullComboOfScore('TapNoteScore_W1') then
+					c = ThemeColor.W1
+				elseif playerstats:FullComboOfScore('TapNoteScore_W2') then
+					c = ThemeColor.W2
+				end
+				c = BoostColor(c, 1.1)
+				self:settext('FULL\nCOMBO'):diffuse(c):diffusebottomedge(ColorDarkTone(c))
+			end
+			self
+				:queuecommand('Bob')
+				:diffusealpha(0)
+				:sleep(1)
+				:easeoutexpo(1)
+				:addx(20)
+				:diffusealpha(1)
+		end,
+		OffCommand = function(self)
+			self
+				:sleep(0.05)
+				:easeinexpo(0.25)
+				:addx(-20)
+				:diffusealpha(0)
+		end,
+		BobCommand=function(self)
+			self
+				:bob()
+				:effectperiod(8)
+				:effectmagnitude(4, 0, 0)
+		end,
+	}
 }
 
 t[#t + 1] = Def.ActorFrame {

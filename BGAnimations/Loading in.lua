@@ -4,8 +4,8 @@ return Def.ActorFrame {
 		Font = '_xide/40px',
 		Text = 'Loading...',
 		InitCommand = Actor.Center,
-		StartTransitioningCommand=function(self) 
-			self:easeinexpo(0.5):diffusealpha(0):addy(SCREEN_CENTER_Y * 1.2)
+		OnCommand=function(self) 
+			self:easeinexpo(0.25):diffusealpha(0):addy(-SCREEN_CENTER_Y * 1.2)
 		end
 	}
 }

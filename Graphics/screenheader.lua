@@ -1,5 +1,8 @@
 local ThemeColor = LoadModule('Theme.Colors.lua')
 
+local header = THEME:GetString(Var 'LoadingScreen', 'HeaderText')
+local subheader = THEME:GetString(Var 'LoadingScreen', 'HeaderSubText')
+
 return Def.ActorFrame {
 	InitCommand = function(self)
 		self
@@ -45,15 +48,31 @@ return Def.ActorFrame {
 		end,
 	},
 	Def.BitmapText {
-		Font = 'Common Normal',
+		Name = 'Text',
+		Font = 'Stylized Large',
 		OnCommand = function(self)
 			self
-				:x(-SCREEN_CENTER_X + 10)
-				:y(-10)
+				:xy(-SCREEN_CENTER_X + 20, 10)
 				:skewx(0.5)
+				:zoom(0.5)
 				:horizalign('left')
-				:vertalign('top')
-			self:settext(THEME:GetString(SCREENMAN:GetTopScreen():GetName(), 'HeaderText'))
+				:vertalign('bottom')
+				:settext(header)
+		end,
+		OffCommand = function(self)
+		end,
+	},
+	Def.BitmapText {
+		Name = 'SubText',
+		Font = 'Stylized Normal',
+		OnCommand = function(self)
+			self
+				:xy(-SCREEN_CENTER_X + 20 + self:GetParent():GetChild('Text'):GetZoomedWidth() + 12, 10)
+				:skewx(0.5)
+				:zoom(0.5)
+				:horizalign('left')
+				:vertalign('bottom')
+				:settext(subheader)
 		end,
 		OffCommand = function(self)
 		end,
@@ -61,18 +80,36 @@ return Def.ActorFrame {
 
 	-- ScreenSelectMusic specific stuff
 	Def.BitmapText {
-		Font = 'Common Normal',
+		Font = 'Stylized Large',
 		InitCommand = function(self)
 			self
-				:x(SCREEN_CENTER_X / 2)
+				:halign(0)
+				:x(SCREEN_CENTER_X - 280)
 				:skewx(0.5)
+				:zoom(0.5)
 		end,
-		CurrentSongChangedMessageCommand = function(self)
-			if SCREENMAN:GetTopScreen() and SCREENMAN:GetTopScreen():GetName() == "ScreenSelectMusic" then
-				self:settext(string.sub(GAMESTATE:GetSortOrder(), 11))
+		OnCommand = function(self)
+			self:queuecommand('ShowSort')
+		end,
+		CycleSortMessageCommand = function(self)
+			self:queuecommand('ShowSort')
+		end,
+		ShowSortCommand = function(self)
+			if SCREENMAN:GetTopScreen():GetName():find('OFSelectMusic') then
+				self
+					:settext(TF_WHEEL.PreferredSort)
 			else
 				self:settext('')
 			end
+			--[[
+			if GAMESTATE:GetSortOrder() and string.find(Var 'LoadingScreen', "SelectMusic") then
+				self:settext(string.sub(GAMESTATE:GetSortOrder(), 11))
+			elseif string.find(Var 'LoadingScreen', 'SelectMusic') then
+				self:settext(TF_WHEEL.PreferredSort)
+			else
+				self:settext('')
+			end
+			--]]
 		end,
 	},
 

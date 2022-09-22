@@ -1,6 +1,7 @@
 local ThemeColor = LoadModule('Theme.Colors.lua')
 
 return Def.ActorFrame {
+	Name = 'EvalUnderlay',
 	-- TODO: Fill this with Discord RCP including scores. ~Sudo
 	OnCommand = function(self)
 	end,
@@ -24,6 +25,7 @@ return Def.ActorFrame {
 			end,
 			OnCommand = function(self)
 				self
+					:cropbottom(1)
 					:easeinoutexpo(0.25)
 					:cropbottom(0)
 			end,
@@ -44,6 +46,7 @@ return Def.ActorFrame {
 			end,
 			OnCommand = function(self)
 				self
+					:cropbottom(1)
 					:easeinoutexpo(0.25)
 					:cropbottom(0)
 			end,
@@ -76,6 +79,7 @@ return Def.ActorFrame {
 			end,
 			OnCommand = function(self)
 				self
+					:croptop(1)
 					:sleep(0.125)
 					:easeinoutexpo(0.25)
 					:croptop(0)
@@ -97,6 +101,7 @@ return Def.ActorFrame {
 			end,
 			OnCommand = function(self)
 				self
+					:croptop(1)
 					:sleep(0.125)
 					:easeinoutexpo(0.25)
 					:croptop(0)
@@ -111,6 +116,7 @@ return Def.ActorFrame {
 		loadfile(THEME:GetPathB('ScreenEvaluation', 'underlay/NoteScores.lua'))(PLAYER_2)
 	},
 	Def.ActorFrame {
+		Name = 'BannerFrame',
 		InitCommand = function(self)
 			self
 				:xy(SCREEN_CENTER_X, 120)
@@ -128,6 +134,7 @@ return Def.ActorFrame {
 			end,
 			OnCommand = function(self)
 				self
+					:cropleft(1)
 					:easeinoutexpo(0.5)
 					:cropleft(0)
 			end,
@@ -149,6 +156,7 @@ return Def.ActorFrame {
 			end,
 			OnCommand = function(self)
 				self
+					:cropleft(1)
 					:easeinoutexpo(0.5)
 					:cropleft(0)
 			end,
@@ -159,9 +167,9 @@ return Def.ActorFrame {
 			end,
 		},
 		Def.Banner {
+			Name = 'Banner',
 			InitCommand = function(self)
 				self
-					:scaletoclipped(402,160)
 					:skewx(0.5)
 					:fadeleft(1)
 					:faderight(1)
@@ -176,7 +184,10 @@ return Def.ActorFrame {
 				else
 					self:LoadFromSongGroup(target:GetGroupName())
 				end
+				local w, h = self:GetWidth(), self:GetHeight()
 				self
+					:zoomto(160 * w/h, 160)
+					:diffusealpha(0)
 					:sleep(0.5)
 					:easeoutexpo(0.25)
 					:diffusealpha(1)
@@ -198,6 +209,7 @@ return Def.ActorFrame {
 			end,
 			OnCommand = function(self)
 				self
+					:diffusealpha(0)
 					:sleep(0.5)
 					:easeoutexpo(0.25)
 					:diffusealpha(1)
@@ -219,8 +231,7 @@ return Def.ActorFrame {
 						:addy(-18)
 						:maxwidth(SCREEN_WIDTH - 360)
 					local target = GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentCourse() or GAMESTATE:GetCurrentSong()
-					text = GAMESTATE:IsCourseMode() and target:GetDisplayFullTitle() or target:GetDisplayMainTitle()
-					self:settext(text)
+					self:settext(target:GetDisplayMainTitle())
 				end,
 				OnCommand = function(self)
 					if self:GetParent():GetChild('SongTitleS'):GetWidth() > 0 then
@@ -241,7 +252,6 @@ return Def.ActorFrame {
 						:addy(-18)
 						:maxwidth((SCREEN_WIDTH - 400) * (1/3) * 0.75)
 					local target = GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentCourse() or GAMESTATE:GetCurrentSong()
-					local text = GAMESTATE:IsCourseMode() and '' or target:GetDisplaySubTitle()
 					self:settext(target:GetDisplaySubTitle())
 				end,
 			},
@@ -255,8 +265,7 @@ return Def.ActorFrame {
 						:addy(12)
 						:maxwidth(SCREEN_WIDTH - 360)
 					local target = GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentCourse() or GAMESTATE:GetCurrentSong()
-					local text = GAMESTATE:IsCourseMode() and target:GetScripter() or target:GetDisplayArtist()
-					self:settext(text)
+					self:settext(target:GetDisplayArtist())
 				end,
 				OffCommand = function(self)
 					self:sleep(1.25)
@@ -279,5 +288,17 @@ return Def.ActorFrame {
 				end,
 			},
 		},
+		Def.Sprite {
+			Texture = THEME:GetPathG('', '_StepsType/'..ToEnumShortString(GAMESTATE:GetCurrentStyle():GetStepsType())),
+			InitCommand = function(self)
+				self:align(0, 0):x(-SCREEN_CENTER_X):skewx(0.5):basezoom(4):diffuse(0.25, 0.25, 0.25, 0)
+			end,
+			OnCommand = function(self)
+				self:sleep(0.3):linear(0.25):diffuse(0.25, 0.25, 0.25, 1):sleep(0.25):linear(0.5):glow(1, 1, 1, 1)
+			end,
+			OffCommand = function(self)
+				self:linear(0.1):glow(1, 1, 1, 0):linear(0.1):diffusealpha(0)
+			end,
+		}
 	}
 }

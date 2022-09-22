@@ -1,8 +1,14 @@
+LoadModule('Konko.Core.lua')
+
 function OptionNameString(str)
 	return THEME:GetString('OptionNames',str)
 end
 
 LoadModule("Row.Prefs.lua")(LoadModule("Options.Prefs.lua"))
+
+Branch.GameplayScreen = function()
+	return "ScreenGameplay"
+end
 
 Branch.AfterTitleMenu = function()
 	return Branch.StartGame()
@@ -12,7 +18,7 @@ Branch.AfterSelectMusic = function()
 	if SCREENMAN:GetTopScreen():GetGoToOptions() then
 		return SelectFirstOptionsScreen()
 	else
-		return "ScreenGameplay"
+		return Branch.GameplayScreen()
 	end
 end
 
@@ -28,14 +34,14 @@ Branch.PlayerOptions = function()
 	if SCREENMAN:GetTopScreen():GetGoToOptions() then
 		return optionsScreen
 	else
-		return "ScreenGameplay"
+		return Branch.GameplayScreen()
 	end
 end
 Branch.SongOptions = function()
 	if SCREENMAN:GetTopScreen():GetGoToOptions() then
 		return "ScreenSongOptions"
 	else
-		return "ScreenGameplay"
+		return Branch.GameplayScreen()
 	end
 end
 
@@ -49,10 +55,6 @@ Branch.AfterSelectProfile = function()
 	else
 		return "ScreenSelectStyle"
 	end
-end
-
-Branch.GameplayScreen = function()
-	return "ScreenGameplay"
 end
 
 function check_stop_course_early()

@@ -13,13 +13,15 @@ local Choices = {
 	{
 		Name = "restart_song",
 		Action = function( screen )
+			MESSAGEMAN:Broadcast('RestartGameplay')
 			screen:SetPrevScreenName('ScreenGameplay'):begin_backing_out()
 		end
 	},
 	{
 		Name = "forfeit_song",
 		Action = function( screen )
-			screen:SetPrevScreenName(SelectMusicRedirect()):begin_backing_out()
+			MESSAGEMAN:Broadcast('QuitGameplay')
+			screen:SetPrevScreenName(CustomBranch.SelectMusicOrCourse()):begin_backing_out()
 		end
 	},
 }
@@ -41,12 +43,14 @@ if GAMESTATE:IsCourseMode() then
 		{
 			Name = "forfeit_course",
 			Action = function( screen )
-				screen:SetPrevScreenName(SelectMusicOrCourse()):begin_backing_out()
+				MESSAGEMAN:Broadcast('QuitGameplay')
+				screen:SetPrevScreenName(CustomBranch.SelectMusicOrCourse()):begin_backing_out()
 			end
 		},
 		{
 			Name = "end_course",
 			Action = function( screen )
+				MESSAGEMAN:Broadcast('QuitGameplay')
 				screen:PostScreenMessage('SM_LeaveGameplay', 0)
 			end
 		},
@@ -136,7 +140,9 @@ end
 
 return Def.ActorFrame {
 	OnCommand = function(self)
-		self:queuecommand('ReportCursor')
+		-- i literally put this in as a joke about how taro always his cursor on screen.
+		-- it shouldnt even be here anymore. its just fucking annoying me now.
+		--self:queuecommand('ReportCursor')
 	end,
 	ReportCursorCommand = function(self)
 		if not Paused then

@@ -48,7 +48,7 @@ t[#t+1] = Def.ActorFrame {
 
 				-- check if the song has hidden bpm
 				if song:IsDisplayBpmRandom() then
-					self:settext('? ? ?')
+					self:settext('???')
 					-- return early
 					return
 				end

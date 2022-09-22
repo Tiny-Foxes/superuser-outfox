@@ -1,10 +1,31 @@
-local gc = Var("GameCommand");
-local item_width = 260;
-local item_height = 48;
-local splash = false;
+local gc = Var("GameCommand")
+local item_width = 260
+local item_height = 48
+local splash = false
+
+local hovered = false
+
+local id = ProductID()
+if not string.find(id, 'OutFox') then
+	return Def.Actor {}
+end
+
+local function UpdateMouse(self)
+	local mouseX, mouseY = INPUTFILTER:GetMouseX(), INPUTFILTER:GetMouseY()
+	local targetX, targetY = self:GetParent():GetX() + self:GetDestX(), self:GetParent():GetY() + self:GetDestY()
+	local isOnX = (mouseX > targetX - (item_width * 0.5) and mouseX < targetX + (item_width * 0.5))
+	local isOnY = (mouseY > targetY - (item_height * 0.5) and mouseY < targetY + (item_height * 0.5))
+	if isOnX and isOnY then
+		if not hovered then self:playcommand('MouseHovered') end
+	else
+		if hovered then self:playcommand('MouseUnhovered') end
+	end
+end
 
 return Def.ActorFrame {
+	Name = gc:GetText(),
 	InitCommand = function(self)
+		if ProductVersion():find('0.5') then self:SetUpdateFunction(UpdateMouse) end
 		self
 			:SetSize(item_width, item_height)
 			:diffusealpha(0.75)
@@ -22,6 +43,25 @@ return Def.ActorFrame {
 		self
 			:easeinoutexpo(0.5)
 			:diffusealpha(0)
+	end,
+	MouseHoveredMessageCommand = function(self)
+		hovered = true
+		SOUND:PlayOnce(THEME:GetPathS('Common', 'value'), true)
+		self:queuecommand('GainFocus')
+	end,
+	MouseUnhoveredMessageCommand = function(self)
+		hovered = false
+		self:queuecommand('LoseFocus')
+	end,
+	MouseLeftClickMessageCommand = function(self, params)
+		if not params.IsPressed then return end
+		if hovered then
+			SCREENMAN
+				:PlayStartSound()
+				:GetTopScreen()
+					:SetNextScreenName(gc:GetScreen())
+					:StartTransitioningScreen('SM_GoToNextScreen')
+		end
 	end,
 	Def.ActorFrame {
 		InitCommand = function(self)
@@ -76,6 +116,9 @@ return Def.ActorFrame {
 		Def.BitmapText {
 			Font = 'Common Normal',
 			Text = THEME:GetString('ScreenTitleMenu', gc:GetText()),
+			InitCommand = function(self)
+				self:shadowlengthy(1)
+			end
 		},
 		Def.Quad {
 			InitCommand = function(self)

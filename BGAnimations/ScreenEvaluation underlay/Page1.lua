@@ -141,13 +141,16 @@ for i,v in ipairs( Name ) do
 			BobCommand=function(self)
 				self:bob():effectperiod(8):effectmagnitude(4, 0, 0)
 			end,
+			BeginCommand=function(self)
+				self:settext(GetJLineValue(v, p))
+			end,
 		}
 	}
 	Con[#Con+1] = Def.BitmapText {
 		Font = "Common Normal",
 		Text=ToUpper(THEME:GetString( CurPrefTiming or "Original" , "Judgment"..v )),
 		InitCommand=function(self)
-			self:skewx(0.25):diffuse(BoostColor((JudgmentLineToColor("JudgmentLine_" .. v)),1.3))
+			self:skewx(0.25):diffuse(BoostColor(ThemeColor[v], 1.1))
 			self:xy((eval_part_offs-150),-80+((44-(Length*2))*i)):zoom(1.475-(Length*0.075)):halign(0)
 		end,
 		OnCommand=function(self)
@@ -160,6 +163,9 @@ for i,v in ipairs( Name ) do
 		end,
 		BobCommand=function(self)
 			self:bob():effectperiod(8):effectmagnitude(4, 0, 0)
+		end,
+		BeginCommand=function(self)
+			self:settext(ToUpper(THEME:GetString( CurPrefTiming or "Original" , "Judgment"..v )))
 		end,
 	}
 	t[#t+1] = Con

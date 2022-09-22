@@ -25,19 +25,20 @@ return Def.ActorFrame {
 		CurrentSongChangedMessageCommand = function(self)
 			self
 				:stoptweening()
-				:easeinoutsine(0.2)
+				:easeoutexpo(0.1)
 				:diffusealpha(0)
-				:sleep(0.1)
+				:sleep(0.3)
 				:queuecommand('LoadBackground')
 		end,
 		LoadBackgroundCommand = function(self)
-			if not GAMESTATE:IsCourseMode() and SU_Wheel.CurSong:GetPreviewVidPath() then
-				self:Load(SU_Wheel.CurSong:GetPreviewVidPath())
+			local song = GAMESTATE:GetCurrentSong()
+			if not GAMESTATE:IsCourseMode() and song:GetPreviewVidPath() then
+				self:Load(song:GetPreviewVidPath())
 			else
-				self:LoadFromSongBackground(SU_Wheel.CurSong)
+				self:LoadFromCurrentSongBackground()
 			end
 			self
-				:easeinoutsine(0.5)
+				:easeinoutsine(0.3)
 				:diffusealpha(0.25)
 		end,
 	},
@@ -51,13 +52,12 @@ return Def.ActorFrame {
 			CurrentSongChangedMessageCommand = function(self)
 				self
 					:stoptweening()
-					:linear(0.1)
+					:easeoutexpo(0.1)
 					:diffusealpha(0)
-					:sleep(0.25)
 					:queuecommand('LoadBanner')
 			end,
 			LoadBannerCommand = function(self)
-				local song = SU_Wheel.CurSong
+				local song = GAMESTATE:GetCurrentSong()
 				if song:HasBanner() then
 					self:LoadFromCachedBanner(song:GetBannerPath())
 				else
@@ -65,7 +65,7 @@ return Def.ActorFrame {
 				end
 				local w, h = self:GetWidth(), self:GetHeight()
 				self:zoomto(160 * w/h, 160)
-				self:easeinoutsine(0.2):diffusealpha(1)
+				self:easeinoutsine(0.1):diffusealpha(1)
 			end,
 		},
 	},
@@ -86,13 +86,12 @@ return Def.ActorFrame {
 			CurrentSongChangedMessageCommand = function(self)
 				self
 					:stoptweening()
-					:linear(0.1)
+					:easeoutexpo(0.1)
 					:diffusealpha(0)
-					:sleep(0.25)
 					:queuecommand('LoadTitle')
 			end,
 			LoadTitleCommand = function(self)
-				local song = SU_Wheel.CurSong
+				local song = GAMESTATE:GetCurrentSong()
 				local title = song:GetDisplayFullTitle()
 				if not GAMESTATE:IsCourseMode() then
 					if song:GetDisplaySubTitle() and song:GetDisplaySubTitle() ~= '' then
@@ -117,9 +116,8 @@ return Def.ActorFrame {
 			CurrentSongChangedMessageCommand = function(self)
 				self
 					:stoptweening()
-					:linear(0.1)
+					:easeoutexpo(0.1)
 					:diffusealpha(0)
-					:sleep(0.25)
 					:easeinoutsine(0.2)
 					:diffusealpha(1)
 			end,
@@ -136,13 +134,12 @@ return Def.ActorFrame {
 			CurrentSongChangedMessageCommand = function(self)
 				self
 					:stoptweening()
-					:linear(0.1)
+					:easeoutexpo(0.1)
 					:diffusealpha(0)
-					:sleep(0.25)
 					:queuecommand('LoadArtist')
 			end,
 			LoadArtistCommand = function(self)
-				local song = SU_Wheel.CurSong
+				local song = GAMESTATE:GetCurrentSong()
 				local artist = (GAMESTATE:IsCourseMode() and song:GetScripter()) or song:GetDisplayArtist()
 				self
 					:settext(artist)
@@ -162,17 +159,16 @@ return Def.ActorFrame {
 			CurrentSongChangedMessageCommand = function(self)
 				self
 					:stoptweening()
-					:linear(0.1)
+					:easeoutexpo(0.1)
 					:diffusealpha(0)
-					:sleep(0.25)
 					:queuecommand('LoadMisc')
 			end,
 			LoadMiscCommand = function(self)
 				if GAMESTATE:IsCourseMode() then return end
-				local song = SU_Wheel.CurSong
+				local song = GAMESTATE:GetCurrentSong()
 				local data = {
 					(song:IsDisplayBpmRandom() and '???') or tostring(math.floor(song:GetDisplayBpms()[2])),
-					SecondsToMSS(song:GetStepsSeconds())
+					SecondsToMSS(song:GetLastSecond())
 				}
 				local str = (
 					'BPM: '..

@@ -1,10 +1,5 @@
---[[
-	This is a stripped down version of SuperActorloader.lua from Kitsu template.
-	allows Kitsu SuperActor system specifically OUTSIDE of modfiles.
---]]
-local su = LoadModule('Konko.Core.lua')
-
-su()
+local konko = LoadModule('Konko.Core.lua')
+konko()
 
 local SuperActor = {}
 local VERSION = '1.0'
@@ -38,6 +33,14 @@ local function UpdateTweens(self)
 end
 
 local ActorTree = Def.ActorFrame {
+	InitCommand = function(self)
+		SuperActor.__index.GetTree = function()
+			return self
+		end
+	end,
+	OnCommand = function(self)
+		self:playcommand('Node')
+	end,
 	UpdateCommand = function(self)
 		UpdateTweens(self)
 	end
@@ -53,6 +56,16 @@ local function new(obj)
 		t = obj or {}
 	end
 	if not t.Name then t.Name = 'SuperActor'..actor_idx end
+	actor_idx = actor_idx + 1
+	setmetatable(t, SuperActor)
+	return t
+end
+local function FromFile(path)
+	local obj = LoadActor(path)
+	local t = {}
+	for k, v in pairs(obj) do
+		t[k] = v
+	end
 	actor_idx = actor_idx + 1
 	setmetatable(t, SuperActor)
 	return t
@@ -87,8 +100,8 @@ local function SetMessage(self, name, func)
 		printerr('SuperActor.SetSignal: Invalid argument #2 (expected function, got '..type(func)..')')
 		return
 	end
-	self[name..'MessageCommand'] = function(self)
-		return func(self)
+	self[name..'MessageCommand'] = function(self, params)
+		return func(self, params)
 	end
 	return self
 end
@@ -97,14 +110,19 @@ local function GetMessage(self, name)
 	return self[name..'MessageCommand']
 end
 local function SetInput(self, func)
-	--lua.Trace('SuperActor:SetInput')
+	--print('SuperActor:SetInput')
 	self.InputMessageCommand = function(self, args)
 		return func(self, args[1])
 	end
 	return self
 end
 local function SetDraw(self, func)
-	if self.Type ~= 'ActorFrame' and self.Type ~= 'ActorFrameTexture' then
+	local allowed = {
+		ActorFrame = true,
+		ActorFrameTexture = true,
+		ActorScroller = true,
+	}
+	if not allowed[self.Type] then
 		printerr('Node.SetDraw: Cannot set draw function of type '..self.Type)
 		return
 	end
@@ -116,13 +134,13 @@ local function SetDraw(self, func)
 	return self
 end
 local function SetName(self, name)
-	--lua.Trace('SuperActor:SetName')
+	--print('SuperActor:SetName')
 	self.Name = name
 	return self
 end
 local function AddChild(self, child, idx, name)
 	--print('SuperActor:AddChild')
-	if self.Type ~= 'ActorFrame' and self.Type ~= 'ActorFrameTexture' then
+	if self.Type ~= 'KonkoAF' and not _G[self.Type].GetChildren then
 		printerr('SuperActor.AddChild: Cannot add child to type '..self.Type)
 		return
 	end
@@ -130,18 +148,30 @@ local function AddChild(self, child, idx, name)
 		name = idx
 		idx = nil
 	end
-	if name then child:SetName(name) end
-	child = Def[child.Type](child)
+	if name then
+		child.Name = name
+	end
+	if child.Type then
+		child = Def[child.Type](child)
+	end
 	if idx then
 		table.insert(self, idx, child)
 	else
 		table.insert(self, child)
 	end
+	if child.Name then
+		local node = self.NodeCommand
+		self.NodeCommand = function(this)
+			if node then node(this) end
+			this[child.Name] = this:GetChild(child.Name)
+		end
+		self[child.Name] = child
+	end
 	return self
 end
 local function GetChildIndex(self, name)
-	print('SuperActor:GetChildIndex')
-	if self.Type ~= 'ActorFrame' and self.Type ~= 'ActorFrameTexture' then
+	--print('SuperActor:GetChildIndex')
+	if not _G[self.Type].GetChildren then
 		printerr('SuperActor.GetChildIndex: Cannot add child to type '..self.Type)
 		return
 	end
@@ -151,9 +181,31 @@ local function GetChildIndex(self, name)
 		end
 	end
 end
-local function AddToTree(self)
+local function AddToTree(self, idx, name)
 	--lua.Trace('SuperActor:AddToTree')
-	table.insert(ActorTree, self)
+	if type(idx) == 'string' then
+		name = idx
+		idx = nil
+	end
+	if name then
+		self.Name = name
+	end
+	if self.Type then
+		self = Def[self.Type](self)
+	end
+	if idx then
+		table.insert(ActorTree, idx, self)
+	else
+		table.insert(ActorTree, self)
+	end
+	if self.Name then
+		local node = self.NodeCommand
+		self.NodeCommand = function(this)
+			if node then node(this) end
+			SuperActor.GetTree()[self.Name] = SuperActor.GetTree():GetChild(self.Name)
+		end
+		ActorTree[self.Name] = self
+	end
 end
 local function GetTree()
 	--lua.Trace('SuperActor.GetTree')
@@ -179,6 +231,7 @@ end
 SuperActor = {
 	VERSION = VERSION,
 	new = new,
+	FromFile = FromFile,
 	SetAttribute = SetAttribute,
 	GetAttribute = GetAttribute,
 	SetCommand = SetCommand,

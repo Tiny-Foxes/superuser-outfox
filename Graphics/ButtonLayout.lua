@@ -1,5 +1,7 @@
+local Buttons
+
 local function InputHandler(event)
-	MESSAGEMAN:Broadcast('Input', {event})
+	if Buttons then Buttons:playcommand('Input', event) end
 end
 
 local StepHandler = {}
@@ -10,11 +12,14 @@ for pn = 1, 2 do
 			column = col,
 			tns = tns,
 		}
-		MESSAGEMAN:Broadcast('StepP'..pn, ret)
+		Buttons:playcommand('StepP'..pn, ret)
 	end
 end
 
 local af = Def.ActorFrame {
+	InitCommand = function(self)
+		Buttons = self
+	end,
 	OnCommand = function(self)
 		SCREENMAN:GetTopScreen():AddInputCallback(InputHandler)
 		for pn = 1, 2 do
@@ -50,17 +55,14 @@ for pn = 1, 2 do
 						:x(-64)
 						:SetSize(64, 64)
 				end,
-				InputMessageCommand = function(self, param)
-					local event = param[1]
-
-					if event.PlayerNumber ~= 'PlayerNumber_P'..pn then return end
-					if event.type ~= 'InputEventType_Release' then return end
-
+				InputCommand = function(self, event)
+					if event.PlayerNumber ~= PlayerNumber[pn] then return end
+					if not event.type:find('Release') then return end
 					if event.button == 'Left' then
 						self:diffuse(color('#FFFFFF'))
 					end
 				end,
-				['StepP'..pn..'MessageCommand'] = function(self, step)
+				['StepP'..pn..'Command'] = function(self, step)
 					if step.column == 1 then
 						if step.tns ~= 'TapNoteScore_None' then
 							local jl = 'JudgmentLine_'..step.tns:sub(step.tns:find('_') + 1, -1)
@@ -81,17 +83,14 @@ for pn = 1, 2 do
 						:x(64)
 						:SetSize(64, 64)
 				end,
-				InputMessageCommand = function(self, param)
-					local event = param[1]
-
-					if event.PlayerNumber ~= 'PlayerNumber_P'..pn then return end
-					if event.type ~= 'InputEventType_Release' then return end
-
+				InputCommand = function(self, event)
+					if event.PlayerNumber ~= PlayerNumber[pn] then return end
+					if not event.type:find('Release') then return end
 					if event.button == 'Right' then
 						self:diffuse(color('#FFFFFF'))
 					end
 				end,
-				['StepP'..pn..'MessageCommand'] = function(self, step)
+				['StepP'..pn..'Command'] = function(self, step)
 					if step.column == 4 then
 						if step.tns ~= 'TapNoteScore_None' then
 							local jl = 'JudgmentLine_'..step.tns:sub(step.tns:find('_') + 1, -1)
@@ -112,17 +111,14 @@ for pn = 1, 2 do
 						:y(-64)
 						:SetSize(64, 64)
 				end,
-				InputMessageCommand = function(self, param)
-					local event = param[1]
-
-					if event.PlayerNumber ~= 'PlayerNumber_P'..pn then return end
-					if event.type ~= 'InputEventType_Release' then return end
-
+				InputCommand = function(self, event)
+					if event.PlayerNumber ~= PlayerNumber[pn] then return end
+					if not event.type:find('Release') then return end
 					if event.button == 'Up' then
 						self:diffuse(color('#FFFFFF'))
 					end
 				end,
-				['StepP'..pn..'MessageCommand'] = function(self, step)
+				['StepP'..pn..'Command'] = function(self, step)
 					if step.column == 3 then
 						if step.tns ~= 'TapNoteScore_None' then
 							local jl = 'JudgmentLine_'..step.tns:sub(step.tns:find('_') + 1, -1)
@@ -143,17 +139,14 @@ for pn = 1, 2 do
 						:y(64)
 						:SetSize(64, 64)
 				end,
-				InputMessageCommand = function(self, param)
-					local event = param[1]
-
-					if event.PlayerNumber ~= 'PlayerNumber_P'..pn then return end
-					if event.type ~= 'InputEventType_Release' then return end
-
+				InputCommand = function(self, event)
+					if event.PlayerNumber ~= PlayerNumber[pn] then return end
+					if not event.type:find('Release') then return end
 					if event.button == 'Down' then
 						self:diffuse(color('#FFFFFF'))
 					end
 				end,
-				['StepP'..pn..'MessageCommand'] = function(self, step)
+				['StepP'..pn..'Command'] = function(self, step)
 					if step.column == 2 then
 						if step.tns ~= 'TapNoteScore_None' then
 							local jl = 'JudgmentLine_'..step.tns:sub(step.tns:find('_') + 1, -1)
