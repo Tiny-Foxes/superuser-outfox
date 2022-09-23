@@ -29,7 +29,7 @@ t[#t+1] = Def.Actor{
 		if (getenv("NewOptions") == "Main" or getenv("NewOptions") == nil) and SCREENMAN:GetTopScreen() and SCREENMAN:GetTopScreen():GetOptionRow(ORNum) then
 			local text = ""
 			if speed[pn][2] == "x" then
-				text = speed[pn][1] * .01 .. "x"
+				text = speed[pn][1] * 0.01 .. "x"
 			else
 				text = string.upper(speed[pn][2]) .. speed[pn][1]
 			end
@@ -39,7 +39,7 @@ t[#t+1] = Def.Actor{
 	end,
 	OnCommand=function(s)
 		local playeroptions = GAMESTATE:GetPlayerState(pn):GetPlayerOptions("ModsLevel_Preferred")
-		if playeroptions:XMod() then speed[pn][1] = math.floor(playeroptions:XMod()*10)*10 speed[pn][2] = "x" end
+		if playeroptions:XMod() then speed[pn][1] = math.floor(playeroptions:XMod()*100) speed[pn][2] = "x" end
 		if playeroptions:CMod() then speed[pn][1] = math.floor(playeroptions:CMod()) speed[pn][2] = "c" end
 		if playeroptions:MMod() then speed[pn][1] = math.floor(playeroptions:MMod()) speed[pn][2] = "m" end
 		if playeroptions:AMod() then speed[pn][1] = math.floor(playeroptions:AMod()) speed[pn][2] = "a" end
@@ -47,6 +47,9 @@ t[#t+1] = Def.Actor{
 		if playeroptions:AVMod() then speed[pn][1] = math.floor(playeroptions:AVMod()) speed[pn][2] = "av" end
 		if speed[pn][1] > 10000 then
 			speed[pn][1] = 100
+		end
+		while speed[pn][1] % 25 ~= 0 do
+			speed[pn][1] = math.floor(speed[pn][1] * 0.2) * 5 + 5
 		end
 		if SCREENMAN:GetTopScreen() then
 			-- Automatic check for the optionrow that contains the speed mod.
@@ -58,7 +61,7 @@ t[#t+1] = Def.Actor{
 			end
 			local text = ""
 			if speed[pn][2] == "x" then
-				text = speed[pn][1] * .01 .. "x"
+				text = speed[pn][1] * 0.01 .. "x"
 			else
 				text = string.upper(speed[pn][2]) .. speed[pn][1]
 			end
