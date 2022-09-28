@@ -87,6 +87,7 @@ t[#t+1] = Def.Actor{
 	end,
 	OffCommand=function(s)
 		local playeroptions = GAMESTATE:GetPlayerState(pn):GetPlayerOptions("ModsLevel_Preferred")
+		playeroptions:XMod(1.00)
 
 		if speed[pn][2] == "x" then
 			playeroptions:XMod(speed[pn][1]*0.01)

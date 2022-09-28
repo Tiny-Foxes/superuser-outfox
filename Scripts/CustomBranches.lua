@@ -43,6 +43,13 @@ CustomBranch = {
 			return 'ScreenTitleMenu'
 		end
 	end,
+	Minigame = function()
+		local screens = {
+			'Platformer',
+			'IdleGame',
+		}
+		return 'Screen'..screens[math.random(1, #screens)]
+	end,
 }
 
 function SelectMusicRedirect()

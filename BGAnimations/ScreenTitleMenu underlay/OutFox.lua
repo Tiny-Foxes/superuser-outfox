@@ -20,6 +20,8 @@ if gs.Enabled() then
 	_GSSESSION = _GSSESSION or gs.session()
 end
 
+GAMESTATE:UpdateDiscordGameMode(GAMESTATE:GetCurrentGame():GetName())
+
 -- Define local variables and functions
 local scale = SH /480
 local splash = false
@@ -497,6 +499,42 @@ do uiSocial
 	end)
 end
 
+local uiMode = SuperActor.new('Sprite')
+do uiMode
+	:SetCommand('Init', function(self)
+		-- We need a better way to check if this exists. ~Sudo
+		local dir = THEME:GetCurrentThemeDirectory()..'Graphics/_StepsType/'
+		local list = FILEMAN:GetDirListing(dir, false, true)
+		local type = ToEnumShortString(GAMEMAN:GetFirstStepsTypeForGame(GAMESTATE:GetCurrentGame()))
+		local icon
+		for v in ivalues(list) do
+			if v:find(type) then icon = v break end
+		end
+		if icon then self:Load(icon) end
+		self
+			:halign(0)
+			:valign(0)
+			:xy(-480, 86)
+			:basezoom(2)
+			:diffuse(0.25, 0.25, 0.25, 0)
+	end)
+	:SetCommand('On', function(self)
+		self
+			:sleep(0.3)
+			:linear(0.1)
+			:diffuse(0.25, 0.25, 0.25, 1)
+			:linear(0.25)
+			:diffuse(1, 1, 1, 1)
+	end)
+	:SetCommand('Off', function(self)
+		self
+			:linear(0.1)
+			:diffuse(0.25, 0.25, 0.25, 1)
+			:linear(0.25)
+			:diffusealpha(0)
+	end)
+end
+
 -- Add Actors in their respective nesting and order
 -- Not sure if this supports negative ints, but it
 -- DOES support nil ints (insert at last position).
@@ -524,6 +562,7 @@ do uiText
 	:AddChild(uiAuthor, 'Author')
 	:AddChild(uiVersion, 'Version')
 	:AddChild(uiSocial, 'Social')
+	:AddChild(uiMode, 'ModeIcon')
 	:AddChild(SuperActor.new('Sprite')
 		:SetAttribute('Texture', THEME:GetPathG('', 'karen'))
 		:SetCommand('Init', function(self)

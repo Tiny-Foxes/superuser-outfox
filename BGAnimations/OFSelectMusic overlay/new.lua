@@ -529,7 +529,7 @@ do songControl
 	:AddChild(
 		SuperActor.new('BitmapText')
 			:SetAttribute('Font', 'Common Normal')
-			:SetAttribute('Text', '&LEFT;&DOWN;&UP;&RIGHT;: Change Song\n&START;: Select Song\n&BACK;: Switch to Group')
+			:SetAttribute('Text', '&LEFT;&DOWN;&UP;&RIGHT;: Change Song\n&START;: Select Song\n&SELECT;: Switch to Group')
 			:SetCommand('Init', function(self)
 				self:halign(0):y(-30)
 			end)
@@ -769,7 +769,7 @@ do groupControl
 	:AddChild(
 		SuperActor.new('BitmapText')
 			:SetAttribute('Font', 'Common Normal')
-			:SetAttribute('Text', '&LEFT;&DOWN;&UP;&RIGHT;: Change Group\n&START;: Select Group\n&BACK;: Exit to Title')
+			:SetAttribute('Text', '&LEFT;&DOWN;&UP;&RIGHT;: Change Group\n&START;: Select Group\n&SELECT;: Exit to Title')
 			:SetCommand('Init', function(self)
 				self:halign(0):y(-30)
 			end)
@@ -839,13 +839,34 @@ do songPreview
 		self:queuemessage('CurrentSongChanged')
 	end)
 	:SetMessage('CurrentSongChanged', function(self)
+		if not GAMESTATE:IsCourseMode() and wheel.Focus == 'Song' then
+			SOUND:StopMusic()
+			self:stoptweening():sleep(0.4):queuecommand('SongPreview')
+		end
+	end)
+	:SetMessage('GroupUnselect', function(self)
+		SOUND:StopMusic()
+		self:stoptweening():sleep(0.4):queuecommand('IdlePreview')
+	end)
+	:SetMessage('GroupSelect', function(self)
 		SOUND:StopMusic()
 		self:stoptweening():sleep(0.4):queuecommand('SongPreview')
+	end)
+	:SetCommand('IdlePreview', function(self)
+		local path = loadfile(THEME:GetPathS('ScreenTitleMenu', 'music'))()
+		SOUND:PlayMusicPart(
+			path,
+			0,
+			(path:find('main') and 31.884) or 11.996,
+			0,
+			0,
+			true
+		)
 	end)
 	:SetCommand('SongPreview', function(self)
 		if GAMESTATE:IsCourseMode() then
 			SOUND:PlayMusicPart(
-				THEME:GetPathS('ScreenSelectMusic', 'loop music'),
+				loadfile(THEME:GetPathS('ScreenTitleMenu', 'music'))(),
 				nil,
 				nil,
 				0,

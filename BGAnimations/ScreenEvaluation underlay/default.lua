@@ -4,6 +4,32 @@ return Def.ActorFrame {
 	Name = 'EvalUnderlay',
 	-- TODO: Fill this with Discord RCP including scores. ~Sudo
 	OnCommand = function(self)
+		self:queuecommand('UpdateDiscordInfo')
+	end,
+	UpdateDiscordInfoCommand = function(self)
+		local player = GAMESTATE:GetMasterPlayerNumber()
+		local plrnames = {}
+		local plrstats = {}
+		for pn in ivalues(GAMESTATE:GetEnabledPlayers()) do
+			plrnames[pn] = GAMESTATE:GetPlayerDisplayName(pn)
+			plrstats[pn] = STATSMAN:GetCurStageStats():GetPlayerStageStats(pn)
+		end
+		local StageIndex = GAMESTATE:GetCurrentStageIndex()
+		local stats = STATSMAN:GetCurStageStats():GetPlayerStageStats(player)
+		local song = GAMESTATE:GetCurrentSong()
+		if song then
+			local native = PREFSMAN:GetPreference('ShowNativeLanguage')
+			local title = native and song:GetDisplayFullTitle() or song:GetTranslitFullTitle()
+			local artist = native and song:GetDisplayArtist() or song:GetTranslitArtist()
+			local songname = title..' by '..artist..' - '..song:GetGroupName()
+			-- Don't increment stage index here; another stage is already added by now. ~Sudo
+			local state = 'Evaluation (Stage '..StageIndex..')'
+			for pn in ivalues(GAMESTATE:GetEnabledPlayers()) do
+				songname = songname..'\n'..plrnames[pn]..': '..FormatPercentScore(plrstats[pn]:GetPercentDancePoints())
+			end
+			GAMESTATE:UpdateDiscordProfile(GAMESTATE:GetPlayerDisplayName(player))
+			GAMESTATE:UpdateDiscordScreenInfo(state, songname, 1)
+		end
 	end,
 	Def.ActorFrame {
 		Name = 'P1EvalFrame',
@@ -290,8 +316,15 @@ return Def.ActorFrame {
 		},
 		Def.Sprite {
 			Name = 'ModeIcon',
-			Texture = THEME:GetPathG('', '_StepsType/'..ToEnumShortString(GAMESTATE:GetCurrentStyle():GetStepsType())),
 			InitCommand = function(self)
+				local dir = THEME:GetCurrentThemeDirectory()..'Graphics/_StepsType/'
+				local list = FILEMAN:GetDirListing(dir, false, true)
+				local type = ToEnumShortString(GAMESTATE:GetCurrentStyle():GetStepsType())
+				local icon
+				for v in ivalues(list) do
+					if v:find(type) then icon = v break end
+				end
+				if icon then self:Load(icon) end
 				self:align(0, 0):x(-SCREEN_CENTER_X + 20):skewx(0.5):basezoom(4):diffuse(0.25, 0.25, 0.25, 0)
 			end,
 			OnCommand = function(self)

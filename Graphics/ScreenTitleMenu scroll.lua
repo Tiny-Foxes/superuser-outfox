@@ -123,6 +123,7 @@ return Def.ActorFrame {
 		Def.Quad {
 			InitCommand = function(self)
 				self
+					:skewx(-0.5)
 					:SetSize(item_width, item_height)
 					:diffuse(color('#777777')) -- get it haha
 			end,

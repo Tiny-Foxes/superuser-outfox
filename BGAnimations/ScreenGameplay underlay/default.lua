@@ -89,7 +89,7 @@ return Def.ActorFrame {
 		local player = GAMESTATE:GetMasterPlayerNumber()
 		local StageIndex = GAMESTATE:GetCurrentStageIndex()
 		if GAMESTATE:GetCurrentSong() then
-			local title = PREFSMAN:GetPreference("ShowNativeLanguage") and GAMESTATE:GetCurrentSong():GetDisplayMainTitle() or GAMESTATE:GetCurrentSong():GetTranslitFullTitle()
+			local title = PREFSMAN:GetPreference("ShowNativeLanguage") and GAMESTATE:GetCurrentSong():GetDisplayFullTitle() or GAMESTATE:GetCurrentSong():GetTranslitFullTitle()
 			local artist = PREFSMAN:GetPreference("ShowNativeLanguage") and GAMESTATE:GetCurrentSong():GetDisplayArtist() or GAMESTATE:GetCurrentSong():GetTranslitArtist()
 			local songname = title .. " by ".. artist .." - " .. GAMESTATE:GetCurrentSong():GetGroupName()
 			local state = GAMESTATE:IsDemonstration() and "Watching Song" or "Playing Song (".. StageIndex+1 ..")"

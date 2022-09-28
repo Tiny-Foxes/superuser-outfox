@@ -150,6 +150,7 @@ for k in pairs(plrs) do
 			local prof = (PROFILEMAN:IsPersistentProfile(k) and PROFILEMAN:GetProfile(k)) or PROFILEMAN:GetMachineProfile()
 			local scorelist = prof:GetHighScoreListIfExists(CurSong, CurDiff[k])
 			if scorelist then
+				-- TODO: Check for timing windows before choosing the score to display. ~Sudo
 				local highscore = scorelist:GetHighScores()[1]
 				if not highscore then return end
 				self:settext(FormatPercentScore(highscore:GetPercentDP()))
@@ -451,7 +452,7 @@ do diffControl
 	:AddChild(
 		SuperActor.new('BitmapText')
 			:SetAttribute('Font', 'Common Normal')
-			:SetAttribute('Text', '&LEFT;&RIGHT;: Change Difficulty\n&DOWN;: Go to Player Options\n&START;: Select Difficulty\n&BACK;: Switch to Song')
+			:SetAttribute('Text', '&LEFT;&RIGHT;: Change Difficulty\n&DOWN;: Go to Player Options\n&START;: Select Difficulty\n&SELECT;: Switch to Song')
 			:SetCommand('Init', function(self)
 				self:halign(0):y(-30)
 			end)
