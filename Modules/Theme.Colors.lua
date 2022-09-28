@@ -44,7 +44,6 @@ local function JudgmentColor(j)
 		},
 	}
 	return c[timing][j] or color("#ffffff")
-	--return c[LoadModule('Options.ReturnCurrentTiming.lua')()][j] or color("#ffffff")
 end
 
 local Colors = {

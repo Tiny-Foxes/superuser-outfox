@@ -1,8 +1,8 @@
---If a Command has "NOTESKIN:GetMetricA" in it, that means it gets the command from the metrics.ini, else use cmd(); to define command.
+--If a Command has "NOTESKIN:GetMetricA" in it, that means it gets the command from the metrics.ini, else use cmd(), to define command.
 --If you dont know how "NOTESKIN:GetMetricA" works here is an explanation.
---NOTESKIN:GetMetricA("The [Group] in the metrics.ini", "The actual Command to fallback on in the metrics.ini");
+--NOTESKIN:GetMetricA("The [Group] in the metrics.ini", "The actual Command to fallback on in the metrics.ini"),
 
-local t = Def.ActorFrame {
+return Def.ActorFrame {
 	Def.Model {
 		Meshes = NOTESKIN:GetPath('_down', 'receptor model'),
 		Materials = NOTESKIN:GetPath('_down', 'receptor model'),
@@ -11,12 +11,12 @@ local t = Def.ActorFrame {
 			self
 				:cullmode('CullMode_None')
 				:zwrite(false)
-				:effectclock('beat')
+				:effectclock("beat")
 				:diffuseramp()
-				:effectcolor1(0.1, 0.1, 0.1, 1)
-				:effectcolor2(1, 1, 1, 1)
+				:effectcolor1(0.1,0.1,0.1,1)
+				:effectcolor2(1,1,1,1)
 				:effectperiod(0.5)
-				:effecttiming(0.25, 0.5, 0, 0.25)
+				:effecttiming(0.25,0.50,0,0.25)
 				:effectoffset(-0.25)
 		end,
 		NoneCommand = NOTESKIN:GetMetricA("ReceptorArrow", "NoneCommand"),
@@ -26,7 +26,7 @@ local t = Def.ActorFrame {
 		W4Command = NOTESKIN:GetMetricA("ReceptorArrow", "W4Command"),
 		W3Command = NOTESKIN:GetMetricA("ReceptorArrow", "W3Command"),
 		W2Command = NOTESKIN:GetMetricA("ReceptorArrow", "W2Command"),
-		W1Command = NOTESKIN:GetMetricA("ReceptorArrow", "W1Command")
+		W1Command = NOTESKIN:GetMetricA("ReceptorArrow", "W1Command"),
 	},
 	Def.Model {
 		Meshes = NOTESKIN:GetPath('_down', 'receptor model'),
@@ -40,16 +40,19 @@ local t = Def.ActorFrame {
 				:diffusealpha(0)
 		end,
 		NoneCommand = NOTESKIN:GetMetricA("ReceptorArrow", "NoneCommand"),
-		PressCommand = function(self) self:diffusealpha(0.2) end,
-		LiftCommand = function(self) self:diffusealpha(0) end,
+		PressCommand = function(self)
+			self:diffusealpha(0.2)
+		end,
+		LiftCommand = function(self)
+			self:diffusealpha(0)
+		end,
 		W5Command = NOTESKIN:GetMetricA("ReceptorArrow", "W5Command"),
 		W4Command = NOTESKIN:GetMetricA("ReceptorArrow", "W4Command"),
 		W3Command = NOTESKIN:GetMetricA("ReceptorArrow", "W3Command"),
 		W2Command = NOTESKIN:GetMetricA("ReceptorArrow", "W2Command"),
-		W1Command = NOTESKIN:GetMetricA("ReceptorArrow", "W1Command")
-	}
+		W1Command = NOTESKIN:GetMetricA("ReceptorArrow", "W1Command"),
+	},
 }
-return t
 
 --[[
 Effecttiming Info
