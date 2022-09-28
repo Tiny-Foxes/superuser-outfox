@@ -418,7 +418,7 @@ for i,v in ipairs( Name ) do
 				self:diffusealpha(0):sleep(0.1 * i):decelerate(0.6):diffusealpha(1)
 				if DLW then
 					for i=0,1 do
-                        if (v == 'W'..(5-i) and tonumber(DLW) >= (i+1)) then self:diffusealpha( 0.4 ) end
+                        if (v:find('W%d') and tonumber(DLW) >= (i+1)) then self:diffusealpha( 0.4 ) end
                     end
 				end
             end,
@@ -444,7 +444,7 @@ for i,v in ipairs( Name ) do
             self:diffusealpha(0):sleep(0.1 * i):decelerate(0.6):diffusealpha(0.86)
             if DLW then
                 for i=0,1 do
-                    if (v == 'W'..(5-i) and tonumber(DLW) >= (i+1)) then self:diffusealpha( 0.4 ) end
+                    if (v:find('W%d') and tonumber(DLW) >= (i+1)) then self:diffusealpha( 0.4 ) end
                 end
             end
         end
