@@ -973,7 +973,7 @@ do varControl
 	end)
 	:SetMessage('EnterGameplay', function(self)
 		SOUND:DimMusic(0, 3)
-		wheel.NextScreen = 'ScreenStageInformation'
+		wheel.NextScreen = 'ScreenLoadGameplayElements'
 		self:sleep(0.25):queuecommand('BeginTransition')
 	end)
 	:SetCommand('BeginTransition', function(self)

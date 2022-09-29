@@ -9,6 +9,22 @@ end
 --table.insert( Rates.Str, "Haste" )
 --table.insert( Rates.Val, "haste" )
 
+local function getNoteSkins()
+	local ret = NOTESKIN:GetNoteSkinNames()
+	for _, v in pairs(FILEMAN:GetDirListing(THEME:GetCurrentThemeDirectory()..'NoteSkins/')) do
+		if v:find(GAMESTATE:GetCurrentGame():GetName()) then
+			local ns = v:sub(v:find('/') + 1, -2)
+			local add = true
+			for v2 in ivalues(ret) do
+				if ns:lower() == v2:lower() then add = false break end
+			end
+			if add then
+				table.insert(ret, ns:lower())
+			end
+		end
+	end
+	return ret
+end
 
 return {
 	AutoSetStyle =
@@ -106,12 +122,6 @@ return {
 		Default = "old",
 		Choices = { OptionNameString('MeterClassic'), OptionNameString('MeterX'), OptionNameString('MeterPump') },
 		Values = { "old", "X", "pump" }
-	},
-	GameplayBPM =
-	{
-		Default = false,
-		Choices = { OptionNameString('Off'), OptionNameString('On') },
-		Values = { false, true }
 	},
 	CustomComboContinue =
 	{
@@ -241,6 +251,13 @@ return {
 		Default = THEME:GetMetric("Common","DefaultToasty"),
 		Choices = LoadModule("Options.SmartToastieChoices.lua")("Show"),
 		Values = LoadModule("Options.SmartToastieChoices.lua")("Show")
+	},
+	BackPlates =
+	{
+		UserPref = true,
+		Default = THEME:GetMetric("Common","DefaultBackPlate"),
+		Choices = LoadModule("Options.BackPlates.lua")("Show"),
+		Values = LoadModule("Options.BackPlates.lua")("Show")
 	},
 	ToastiesDraw =
 	{
@@ -393,6 +410,18 @@ return {
 		Default = 1,
 		Choices = { OptionNameString('swClassic'), OptionNameString('swVaporwave'), OptionNameString('swGrass'), OptionNameString('swRetro'), OptionNameString('swFire'), "Dark", "Chaos", "Ice", "Wave", "Alien Alien", "BISTRO", "Invert Standard", "Rainbow FUN", "Baby Pink", "Sunny Day", "The Blood", "Virtual LED", "Night Emotions", "Cool Blues", "Dragonfire", "Y2K", "Golden Dawn"},
 		Values = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22}
+	},
+	JudgmentAnimations =
+	{
+		Default = true,
+		Choices = { OptionNameString('On'), OptionNameString('Off') },
+		Values = { true, false },
+	},
+	SuperuserSubTheme =
+	{
+		Default = 1,
+		Choices = { 'Default' },
+		Values = { 1 },
 	},
 	LifeType =
 	{

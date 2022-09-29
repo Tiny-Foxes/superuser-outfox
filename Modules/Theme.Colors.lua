@@ -3,20 +3,20 @@ local function JudgmentColor(j)
 	local c = {}
 	c = {
 		Original = {
-			W1	= color("#bfeaff"),
-			W2	= color("#fff568"),
-			W3	= color("#a4ff00"),
-			W4	= color("#34bfff"),
-			W5	= color("#e44dff"),
-			Miss = color("#ff3c3c"),
+			W1 = color("#92d5dd"),
+			W2 = color("#ccd01f"),
+			W3 = color("#b2dd56"),
+			W4 = color("#32abd3"),
+			W5 = color("#c84ad2"),
+			Miss = color("#fa282f"),
 		},
 		ITG = {
-			W1 = color("#a7ffff"),
-			W2 = color("#ffff84"),
-			W3 = color("#a7ffa7"),
-			W4 = color("#ffa7ff"),
-			W5 = color("#ffb8a7"),
-			Miss = color("#ff8b8b"),
+			W1 = color("#a3dde4"),
+			W2 = color("#d0d41f"),
+			W3 = color("#8ecd04"),
+			W4 = color("#9d30d3"),
+			W5 = color("#ea8035"),
+			Miss = color("#fa282f"),
 		},
 		Advanced = {
 			ProW1 = color("#eee133"),
@@ -24,11 +24,11 @@ local function JudgmentColor(j)
 			ProW3 = color("#acf8fa"),
 			ProW4 = color("#e3ebf1"),
 			ProW5 = color("#b3dbf1"),
-			W1	= color("#bfeaff"),
-			W2	= color("#fff568"),
-			W3	= color("#a4ff00"),
-			W4	= color("#34bfff"),
-			W5	= color("#e44dff"),
+			W1 = color("#bfeaff"),
+			W2 = color("#fff568"),
+			W3 = color("#a4ff00"),
+			W4 = color("#34bfff"),
+			W5 = color("#e44dff"),
 			Miss = color("#ff3c3c"),
 		},
 		FAPlus = {
@@ -65,6 +65,8 @@ local Colors = {
 	Challenge = color('#618FB0'),
 	Nightmare = color('#618FB0'),
 	Edit = color('#808080'),
+	Couple = color('#F04D7B'),
+	Routine = color('#5292EB'),
 	
 	-- Judgment Colors
 	ProW1	= JudgmentColor('ProW1'),

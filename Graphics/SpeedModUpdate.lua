@@ -15,7 +15,7 @@ t[#t+1] = Def.Actor{
 			speed[pn][2] = param.choicename
 			local text = ""
 			if speed[pn][2] == "x" then
-				text = speed[pn][1] * .01 .. "x"
+				text = speed[pn][1] * 0.01 .. "x"
 			else
 				text = string.upper(speed[pn][2]) .. speed[pn][1]
 			end
@@ -58,12 +58,6 @@ t[#t+1] = Def.Actor{
 					ORNum = i
 					break
 				end
-			end
-			local text = ""
-			if speed[pn][2] == "x" then
-				text = speed[pn][1] * 0.01 .. "x"
-			else
-				text = string.upper(speed[pn][2]) .. speed[pn][1]
 			end
 			MESSAGEMAN:Broadcast("SpeedChoiceChanged",{pn=pn,mode=speed[pn][2],speed=speed[pn][1]})
 			s:sleep(0.2):queuecommand("UpdateString")

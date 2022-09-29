@@ -1,10 +1,149 @@
-LoadModule('Konko.Core.lua')
-
 function OptionNameString(str)
 	return THEME:GetString('OptionNames',str)
 end
 
+function Actor:PlayerFade(pn, val)
+	assert(pn)
+	if pn == PLAYER_1 then self:diffuseleftedge(val or Color.Black) return self end
+	if pn == PLAYER_2 then self:diffuserightedge(val or Color.Black) return self end
+end
+
+function GameState:BothPlayersEnabled()
+	return GAMESTATE:IsPlayerEnabled(PLAYER_1) and GAMESTATE:IsPlayerEnabled(PLAYER_2)
+end
+
+local ColorTable = LoadModule('Theme.Colors.lua')
+
+GameColor = {
+    PlayerColors = {
+        PLAYER_1 = ColorTable.P1,
+        PLAYER_2 = ColorTable.P2,
+		both = color("#FFFFFF"),
+    },
+    PlayerDarkColors = {
+        PLAYER_1 = ColorDarkTone(ColorTable.P1),
+        PLAYER_2 = ColorDarkTone(ColorTable.P2),
+		both = color("#F5E1E1"),
+    },
+	PlayerCompColors = {
+        PLAYER_1 = color("#C787B9"),
+        PLAYER_2 = color("#53D484"),
+		both = color("#F5E1E1"),
+    },
+    Difficulty = {
+        --[[ These are for 'Custom' Difficulty Ranks. It can be very  useful
+        in some cases, especially to apply new colors for stuff you
+        couldn't before. (huh? -aj) ]]
+        Beginner    = ColorTable["Beginner"],
+        Easy        = ColorTable["Easy"],
+        Medium      = ColorTable["Medium"],
+        Hard        = ColorTable["Hard"],
+        Challenge   = ColorTable["Challenge"],
+        Edit        = ColorTable["Edit"],
+		D7			= color("0.8,0.8,0.8,1"),	-- TODO
+		D8			= color("0.8,0.8,0.8,1"),	-- TODO
+		D9			= color("0.8,0.8,0.8,1"),	-- TODO
+		D10			= color("0.8,0.8,0.8,1"),	-- TODO
+		D11			= color("0.8,0.8,0.8,1"),	-- TODO
+		D12			= color("0.8,0.8,0.8,1"),	-- TODO
+		D13			= color("0.8,0.8,0.8,1"),	-- TODO
+		D14			= color("0.8,0.8,0.8,1"),	-- TODO
+		D15			= color("0.8,0.8,0.8,1"),	-- TODO
+        Couple      = ColorTable["Couple"],
+        Routine     = ColorTable["Routine"],
+        --[[ These are for courses, so let's slap them here in case someone
+        wanted to use Difficulty in Course and Step regions. ]]
+        Difficulty_Beginner = ColorTable["Beginner"],
+        Difficulty_Easy     = ColorTable["Easy"],
+        Difficulty_Medium   = ColorTable["Medium"],
+        Difficulty_Hard     = ColorTable["Hard"],
+        Difficulty_Challenge    = ColorTable["Challenge"],
+		Difficulty_D7			= color("0.8,0.8,0.8,1"),	-- TODO
+		Difficulty_D8			= color("0.8,0.8,0.8,1"),	-- TODO
+		Difficulty_D9			= color("0.8,0.8,0.8,1"),	-- TODO
+		Difficulty_D10			= color("0.8,0.8,0.8,1"),	-- TODO
+		Difficulty_D11			= color("0.8,0.8,0.8,1"),	-- TODO
+		Difficulty_D12			= color("0.8,0.8,0.8,1"),	-- TODO
+		Difficulty_D13			= color("0.8,0.8,0.8,1"),	-- TODO
+		Difficulty_D14			= color("0.8,0.8,0.8,1"),	-- TODO
+		Difficulty_D15			= color("0.8,0.8,0.8,1"),	-- TODO
+        Difficulty_Edit     = ColorTable["Edit"],
+        Difficulty_Couple   = ColorTable["Couple"],
+        Difficulty_Routine  = ColorTable["Routine"]
+    },
+    Stage = {
+        Stage_1st   = color("#6C94D7"),
+        Stage_2nd   = color("#6C94D7"),
+        Stage_3rd   = color("#6C94D7"),
+        Stage_4th   = color("#6C94D7"),
+        Stage_5th   = color("#6C94D7"),
+        Stage_6th   = color("#6C94D7"),
+        Stage_Next  = color("#6C94D7"),
+        Stage_Final = color("#00AEFF"),
+        Stage_Extra1    = color("#FF8000"),
+        Stage_Extra2    = color("#FF2300"),
+        Stage_Nonstop   = color("#934BDD"),
+        Stage_Oni   = color("#934BDD"),
+        Stage_Endless   = color("#934BDD"),
+        Stage_Event = color("#6C94D7"),
+        Stage_Demo  = color("#6C94D7")
+    },
+    Judgment = {
+        JudgmentLine_ProW1     = color("#FFFFFF"),
+        JudgmentLine_ProW2     = color("#AEEDF3"),
+        JudgmentLine_ProW3     = color("#71DDE8"),
+        JudgmentLine_ProW4     = color("#A0DBF1"),
+        JudgmentLine_ProW5     = color("#7EC2D7"),
+        JudgmentLine_W1     = color("#A0DBF1"),
+        JudgmentLine_W2     = color("#F1E4A2"),
+        JudgmentLine_W3     = color("#ABE39B"),
+        JudgmentLine_W4     = color("#86ACD6"),
+        JudgmentLine_W5     = color("#958CD6"),
+        JudgmentLine_Held   = color("#FFFFFF"),
+        JudgmentLine_Miss   = color("#F97E7E"),
+        JudgmentLine_MaxCombo   = color("#f0dc9f")
+	}
+}
+
+function PlayerCompColor( pn )
+	local pn_to_color_name= {[PLAYER_1]= "PLAYER_1", [PLAYER_2]= "PLAYER_2"}
+	if not GameColor or not GameColor.PlayerCompColors then
+		return default_color
+	end
+	return GameColor.PlayerCompColors[pn_to_color_name[pn]] or default_color
+end
+
+GameColor.Difficulty["Crazy"]       = GameColor.Difficulty["Hard"]
+GameColor.Difficulty["Freestyle"]   = GameColor.Difficulty["Easy"]
+GameColor.Difficulty["Nightmare"]   = GameColor.Difficulty["Challenge"]
+GameColor.Difficulty["HalfDouble"]  = GameColor.Difficulty["Medium"]
+
+
 LoadModule("Row.Prefs.lua")(LoadModule("Options.Prefs.lua"))
+
+function thified_curstage_index(on_eval)
+	local numbered_stages= {
+		Stage_1st= true,
+		Stage_2nd= true,
+		Stage_3rd= true,
+		Stage_4th= true,
+		Stage_5th= true,
+		Stage_6th= true,
+		Stage_Next= true
+	}
+	local cur_stage= GAMESTATE:GetCurrentStage()
+	local adjust= 1
+	-- hack: ScreenEvaluation shows the current stage, but it needs to show
+	-- the last stage instead.  Adjust the amount.
+	if on_eval then
+		adjust= 0
+	end
+	if numbered_stages[cur_stage] then
+		return FormatNumberAndSuffix(GAMESTATE:GetCurrentStageIndex() + adjust)
+	else
+		return ToEnumShortString(cur_stage)
+	end
+end
 
 Branch.GameplayScreen = function()
 	return "ScreenGameplay"
@@ -68,9 +207,13 @@ end
 function SPOChoices( itemSet )
 	local TimingMode = GAMESTATE:GetCurrentGame():GetName() ~= "para" and "Timing," or ""
 	local GHMode = GAMESTATE:GetCurrentGame():GetName() == "gh" and "GH," or ""
+	local GDDMMode = GAMESTATE:GetCurrentGame():GetName() == "gddm" and "GDDM," or ""
+
+	-- Only GH for now.
+	local Backplates = GAMESTATE:GetCurrentGame():GetName() == "gh" and "BackPlates," or ""
+
 	local Items = {
-		["Main"] = "SPM,SPV,NS,14,Mini,SF,FilterColor,".. TimingMode .."Judg,13,LuaRate,LuaHaste,LuaSoundEffect,18",
-		--["Main"] = "1,NS,14,Mini,SF,FilterColor,".. TimingMode .."Judg,13,LuaRate,LuaHaste,LuaSoundEffect,18",
+		["Main"] = "SPM,SPV,NS,14,Mini,SF,FilterColor,".. TimingMode .."Judg,"..Backplates.."13,LuaRate,LuaHaste,LuaSoundEffect,"..GDDMMode.."18",
 		["Special"] = "RotateFieldX,RotateFieldZ,MC,MCD,MCB,DLW,JudgImg,Combo,Toasty,ToastDraw,SP,OVG,OB,12",
 		["Effects"] = "2,3A,3B,4,5,6,7,9,R1,"..GHMode.."10,11"
 	}
@@ -92,7 +235,6 @@ end
 
 function PlayerOptionsDefineNextScreen()
 	if GAMESTATE:Env()["PlayerOptionsNextScreen"] then
-		print('PlayerOptions | '..tostring(GAMESTATE:Env()["PlayerOptionsNextScreen"]))
 		return GAMESTATE:Env()["PlayerOptionsNextScreen"]
 	end
 	return Branch.SongOptions()
@@ -102,7 +244,7 @@ function ExtraColorPreference()
 	local Modes = {
 		dance = 10,
 		pump = 21,
-		beat = 12,
+		['be-mu'] = 12,
 		kb7 = 10,
 		para = 10,
 		techno = 10,
