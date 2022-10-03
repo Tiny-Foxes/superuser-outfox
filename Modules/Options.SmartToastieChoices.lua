@@ -1,6 +1,7 @@
 return function(Mode)
 	local Dir = FILEMAN:GetDirListing("Appearance/Toasties/",true,true)
 	local NewDir = {}
+	-- Include theme toasties as well. ~Sudo
 	for k, v in pairs(FILEMAN:GetDirListing(THEME:GetCurrentThemeDirectory()..'Toasties/', true, true)) do
 		Dir[k] = v
 	end

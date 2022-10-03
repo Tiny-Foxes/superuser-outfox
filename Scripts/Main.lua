@@ -293,3 +293,239 @@ function CourseSetConversion(self)
 		Artist:visible(false)
 	end
 end
+
+function Actor:JudgmentAnims(judgment)
+	local enabled = LoadModule('Config.Load.lua')('JudgmentAnimations', 'Save/OutFoxPrefs.ini')
+	local anims = {}
+	if enabled then
+		anims = {
+			ProW1 = function()
+				self
+					:stoptweening()
+					:bob()
+					:effectmagnitude(0,20,0)
+					:effectperiod(0.1)
+					:zoom(0.65)
+					:diffusealpha(0.75)
+					:decelerate(0.15)
+					:zoom(0.60)
+					:diffusealpha(1)
+					:sleep(0.35)
+					:decelerate(0.3)
+					:diffusealpha(0)
+					:zoom(0.56)
+					:glowblink()
+					:effectperiod(0.05)
+					:effectcolor1(color("1,1,1,0"))
+					:effectcolor2(color("1,1,1,0.25"))
+			end,
+			ProW2 = function()
+				self
+					:stoptweening()
+					:zoom(0.65)
+					:diffusealpha(0.75)
+					:decelerate(0.15)
+					:zoom(0.60)
+					:diffusealpha(1)
+					:sleep(0.35)
+					:decelerate(0.3)
+					:diffusealpha(0)
+					:zoom(0.5)
+					:glowblink()
+					:effectperiod(0.05)
+					:effectcolor1(color("1,1,1,0"))
+					:effectcolor2(color("1,1,1,0.2"))
+			end,
+			ProW3 = function()
+				self
+					:stoptweening()
+					:zoom(0.65)
+					:diffusealpha(0.75)
+					:decelerate(0.15)
+					:zoom(0.60)
+					:diffusealpha(1)
+					:sleep(0.35)
+					:decelerate(0.3)
+					:diffusealpha(0)
+					:zoom(0.5)
+					:glowblink()
+					:effectperiod(0.05)
+					:effectcolor1(color("1,1,1,0"))
+					:effectcolor2(color("1,1,1,0.15"))
+			end,
+			ProW4 = function()
+				self
+					:stoptweening()
+					:zoom(0.65)
+					:diffusealpha(0.75)
+					:decelerate(0.15)
+					:zoom(0.60)
+					:diffusealpha(1)
+					:sleep(0.35)
+					:decelerate(0.3)
+					:diffusealpha(0)
+					:zoom(0.5)
+					:glowblink()
+					:effectperiod(0.05)
+					:effectcolor1(color("1,1,1,0"))
+					:effectcolor2(color("1,1,1,0.15"))
+			end,
+			ProW5 = function()
+				self
+					:stoptweening()
+					:zoom(0.65)
+					:diffusealpha(0.75)
+					:decelerate(0.15)
+					:zoom(0.60)
+					:diffusealpha(1)
+					:sleep(0.35)
+					:decelerate(0.3)
+					:diffusealpha(0)
+					:zoom(0.5)
+					:glowblink()
+					:effectperiod(0.05)
+					:effectcolor1(color("1,1,1,0"))
+					:effectcolor2(color("1,1,1,0.1"))
+			end,
+			W1 = function()
+				self
+					:stoptweening()
+					:bob()
+					:effectmagnitude(0,20,0)
+					:effectperiod(0.05)
+					:zoom(0.65)
+					:diffusealpha(0.75)
+					:decelerate(0.15)
+					:zoom(0.60)
+					:diffusealpha(1)
+					:sleep(0.35)
+					:decelerate(0.3)
+					:diffusealpha(0)
+					:zoom(0.5)
+					:glowblink()
+					:effectperiod(0.05)
+					:effectcolor1(color("1,1,1,0"))
+					:effectcolor2(color("1,1,1,0.1"))
+			end,
+			W2 = function()
+				self
+					:stoptweening()
+					:zoom(0.65)
+					:diffusealpha(0.75)
+					:decelerate(0.15)
+					:zoom(0.60)
+					:diffusealpha(1)
+					:sleep(0.35)
+					:decelerate(0.3)
+					:diffusealpha(0)
+					:zoom(0.5)
+					:glowblink()
+					:effectperiod(0.05)
+					:effectcolor1(color("1,1,1,0"))
+					:effectcolor2(color("1,1,1,0.1"))
+			end,
+			W3 = function()
+				self
+					:stoptweening()
+					:bob()
+					:effectmagnitude(0,20,0)
+					:effectperiod(0.05)
+					:zoom(0.65)
+					:diffusealpha(0.75)
+					:decelerate(0.15)
+					:zoom(0.60)
+					:diffusealpha(1)
+					:sleep(0.35)
+					:decelerate(0.3)
+					:diffusealpha(0)
+					:zoom(0.5)
+					:glowblink()
+					:effectperiod(0.05)
+					:effectcolor1(color("1,1,1,0"))
+					:effectcolor2(color("1,1,1,0.1"))
+			end,
+			W4 = function()
+				self
+					:stoptweening()
+					:bob()
+					:effectmagnitude(0,20,0)
+					:effectperiod(0.05)
+					:zoom(0.65)
+					:diffusealpha(0.75)
+					:decelerate(0.15)
+					:zoom(0.60)
+					:diffusealpha(1)
+					:sleep(0.35)
+					:decelerate(0.3)
+					:diffusealpha(0)
+					:zoom(0.5)
+					:glowblink()
+					:effectperiod(0.05)
+					:effectcolor1(color("1,1,1,0"))
+					:effectcolor2(color("1,1,1,0.1"))
+			end,
+			W5 = function()
+				self
+					:stoptweening()
+					:bob()
+					:effectmagnitude(0,20,0)
+					:effectperiod(0.05)
+					:zoom(0.65)
+					:diffusealpha(0.75)
+					:decelerate(0.15)
+					:zoom(0.60)
+					:diffusealpha(1)
+					:sleep(0.35)
+					:decelerate(0.3)
+					:diffusealpha(0)
+					:zoom(0.5)
+					:glowblink()
+					:effectperiod(0.05)
+					:effectcolor1(color("1,1,1,0"))
+					:effectcolor2(color("1,1,1,0.1"))
+			end,
+			Miss = function()
+				self
+					:stoptweening()
+					:vibrate()
+					:effectmagnitude(2,2,0)
+					:zoom(0.65)
+					:diffusealpha(0.75)
+					:decelerate(0.15)
+					:zoom(0.60)
+					:diffusealpha(1)
+					:sleep(0.35)
+					:decelerate(0.3)
+					:diffusealpha(0)
+					:zoom(0.5)
+					:glowblink()
+					:effectperiod(0.05)
+					:effectcolor1(color("1,1,1,0"))
+					:effectcolor2(color("1,1,1,0.1"))
+			end,
+		}
+	else
+		local anim = function()
+			self
+				:stoptweening()
+				:diffusealpha(1)
+				:zoom(0.6)
+				:sleep(0.75)
+				:diffusealpha(0)
+		end
+		anims = {
+			ProW1 = anim,
+			ProW2 = anim,
+			ProW3 = anim,
+			ProW4 = anim,
+			ProW5 = anim,
+			W1 = anim,
+			W2 = anim,
+			W3 = anim,
+			W4 = anim,
+			W5 = anim,
+			Miss = anim,
+		}
+	end
+	return anims[judgment]
+end

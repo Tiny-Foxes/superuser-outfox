@@ -43,6 +43,7 @@ return function(pn)
 
 	local ShortCom = {}
 
+	-- Search in main path first, then theme path if nothing found. ~Sudo
 	local path = "Appearance/Toasties/"..CurToast.."/"
 	if not FILEMAN:DoesFileExist(path.."/default.ini") then
 		path = THEME:GetCurrentThemeDirectory().."Toasties/"..CurToast.."/"
