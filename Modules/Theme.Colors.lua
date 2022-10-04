@@ -4,6 +4,7 @@ local function JudgmentColor(j)
 	local timing = LoadModule('Options.ReturnCurrentTiming.lua')().Name
 	local c = {}
 	c = {
+		-- Not fully implemented. ~Sudo
 		Original = {
 			W1 = color("#92d5dd"),
 			W2 = color("#ccd01f"),
