@@ -55,7 +55,7 @@ end
 -- Title ActorFrameTexture
 local titleAFT = SuperActor.new('ActorFrameTexture')
 -- Title AFT Background
-local bg = LoadActor(THEME:GetPathB('ScreenWithMenuElements', 'background'))
+local bg = LoadActor(THEME:GetPathB('ScreenTitleMenu', 'background'))
 -- Title AFT BG Dimmer
 local bgDim = SuperActor.new('Quad')
 -- Title AFT Sprite
@@ -354,16 +354,34 @@ do uiTitleBackAF
 	:AddChild(uiTitleBack, 'TitleBack')
 end
 
--- UIWrap.UI.Text.Title
+-- UIWrap.UI.Text.Title.Texture
 do uiTitle
-	:SetAttribute('Texture', THEME:GetPathG('ScreenTitleMenu', 'supertext'))
-	:SetCommand('Init', function(self)
+	:SetAttribute('Texture', THEME:GetPathG('ScreenTitleMenu', 'supertitle'))
+	:SetCommand('On', function(self)
 		self
-			:xy(-220, 28)
-			:zoom(0.45)
-			:shadowlengthy(4)
+			:sleep(0.25)
+			:linear(0.1)
+			:cropright(0)
+	end)
+	:SetCommand('Off', function(self)
+		self
+			:sleep(0.15)
+			:linear(0.2)
 			:cropright(1)
-			:rotationx(SetMeFree and -60 or 0)
+	end)
+end
+
+local uiTitleColor = SuperActor.new('Sprite')
+do uiTitleColor
+	:SetAttribute('Texture', THEME:GetPathG('ScreenTitleMenu', 'supercolor'))
+	:SetCommand('Init', function(self)
+		self:blend('BlendMode_Add')
+		if ThemeColor.Title then
+			self:diffuse(ThemeColor.Title)
+		else
+			self:diffuse(ThemeColor.TitleBottom):diffusetopedge(ThemeColor.TitleTop)
+		end
+			
 	end)
 	:SetCommand('On', function(self)
 		self
@@ -378,6 +396,21 @@ do uiTitle
 			:cropright(1)
 	end)
 end
+
+local uiTitleAF = SuperActor.new('ActorFrame')
+do uiTitleAF
+	:SetCommand('Init', function(self)
+		self
+			:xy(-220, 28)
+			:zoom(0.45)
+			:shadowlengthy(4)
+			:cropright(1)
+			:rotationx(SetMeFree and -60 or 0)
+	end)
+	:AddChild(uiTitle, 'Texture')
+	:AddChild(uiTitleColor, 'Color')
+end
+
 -- UIWrap.UI.Text.Tagline
 do uiTagline
 	:SetAttribute('Font', 'Common Normal')
@@ -557,7 +590,7 @@ do showTitle
 end
 do uiText
 	:AddChild(uiPoweredBy, 'PoweredBy')
-	:AddChild(uiTitle, 'Title')
+	:AddChild(uiTitleAF, 'Title')
 	:AddChild(uiTagline, 'Tagline')
 	:AddChild(uiAuthor, 'Author')
 	:AddChild(uiVersion, 'Version')

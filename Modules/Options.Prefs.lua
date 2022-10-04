@@ -379,7 +379,7 @@ return {
 					elseif po:TimeSpacing() > 0 then list[4] = true return
 					elseif po:ConstAverageScrollBPM() > 0 then list[5] = true return
 					elseif po:AverageVelocityBPM() > 0 then list[6] = true return
-					else list[1] = true return 
+					else list[1] = true return
 				end
 			end
 		end,
@@ -420,8 +420,8 @@ return {
 	SuperuserSubTheme =
 	{
 		Default = 1,
-		Choices = { 'Default' },
-		Values = { 1 },
+		Choices = LoadModule('Theme.Colors.lua', true).Choices,
+		Values = LoadModule('Theme.Colors.lua', true).Values,
 	},
 	LifeType =
 	{

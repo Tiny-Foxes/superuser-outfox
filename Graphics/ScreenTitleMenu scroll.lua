@@ -2,6 +2,8 @@ local gc = Var("GameCommand")
 local item_width = 260
 local item_height = 48
 
+local ThemeColor = LoadModule('Theme.Colors.lua')
+
 local splash = false
 local hovered = false
 
@@ -88,7 +90,7 @@ return Def.ActorFrame {
 			InitCommand = function(self)
 				self
 					:SetSize(item_width, item_height)
-					:diffuse(color('#9D276C'))
+					:diffuse(ThemeColor.Elements)
 					:skewx(-0.5)
 					:shadowlength(2, 2)
 			end,
@@ -117,7 +119,7 @@ return Def.ActorFrame {
 			Font = 'Common Normal',
 			Text = THEME:GetString('ScreenTitleMenu', gc:GetText()),
 			InitCommand = function(self)
-				self:shadowlengthy(1)
+				self:shadowlengthy(1):diffuse(ThemeColor.Text)
 			end
 		},
 		Def.Quad {

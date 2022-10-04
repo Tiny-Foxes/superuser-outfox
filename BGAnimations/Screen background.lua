@@ -87,7 +87,15 @@ return Def.ActorFrame {
 				:FullScreen()
 				:diffuse(ThemeColor.Primary)
 				:diffusebottomedge(ThemeColor.Secondary)
-				:diffusealpha(0.5)
+				:diffusealpha(0.15)
+		end,
+		ThemeColorChangedMessageCommand = function(self, color)
+			self
+				:stoptweening()
+				:linear(0.25)
+				:diffuse(color.Primary)
+				:diffusebottomedge(color.Secondary)
+				:diffusealpha(0.15)
 		end,
 	},
 }

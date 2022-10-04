@@ -388,14 +388,14 @@ for i = 1, wheel.Song.Size do
 		:SetAttribute('Font', 'Common Large')
 		:SetAttribute('Text', CurSongs[songIdx]:GetDisplayMainTitle())
 		:SetCommand('Init', function(self)
-			self:zoom(0.5):maxwidth(540)
+			self:zoom(0.5):maxwidth(540):diffuse(ThemeColor.Text)
 		end)
 	end
 	do subtitle
 		:SetAttribute('Font', 'Common Normal')
 		:SetAttribute('Text', CurSongs[songIdx]:GetDisplaySubTitle())
 		:SetCommand('Init', function(self)
-			self:zoom(0.5):maxwidth(540)
+			self:zoom(0.5):maxwidth(540):diffuse(ThemeColor.Text)
 		end)
 	end
 	do song
@@ -640,7 +640,7 @@ for i = 1, wheel.Group.Size do
 		:SetAttribute('Font', 'Common Large')
 		:SetAttribute('Text', AllGroups[groupIdx])
 		:SetCommand('Init', function(self)
-			self:zoom(0.5):maxwidth(540)
+			self:zoom(0.5):maxwidth(540):diffuse(ThemeColor.Text)
 		end)
 	group
 		:AddChild(panel, 'Panel')
@@ -811,7 +811,7 @@ do groupSelect
 		SuperActor.new('BitmapText')
 			:SetAttribute('Font', 'Common Large')
 			:SetCommand('Init', function(self)
-				self:zoom(0.5):maxwidth(540)
+				self:zoom(0.5):maxwidth(540):diffuse(ThemeColor.Text)
 			end)
 			:SetMessage('CurrentSongChanged', function(self)
 				self:settext(AllGroups[Index.Group])

@@ -294,8 +294,9 @@ function CourseSetConversion(self)
 	end
 end
 
-function Actor:JudgmentAnims(judgment)
-	local enabled = LoadModule('Config.Load.lua')('JudgmentAnimations', 'Save/OutFoxPrefs.ini')
+function Actor:JudgmentAnims(judgment, plr)
+	local enabled = LoadModule('Config.Load.lua')('JudgmentAnimations', '/Save/OutFoxPrefs.ini')
+	if not enabled then enabled = true end
 	local anims = {}
 	if enabled then
 		anims = {
