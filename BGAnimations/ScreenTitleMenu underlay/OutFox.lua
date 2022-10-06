@@ -1,7 +1,10 @@
 -- Load Konko core module and initialize environment
 local konko = LoadModule('Konko.Core.lua')
 konko()
+
 if not SetMeFree then SetMeFree = false end
+
+local subo_notes = true
 
 -- Load SuperActor module
 local SuperActor = LoadModule('Konko.SuperActor.lua')
@@ -381,7 +384,7 @@ do uiTitleColor
 		else
 			self:diffuse(ThemeColor.TitleBottom):diffusetopedge(ThemeColor.TitleTop)
 		end
-			
+
 	end)
 	:SetCommand('On', function(self)
 		self
@@ -640,12 +643,13 @@ do OFVersion
 	:SetAttribute('Font', 'Common Normal')
 	:SetCommand('Init', function(self)
 		local ver = ProductVersion()
+		local notes = {'subo notes:', '- finish color schemes', '- finish timing window colors', '- finalize for steam release', '- u did the it :)'}
 		self
 			:align(0, 0)
 			:zoom(0.5)
 			:shadowlengthy(1)
 			:xy(SL + 12, ST + 12)
-			:settext(ver)
+			:settext(ver..'\n'..table.concat(notes, '\n'))
 	end)
 	:AddToTree('OFVersion')
 end

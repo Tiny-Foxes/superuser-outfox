@@ -46,7 +46,11 @@ local function JudgmentColor(j)
 			Miss = color("#ff8b8b"),
 		},
 	}
-	return c[timing][j] or color("#ffffff")
+	if c[timing] then
+		return c[timing][j] or color('#FFFFFF')
+	else
+		return color('#FFFFFF')
+	end
 end
 
 local Colors = {
@@ -56,7 +60,7 @@ local Colors = {
 		Primary = color('#3F162D'),
 		Secondary = color('#4E2635'),
 		Elements = color('#9D276C'),
-		Text = color('#FFFFFF'),
+		Text = color('#F5F3F5'),
 		Title = color('#CF3B98'),
 		TitleTop = color('#CF3B98'),
 		TitleBottom = color('#CF3B98'),
@@ -76,7 +80,7 @@ local Colors = {
 		Edit = color('#808080'),
 		Couple = color('#F04D7B'),
 		Routine = color('#5292EB'),
-		
+
 		-- Judgment Colors
 		ProW1	= JudgmentColor('ProW1'),
 		ProW2	= JudgmentColor('ProW2'),
@@ -158,19 +162,20 @@ local Colors = {
 		Title = color('#00DECE'),
 	},
 	{
-		Name = 'Polterheist',
-		Primary = color('#204020'),
-		Secondary = color('#00FFFF'),
-		Elements = color('#FF00FF'),
-		Title = color('#2F832F')
+		Name = 'Espresso',
+		Primary = color('#38220F'),
+		Secondary = color('#634832'),
+		Elements = color('#967259'),
+		Text = color('#ECE0D1'),
+		Title = color('#DBC1AC'),
+
 	},
 	{
-		Name = 'Feat. Umbra',
-		--Primary = ,
-		--Secondary = ,
-		--Elements = ,
-		--TitleTop = ,
-		--TitleBottom = ,
+		Name = 'Feat. Chegg',
+		Primary = color('#1D3461'),
+		Secondary = color('#1F487E'),
+		Elements = color('#247BA0'),
+		Title = color('#FFFD82'),
 	},
 	{
 		Name = 'Kit',
@@ -187,12 +192,92 @@ local Colors = {
 		Title = color('#E85ED7')
 	},
 	{
-		Name = 'Feat. Chegg',
-		--Primary = ,
-		--Secondary = ,
-		--Elements = ,
-		--TitleTop = ,
-		--TitleBottom = ,
+		Name = 'Umbra',
+		Primary = color('#3B77BC'),
+		Secondary = color('#DE482B'),
+		Elements = color('#81C046'),
+		TitleTop = color('#3B77BC'),
+		TitleBottom = color('#FCCF03'),
+	},
+	{
+		Name = 'Sunset Sea',
+		Primary = color('#242045'),
+		Secondary = color('#E7C86D'),
+		Elements = color('#F27100'),
+		TitleTop = BoostColor(color('#E7C86D'), 1.25),
+		TitleBottom = BoostColor(color('#F27100'), 1.25),
+	},
+	{
+		Name = 'Achromatic',
+		Primary = color('#1A1A1C'),
+		Secondary = color('#F3EED9'),
+		Elements = color('#555358'),
+		Title = BoostColor(color('#555358'), 1.25),
+	},
+	{
+		Name = 'Lavender Farm',
+		Primary = color('#308980'),
+		Secondary = color('#E2DAE3'),
+		Elements = color('#C7A9D1'),
+		Title = BoostColor(color('#C7A9D1'), 1.25),
+	},
+	{
+		Name = 'Toxic Ivy',
+		Primary = color('#49274C'),
+		Secondary = color('#715B64'),
+		Elements = color('#BDD79B'),
+		Title = BoostColor(color('#BDD79B'), 1.25),
+	},
+	{
+		Name = 'Heat Wave',
+		Primary = color('#4C071A'),
+		Secondary = color('#FFE2A4'),
+		Elements = color('#D52941'),
+		Title = BoostColor(color('#D52941'), 1.25),
+	},
+	{
+		Name = 'Seaweed Blues',
+		Primary = color('#122931'),
+		Secondary = color('#4D7087'),
+		Elements = color('#58A071'),
+		Title = BoostColor(color('#58A071'), 1.25),
+	},
+	{
+		Name = 'Antique',
+		Primary = color('#938273'),
+		Secondary = color('#FBFFEB'),
+		Elements = color('#D1D0A3'),
+		Title = BoostColor(color('#938273'), 1.25),
+	},
+	{
+		Name = 'Outrunner',
+		Primary = color('#391D5E'),
+		Secondary = color('#76E5FC'),
+		Elements = color('#B80E96'),
+		Title = BoostColor(color('#76E5FC'), 1.25),
+	},
+	{
+		Name = 'Tropical Goth',
+		Primary = color('#192E39'),
+		Secondary = color('#F6B873'),
+		Elements = color('#487272'),
+		TitleTop = color('#487272'),
+		TitleBottom = color('#F99836'),
+	},
+	{
+		Name = 'Technical Gato',
+		Primary = color('#372348'),
+		Secondary = color('#EFE8B4'),
+		Elements = color('#52335D'),
+		TitleTop = color('#6EE231'),
+		TitleBottom = color('#F7E656'),
+	},
+	{
+		Name = 'Polterheist',
+		Primary = color('#204020'),
+		Secondary = color('#00FFFF'),
+		Elements = color('#FF00FF'),
+		Title = color('#2F832F')
 	},
 	{
 		Name = 'Trans Pride',

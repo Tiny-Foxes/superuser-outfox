@@ -423,6 +423,12 @@ return {
 		Choices = LoadModule('Theme.Colors.lua', true).Choices,
 		Values = LoadModule('Theme.Colors.lua', true).Values,
 	},
+	SuperuserBGBrightness =
+	{
+		Default = 1,
+		Choices = { 1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0 },
+		Values = { 1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0 },
+	},
 	LifeType =
 	{
 		Default = "Bar",

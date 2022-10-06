@@ -70,19 +70,15 @@ t[#t + 1] = Def.ActorFrame {
 				:cropright(1)
 		end,
 	},
-	GAMESTATE:IsSideJoined(plr) and Def.BitmapText {
+	GAMESTATE:IsSideJoined(plr) and Def.Sprite {
 		Name = 'Grade',
-		Font = '_xiaxide 80px',
-		Text = GetPlrGrade(),
+		Texture = THEME:GetPathG('GradeDisplay', 'Grade '..playerstats:GetGrade()),
 		InitCommand = function(self)
-			local diff = GAMESTATE:GetCurrentSteps(plr):GetDifficulty()
-			local cdiff = THEME:GetString("CustomDifficulty",ToEnumShortString(diff))
 			self
 				:skewx(0.25)
 				:addx(10)
-				:addy(-58)
-				:zoom(2)
-				:diffuse(ColorLightTone(PlayerColor(plr)))
+				:addy(-72)
+				:zoom(0.75)
 				:addx(40)
 				:diffusealpha(0)
 		end,

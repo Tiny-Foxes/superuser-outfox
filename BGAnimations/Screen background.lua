@@ -14,6 +14,18 @@ return Def.ActorFrame {
 				:zoom((sh / 1080) * 1.1)
 		end,
 	},
+	--[[
+	Def.ActorFrame {
+		Name = 'Starfield',
+		Def.Sprite {
+			Texture = THEME:GetPathG('', 'better-starfield'),
+			OnCommand = function(self)
+				self:FullScreen():diffusealpha(0.5)
+			end,
+		},
+	},
+	--]]
+	---[[
 	Def.ActorFrame {
 		Name = 'Starfield',
 		OnCommand = function(self)
@@ -80,6 +92,7 @@ return Def.ActorFrame {
 			end
 		},
 	},
+	--]]
 	-- Tint
 	Def.Quad {
 		OnCommand = function(self)
@@ -96,6 +109,22 @@ return Def.ActorFrame {
 				:diffuse(color.Primary)
 				:diffusebottomedge(color.Secondary)
 				:diffusealpha(0.15)
+		end,
+	},
+	-- Dimmer
+	Def.Quad {
+		OnCommand = function(self)
+			local a = LoadModule('Config.Load.lua')('SuperuserBGBrightness', 'Save/OutFoxPrefs.ini') or 1
+			self
+				:FullScreen()
+				:diffuse(0, 0, 0, 1 - a)
+		end,
+		ThemeColorChangedMessageCommand = function(self)
+			local a = LoadModule('Config.Load.lua')('SuperuserBGBrightness', 'Save/OutFoxPrefs.ini') or 1
+			self
+				:stoptweening()
+				:linear(0.25)
+				:diffuse(0, 0, 0, 1 - a)
 		end,
 	},
 }
