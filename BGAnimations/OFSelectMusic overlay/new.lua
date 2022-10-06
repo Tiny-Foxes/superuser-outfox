@@ -198,6 +198,8 @@ local function MoveSong(self, offset, Songs, reset)
 	end
 
 	if offset ~= 0 then
+		-- This should stabilize the wheel listings. ~Sudo
+		MoveSong(self, 0, Songs)
 		for i = 1, wheel.Song.Size do
 
 			local pos = Index.Song + (offset * 6) - 1
