@@ -19,7 +19,7 @@ return function(Songs, Sort)
 	for v in ivalues(Groups) do
 		GroupsAndSongs[v] = GroupsAndSongs[v] or {}
 		for v2 in ivalues(Songs) do
-			if TF_WHEEL.SortType[Sort](v2) == v then
+			if TF_WHEEL.SortType[Sort](v2) == v or GAMESTATE:IsCourseMode() then
 				GroupsAndSongs[v][#GroupsAndSongs[v] + 1] = v2
 			end
 		end

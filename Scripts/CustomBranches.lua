@@ -3,8 +3,6 @@
 function SelectMusicOrCourse()
 	if IsNetSMOnline() then
 		return "ScreenNetSelectMusic"
-	elseif GAMESTATE:IsCourseMode() then
-		return "ScreenSelectCourse"
 	else
 		return SelectMusicRedirect()
 	end

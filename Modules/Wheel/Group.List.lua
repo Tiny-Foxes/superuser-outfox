@@ -4,6 +4,10 @@ return function(Songs, Sort)
 
     local Groups = {}
 
+	if GAMESTATE:IsCourseMode() then
+		return {'Course Mode'}
+	end
+
 	for v in ivalues(Songs) do
 		local Add = true
 		for v2 in ivalues(Groups) do

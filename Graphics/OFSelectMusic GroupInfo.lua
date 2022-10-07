@@ -1,3 +1,5 @@
+if GAMESTATE:IsCourseMode() then return Def.Actor {} end
+
 return Def.ActorFrame {
 	Name = 'GroupInfoFrame',
 	InitCommand = function(self)
@@ -45,7 +47,11 @@ return Def.ActorFrame {
 			end,
 			LoadBannerCommand = function(self)
 				local song = GAMESTATE:GetCurrentSong()
-				self:LoadFromSongGroup(song:GetGroupName())
+				if song.GetGroupName then
+					self:LoadFromSongGroup(song:GetGroupName())
+				else
+					self:LoadFromCourse(song)
+				end
 				local w, h = self:GetWidth(), self:GetHeight()
 				self:zoomto(160 * w/h, 160)
 				self:easeinoutsine(0.1):diffusealpha(1)

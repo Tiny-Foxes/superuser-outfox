@@ -8,12 +8,13 @@
 		X Add difficulty select subscreen.
 		X Allow dynamic player join and unjoin.
 		X Add song elements to music select screen.
-		- Pretty up music select screen.
+		X Pretty up music select screen.
+		X Allow sorting group wheel.
+		X Allow compatibility with course mode.
 		- Add difficulty pips to song wheel.
 		- Add chart preview on difficulty select screen.
 		- Add player option select subscreen.
 		- Preview player option modifiers.
-		- Allow custom sorting on wheel and groups.
 		- Add song and group search.
 		- Preview modcharts?
 		- SHIP IT.
@@ -211,8 +212,13 @@ local function MoveSong(self, offset, Songs, reset)
 
 			if (i == wheel.Song.Inc and offset < 0) or (i == wheel.Song.Dec and offset > 0) then
 				local contAF = self:GetChild('Container'..i)
-				contAF:GetChild('Title'):settext(Songs[pos]:GetDisplayMainTitle()):zoom(0.5):maxwidth(540)
-				contAF:GetChild('SubTitle'):settext(Songs[pos]:GetDisplaySubTitle()):zoom(0.5):maxwidth(540)
+				if GAMESTATE:IsCourseMode() then
+					contAF:GetChild('Title'):settext(Songs[pos]:GetDisplayFullTitle()):zoom(0.5):maxwidth(540)
+					contAF:GetChild('SubTitle'):settext(''):zoom(0.5):maxwidth(540)
+				else
+					contAF:GetChild('Title'):settext(Songs[pos]:GetDisplayMainTitle()):zoom(0.5):maxwidth(540)
+					contAF:GetChild('SubTitle'):settext(Songs[pos]:GetDisplaySubTitle()):zoom(0.5):maxwidth(540)
+				end
 				if contAF:GetChild('SubTitle'):GetText() == '' then
 					contAF:GetChild('Title'):y(0)
 					contAF:GetChild('SubTitle'):y(0)
@@ -238,8 +244,13 @@ local function MoveSong(self, offset, Songs, reset)
 			while pos > songCount do pos = pos - songCount end
 			while pos < 1 do pos = pos + songCount end
 			local contAF = self:GetChild('Container'..off)
-			contAF:GetChild('Title'):settext(Songs[pos]:GetDisplayMainTitle()):zoom(0.5):maxwidth(540)
-			contAF:GetChild('SubTitle'):settext(Songs[pos]:GetDisplaySubTitle()):zoom(0.5):maxwidth(540)
+			if GAMESTATE:IsCourseMode() then
+				contAF:GetChild('Title'):settext(Songs[pos]:GetDisplayFullTitle()):zoom(0.5):maxwidth(540)
+				contAF:GetChild('SubTitle'):settext(''):zoom(0.5):maxwidth(540)
+			else
+				contAF:GetChild('Title'):settext(Songs[pos]:GetDisplayMainTitle()):zoom(0.5):maxwidth(540)
+				contAF:GetChild('SubTitle'):settext(Songs[pos]:GetDisplaySubTitle()):zoom(0.5):maxwidth(540)
+			end
 			if contAF:GetChild('SubTitle'):GetText() == '' then
 				contAF:GetChild('Title'):y(0)
 				contAF:GetChild('SubTitle'):y(0)
@@ -250,7 +261,11 @@ local function MoveSong(self, offset, Songs, reset)
 
 		end
 	end
-	GAMESTATE:SetCurrentSong(Songs[Index.Song])
+	if GAMESTATE:IsCourseMode() then
+		GAMESTATE:SetCurrentCourse(Songs[Index.Song])
+	else
+		GAMESTATE:SetCurrentSong(Songs[Index.Song])
+	end
 end
 
 -- Function for moving along the group wheel.
@@ -388,14 +403,14 @@ for i = 1, wheel.Song.Size do
 	end
 	do title
 		:SetAttribute('Font', 'Common Large')
-		:SetAttribute('Text', CurSongs[songIdx]:GetDisplayMainTitle())
+		:SetAttribute('Text', (not GAMESTATE:IsCourseMode() and CurSongs[songIdx]:GetDisplayMainTitle()) or CurSongs[songIdx]:GetDisplayFullTitle())
 		:SetCommand('Init', function(self)
 			self:zoom(0.5):maxwidth(540):diffuse(ThemeColor.Text)
 		end)
 	end
 	do subtitle
 		:SetAttribute('Font', 'Common Normal')
-		:SetAttribute('Text', CurSongs[songIdx]:GetDisplaySubTitle())
+		:SetAttribute('Text', (not GAMESTATE:IsCourseMode() and CurSongs[songIdx]:GetDisplaySubTitle()) or '')
 		:SetCommand('Init', function(self)
 			self:zoom(0.5):maxwidth(540):diffuse(ThemeColor.Text)
 		end)
@@ -475,7 +490,10 @@ do songWheel
 		end
 	end)
 	:SetCommand('Back', function(self)
-		if PlayersJoined[self.pn] then
+		if GAMESTATE:IsCourseMode() then
+			SCREENMAN:PlayCancelSound()
+			SCREENMAN:GetTopScreen():Cancel()
+		elseif PlayersJoined[self.pn] then
 			MESSAGEMAN:Broadcast('GroupUnselect')
 		end
 	end)
@@ -585,7 +603,11 @@ do songSelect
 				self:zoom(0.5):maxwidth(540)
 			end)
 			:SetMessage('CurrentSongChanged', function(self)
-				self:settext(GAMESTATE:GetCurrentSong():GetDisplayMainTitle())
+				if GAMESTATE:IsCourseMode() then
+					self:settext(GAMESTATE:GetCurrentCourse():GetDisplayFullTitle())
+				else
+					self:settext(GAMESTATE:GetCurrentSong():GetDisplayMainTitle())
+				end
 			end),
 		'Title'
 	)
@@ -596,7 +618,11 @@ do songSelect
 				self:zoom(0.5):maxwidth(540)
 			end)
 			:SetMessage('CurrentSongChanged', function(self)
-				self:settext(GAMESTATE:GetCurrentSong():GetDisplaySubTitle())
+				if GAMESTATE:IsCourseMode() then
+					self:settext('')
+				else
+					self:settext(GAMESTATE:GetCurrentSong():GetDisplaySubTitle())
+				end
 				if self:GetText() == '' then
 					self:GetParent():GetChild('Title'):y(0)
 					self:y(0)
@@ -836,12 +862,17 @@ do diffCover
 	:AddToTree('DiffCover')
 end
 
+local course = GAMESTATE:GetCurrentCourse()
+local entry = 1
+
 do songPreview
 	:SetCommand('On', function(self)
 		self:queuemessage('CurrentSongChanged')
 	end)
 	:SetMessage('CurrentSongChanged', function(self)
-		if not GAMESTATE:IsCourseMode() and wheel.Focus == 'Song' then
+		course = GAMESTATE:GetCurrentCourse()
+		entry = 1
+		if wheel.Focus == 'Song' then
 			SOUND:StopMusic()
 			self:stoptweening():sleep(0.4):queuecommand('SongPreview')
 		end
@@ -867,14 +898,24 @@ do songPreview
 	end)
 	:SetCommand('SongPreview', function(self)
 		if GAMESTATE:IsCourseMode() then
-			SOUND:PlayMusicPart(
-				loadfile(THEME:GetPathS('ScreenTitleMenu', 'music'))(),
-				nil,
-				nil,
-				0,
-				0,
-				true
-			)
+			if #course:GetAllTrails() < 1 then return end
+			local entries = #course:GetAllTrails()[1]:GetTrailEntries()
+			if not entries then return end
+			local song = course:GetAllTrails()[1]:GetTrailEntry(entry):GetSong()
+			if song then
+				SOUND:PlayMusicPart(
+					song:GetPreviewMusicPath(),
+					song:GetSampleStart(),
+					song:GetSampleLength(),
+					0,
+					1,
+					true
+				)
+				entry = entry + 1
+				while entry > entries do entry = entry - entries end
+				while entry < 1 do entry = entry + entries end
+				self:stoptweening():sleep(song:GetSampleLength()):queuecommand('SongPreview')
+			end
 		else
 			--GAMESTATE:GetCurrentSong():PlayPreviewMusic() -- Doesn't fade out.
 			---[[
@@ -959,6 +1000,7 @@ do varControl
 		wheel.Focus = 'Song'
 	end)
 	:SetMessage('CycleSort', function(self)
+		if GAMESTATE:IsCourseMode() then return end
 		sortIdx = sortIdx + 1
 		while sortIdx > #sorts do sortIdx = sortIdx - #sorts end
 		TF_WHEEL.PreferredSort = sorts[sortIdx]
@@ -1006,6 +1048,10 @@ do previewAF
 		--self:easeinexpo(0.5):y(SH)
 	end)
 	:AddToTree('PreviewFrame')
+end
+
+SuperActor.GetTree().CurrentCourseChangedMessageCommand = function(self)
+	self:queuemessage('CurrentSongChanged')
 end
 
 return SuperActor.GetTree()

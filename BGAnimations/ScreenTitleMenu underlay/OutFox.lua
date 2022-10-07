@@ -638,20 +638,28 @@ do uiWrap
 	:AddToTree('UIWrap')
 end
 
-local OFVersion = SuperActor.new('BitmapText')
-do OFVersion
+local uiDetails = SuperActor.new('BitmapText')
+do uiDetails
 	:SetAttribute('Font', 'Common Normal')
 	:SetCommand('Init', function(self)
-		local ver = ProductVersion()
-		local notes = {'subo notes:', '- finish color schemes', '- finish timing window colors', '- finalize for steam release', '- u did the it :)'}
+		local text = ProductID()..' '..ProductVersion()
+		local songstats = #SONGMAN:GetAllSongs()..' songs in '..#SONGMAN:GetSongGroupNames()..' groups ('..#SONGMAN:GetAllCourses(true)..' courses)'
+		text = text..'\n'..songstats
+		local notes = {
+			'subo notes:',
+			'- finish timing window colors',
+			'- finalize for steam release',
+			'- u did the it :)'
+		}
+		if subo_notes then text = text..'\n'..table.concat(notes, '\n') end
 		self
 			:align(0, 0)
 			:zoom(0.5)
 			:shadowlengthy(1)
 			:xy(SL + 12, ST + 12)
-			:settext(ver..'\n'..table.concat(notes, '\n'))
+			:settext(text)
 	end)
-	:AddToTree('OFVersion')
+	:AddToTree('GameDetails')
 end
 
 

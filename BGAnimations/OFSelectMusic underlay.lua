@@ -31,11 +31,13 @@ return Def.ActorFrame {
 				:queuecommand('LoadBackground')
 		end,
 		LoadBackgroundCommand = function(self)
-			local song = GAMESTATE:GetCurrentSong()
-			if not GAMESTATE:IsCourseMode() and song:GetPreviewVidPath() then
-				self:Load(song:GetPreviewVidPath())
-			else
-				self:LoadFromCurrentSongBackground()
+			local song = GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentCourse() or GAMESTATE:GetCurrentSong()
+			if not GAMESTATE:IsCourseMode() then
+				if song:GetPreviewVidPath() then
+					self:Load(song:GetPreviewVidPath())
+				else
+					self:LoadFromCurrentSongBackground()
+				end
 			end
 			self
 				:easeinoutsine(0.3)
@@ -57,9 +59,11 @@ return Def.ActorFrame {
 					:queuecommand('LoadBanner')
 			end,
 			LoadBannerCommand = function(self)
-				local song = GAMESTATE:GetCurrentSong()
+				local song = GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentCourse() or GAMESTATE:GetCurrentSong()
 				if song:HasBanner() then
 					self:LoadFromCachedBanner(song:GetBannerPath())
+				elseif GAMESTATE:IsCourseMode() then
+					self:LoadFromCourse(song)
 				else
 					self:LoadFromSongGroup(song:GetGroupName())
 				end
@@ -91,7 +95,7 @@ return Def.ActorFrame {
 					:queuecommand('LoadTitle')
 			end,
 			LoadTitleCommand = function(self)
-				local song = GAMESTATE:GetCurrentSong()
+				local song = GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentCourse() or GAMESTATE:GetCurrentSong()
 				local title = song:GetDisplayFullTitle()
 				if not GAMESTATE:IsCourseMode() then
 					if song:GetDisplaySubTitle() and song:GetDisplaySubTitle() ~= '' then
@@ -142,7 +146,7 @@ return Def.ActorFrame {
 					:queuecommand('LoadArtist')
 			end,
 			LoadArtistCommand = function(self)
-				local song = GAMESTATE:GetCurrentSong()
+				local song = GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentCourse() or GAMESTATE:GetCurrentSong()
 				local artist = (GAMESTATE:IsCourseMode() and song:GetScripter()) or song:GetDisplayArtist()
 				self
 					:settext(artist)

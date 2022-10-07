@@ -23,6 +23,9 @@ Index.Diff = Index.Diff or {
 }
 
 local CurSong = GAMESTATE:GetCurrentSong()
+if GAMESTATE:IsCourseMode() then
+	CurSong = GAMESTATE:GetCurrentCourse()
+end
 local DiffLoader = LoadModule('Wheel/Difficulty.Sort.lua')
 local AllDiffs = DiffLoader(CurSong)
 local CurDiff = {

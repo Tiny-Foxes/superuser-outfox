@@ -2,11 +2,18 @@
 -- Accepts Style.
 return function(Style)
 
+	local Songs
+	if GAMESTATE:IsCourseMode() then
+		Songs = SONGMAN:GetAllCourses(true)
+	else
+		Songs = SONGMAN:GetAllSongs()
+	end
+
 	-- All the Compatible Songs Container.
 	local AllCompSongs = {}
 		
 	-- For all Songs.
-	for CurSong in ivalues(SONGMAN:GetAllSongs()) do
+	for CurSong in ivalues(Songs) do
 	
 		-- Temp Difficulty Container.
 		local DiffCon = {}
@@ -16,7 +23,13 @@ return function(Style)
 		
 
 		-- For all the playable steps in Current looped Song.
-		for CurStep in ivalues(SongUtil.GetPlayableSteps(CurSong)) do
+		local Steps
+		if GAMESTATE:IsCourseMode() then
+			Steps = CurSong:GetAllTrails()
+		else
+			Steps = SongUtil.GetPlayableSteps(CurSong)
+		end
+		for CurStep in ivalues(Steps) do
 			-- Find if Steps supports current selected Style.
 			if string.find(CurStep:GetStepsType():lower(), Style) then
 
