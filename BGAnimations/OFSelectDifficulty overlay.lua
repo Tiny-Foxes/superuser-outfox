@@ -128,7 +128,12 @@ for k in pairs(plrs) do
 				:zoom(0.6)
 		end)
 		:SetCommand('SetDifficulty'..PN, function(self)
-			local title = CurDiff[k]:GetChartName()
+			local title
+			if GAMESTATE:IsCourseMode() then
+				title = THEME:GetString('CustomDifficulty', ToEnumShortString(CurDiff[k]:GetDifficulty()))
+			else
+				title = CurDiff[k]:GetChartName()
+			end
 			if title == '' then title = THEME:GetString('CustomDifficulty', ToEnumShortString(CurDiff[k]:GetDifficulty())) end
 			self
 				:settext(title)
@@ -227,14 +232,24 @@ for k in pairs(plrs) do
 				if i % 4 == 1 then
 					newln = '\n   '
 					if v == 'Author' then
-						datum = chart:GetAuthorCredit()
+						if GAMESTATE:IsCourseMode() then
+							datum = GAMESTATE:GetCurrentCourse():GetScripter()
+							if datum == '' then datum = 'Unknown' end
+						else
+							datum = chart:GetAuthorCredit()
+						end
 					elseif v == 'Style' then
 						datum = THEME:GetString('LongStepsType', ToEnumShortString(chart:GetStepsType()))
 					elseif v == 'Info' then
-						datum = chart:GetDescription()
+						if GAMESTATE:IsCourseMode() then
+							datum = {GAMESTATE:GetCurrentCourse():GetDescription(), '('..#chart:GetTrailEntries()..' songs)'}
+							datum = table.concat(datum, ' ')
+						else
+							datum = chart:GetDescription()
+						end
 					end
 				else
-					local radar = CurDiff[k]:GetRadarValues(k)
+					local radar = CurDiff[k]:GetRadarValues((GAMESTATE:IsCourseMode() and nil) or k)
 					local map = {
 						Taps = 6,
 						Holds = 9,
@@ -246,6 +261,7 @@ for k in pairs(plrs) do
 						Mines = 10,
 					}
 					datum = radar:GetValue(RadarCategory[map[v]])
+					if datum == -1 then datum = '???' end
 				end
 				self
 					:stoptweening()
@@ -357,7 +373,11 @@ do af
 				local type = CurDiff[pn]:GetStepsType()
 				GAMESTATE:SetCurrentStyle(type:sub(1 - type:reverse():find('_'), -1))
 			end
-			GAMESTATE:SetCurrentSteps(pn, CurDiff[pn])
+			if GAMESTATE:IsCourseMode() then
+				GAMESTATE:SetCurrentTrail(pn, CurDiff[pn])
+			else
+				GAMESTATE:SetCurrentSteps(pn, CurDiff[pn])
+			end
 		end
 		if not PROFILEMAN:GetProfile(PLAYER_1) and not PROFILEMAN:GetProfile(PLAYER_2) then
 			PROFILEMAN:SaveMachineProfile()
@@ -420,12 +440,12 @@ do af
 			elseif PlayerReady[PLAYER_1] and PlayerReady[PLAYER_2] then
 				SOUND:PlayOnce(THEME:GetPathS('Common', 'Start'), true)
 				self:stoptweening():playcommand('Off')
-				SCREENMAN:GetTopScreen():queuemessage('EnterGameplay', CurDiff)
+				SCREENMAN:GetTopScreen():queuemessage('EnterGameplay')
 			end
 		else
 			SOUND:PlayOnce(THEME:GetPathS('Common', 'Start'), true)
 			self:stoptweening():playcommand('Off')
-			SCREENMAN:GetTopScreen():queuemessage('EnterGameplay', CurDiff)
+			SCREENMAN:GetTopScreen():queuemessage('EnterGameplay')
 		end
 	end)
 	:AddToTree('DifficultyFrame')

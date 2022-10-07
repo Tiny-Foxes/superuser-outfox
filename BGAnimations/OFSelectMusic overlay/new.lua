@@ -901,7 +901,8 @@ do songPreview
 			if #course:GetAllTrails() < 1 then return end
 			local entries = #course:GetAllTrails()[1]:GetTrailEntries()
 			if not entries then return end
-			local song = course:GetAllTrails()[1]:GetTrailEntry(entry):GetSong()
+			-- GetTrailEntry is 0-indexed. ~Sudo
+			local song = course:GetAllTrails()[1]:GetTrailEntry(entry - 1):GetSong()
 			if song then
 				SOUND:PlayMusicPart(
 					song:GetPreviewMusicPath(),
@@ -920,6 +921,7 @@ do songPreview
 			--GAMESTATE:GetCurrentSong():PlayPreviewMusic() -- Doesn't fade out.
 			---[[
 			local song = GAMESTATE:GetCurrentSong()
+			lua.ReportScriptError(tostring(song))
 			SOUND:PlayMusicPart(
 				song:GetPreviewMusicPath(),
 				song:GetSampleStart(),
@@ -1017,13 +1019,14 @@ do varControl
 	end)
 	:SetMessage('EnterGameplay', function(self)
 		SOUND:DimMusic(0, 3)
-		wheel.NextScreen = 'ScreenLoadGameplayElements'
+		wheel.NextScreen = Branch.GameplayScreen()
 		self:sleep(0.25):queuecommand('BeginTransition')
 	end)
 	:SetCommand('BeginTransition', function(self)
 		SCREENMAN:GetTopScreen()
 			:SetNextScreenName(wheel.NextScreen)
 			:StartTransitioningScreen('SM_GoToNextScreen')
+			--:PostScreenMessage('SM_GoToNextScreen', 1)
 	end)
 	:AddToTree()
 end

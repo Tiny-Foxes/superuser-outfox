@@ -35,6 +35,13 @@ local function JudgmentColor(j)
 			Miss = color("#ff3c3c"),
 		},
 		FAPlus = {
+			ProW1 = color("#a7ffff"),
+			W1 = color("#f2f6fb"),
+			W2 = color("#ffff84"),
+			W3 = color("#a7ffa7"),
+			W4 = color("#ffa7ff"),
+			W5 = color("#ffb8a7"),
+			Miss = color("#ff8b8b"),
 		},
 		ECFA = {
 			ProW1 = color("#f2f6fb"),
@@ -44,6 +51,27 @@ local function JudgmentColor(j)
 			W4 = color("#ffa7ff"),
 			W5 = color("#ffb8a7"),
 			Miss = color("#ff8b8b"),
+		},
+		Pump = {
+			W1 = color('#84c7ea'),
+			W2 = color('#97e270'),
+			W3 = color('#ffe4b3'),
+			W4 = color('#c183e5'),
+			Miss = color('#e98061'),
+		},
+		Taitai = {
+			W1 = color('#ffed7c'),
+			W2 = color('#fcfcfc'),
+			W3 = color('#c58bfb'),
+			Miss = color('#c58bfb'),
+		},
+		BMS = {
+			W1 = color('#ffb463'),
+			W2 = color('#407fec'),
+			W3 = color('#407fec'),
+			W4 = color('#f9aa2a'),
+			W5 = color('#f9aa2a'),
+			Miss = color('#ff958d'),
 		},
 	}
 	if c[timing] then

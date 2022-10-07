@@ -1,3 +1,4 @@
+if GAMESTATE:IsCourseMode() then TF_WHEEL.PreferredSort = 'Group' end
 local wheel = 'new'
 return Def.ActorFrame {
 	OnCommand = function(self)

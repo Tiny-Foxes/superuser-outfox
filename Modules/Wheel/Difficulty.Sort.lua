@@ -20,7 +20,12 @@ local function compare(a, b)
 end
 
 return function(Song)
-	local diffs = Song:GetAllSteps()
+	local diffs
+	if GAMESTATE:IsCourseMode() then
+		diffs = Song:GetAllTrails()
+	else
+		diffs = Song:GetAllSteps()
+	end
 	local compat = {}
 	for chart in ivalues(diffs) do
 		local match = chart:GetStepsType():lower()

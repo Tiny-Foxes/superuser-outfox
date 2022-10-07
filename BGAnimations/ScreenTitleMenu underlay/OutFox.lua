@@ -4,7 +4,7 @@ konko()
 
 if not SetMeFree then SetMeFree = false end
 
-local subo_notes = true
+local subo_notes = false
 
 -- Load SuperActor module
 local SuperActor = LoadModule('Konko.SuperActor.lua')
@@ -647,8 +647,6 @@ do uiDetails
 		text = text..'\n'..songstats
 		local notes = {
 			'subo notes:',
-			'- finish timing window colors',
-			'- finalize for steam release',
 			'- u did the it :)'
 		}
 		if subo_notes then text = text..'\n'..table.concat(notes, '\n') end
