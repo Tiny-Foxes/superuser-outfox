@@ -921,7 +921,6 @@ do songPreview
 			--GAMESTATE:GetCurrentSong():PlayPreviewMusic() -- Doesn't fade out.
 			---[[
 			local song = GAMESTATE:GetCurrentSong()
-			lua.ReportScriptError(tostring(song))
 			SOUND:PlayMusicPart(
 				song:GetPreviewMusicPath(),
 				song:GetSampleStart(),

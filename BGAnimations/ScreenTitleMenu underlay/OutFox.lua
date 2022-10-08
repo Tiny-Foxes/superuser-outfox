@@ -553,6 +553,7 @@ do uiMode
 			:xy(-480, 86)
 			:basezoom(2)
 			:diffuse(0.25, 0.25, 0.25, 0)
+			:visible(not splash)
 	end)
 	:SetCommand('On', function(self)
 		self
@@ -656,6 +657,7 @@ do uiDetails
 			:shadowlengthy(1)
 			:xy(SL + 12, ST + 12)
 			:settext(text)
+			:visible(not splash)
 	end)
 	:AddToTree('GameDetails')
 end
