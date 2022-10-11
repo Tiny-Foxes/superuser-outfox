@@ -132,13 +132,17 @@ local HoldJudgments = Def.ActorFrame {
 		self:y(ypos)
 	end,
 }
+local po = GAMESTATE:GetPlayerState(PlayerNumber:Reverse()[sPlayer]):GetPlayerOptions('ModsLevel_Current')
 
 
 for i = 1, GAMESTATE:GetCurrentStyle():ColumnsPerPlayer() do
 	local xpos = GAMESTATE:GetCurrentStyle():GetColumnInfo(sPlayer, i).XOffset
 	HoldJudgments[#HoldJudgments + 1] = LoadActor(GetHoldTexture())..{
 		InitCommand = function(self)
-			self:x(xpos):zoom(0.75):diffusealpha(0):pause()
+			self:x(xpos):zoom(0.75):diffusealpha(0):pause():luaeffect('UpdateHide')
+		end,
+		UpdateHideCommand = function(self)
+			self:visible(not po:HideHoldJudgments())
 		end,
 		LetGoCommand = function(self)
 			self
