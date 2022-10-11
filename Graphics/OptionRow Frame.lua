@@ -79,7 +79,7 @@ for _, pn in ipairs(GAMESTATE:GetEnabledPlayers()) do
 	Judges[#Judges+1] = Def.Sprite{
 		OnCommand=function(self)
 			if self:GetParent():GetParent():GetParent():GetName() == "SmartJudgments" then
-				self:x( SCREEN_CENTER_X + (pn == PLAYER_1 and WideToMax(-160,-200) or 380) ):zoom(.5)
+				self:x( SCREEN_CENTER_X + (pn == PLAYER_1 and WideToMax(-160,-200) or 380) ):zoom(0.5)
 				self:Load(LoadModule("Options.SmartJudgments.lua")()[LoadModule("Options.ChoiceToValue.lua")(LoadModule("Options.SmartJudgments.lua")("Show"),LoadModule("Config.Load.lua")("SmartJudgments",CheckIfUserOrMachineProfile(string.sub(pn,-1)-1).."/OutFoxPrefs.ini") or THEME:GetMetric("Common","DefaultJudgment"))])
 				self:playcommand("ReanimateState")
 			end
@@ -110,6 +110,24 @@ for _, pn in ipairs(GAMESTATE:GetEnabledPlayers()) do
 				self:Load( found )
 			end
 		end
+	}
+	Judges[#Judges+1] = Def.Sprite{
+		OnCommand=function(self)
+			if self:GetParent():GetParent():GetParent():GetName() == "SmartHoldJudgments" then
+				self:x( SCREEN_CENTER_X + (pn == PLAYER_1 and WideToMax(-160,-200) or 380) ):zoom(0.75)
+				self:Load(LoadModule("Options.SmartHoldJudgments.lua")()[LoadModule("Config.Load.lua")("SmartHoldJudgments",CheckIfUserOrMachineProfile(string.sub(pn,-1)-1).."/OutFoxPrefs.ini") or THEME:GetMetric("Common","DefaultHoldJudgment")])
+				self:playcommand("ReanimateState")
+			end
+		end,
+		SmartHoldJudgmentsChangeMessageCommand=function(self,params)
+			if params.pn == pn and self:GetParent():GetParent():GetParent() and self:GetParent():GetParent():GetParent():GetName() == "SmartHoldJudgments" then
+				self:Load(LoadModule("Options.SmartHoldJudgments.lua")()[LoadModule("Options.SmartHoldChoices.lua")("Value")[params.choice]])
+				self:playcommand("ReanimateState")
+			end
+		end,
+		ReanimateStateCommand=function(self)
+			self:SetAllStateDelays(1)
+		end,
 	}
 
 	Judges[#Judges+1] = Def.ActorProxy{

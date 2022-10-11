@@ -231,6 +231,15 @@ return {
 		Choices = LoadModule("Options.SmartJudgeChoices.lua")(),
 		Values = LoadModule("Options.SmartJudgeChoices.lua")("Value")
 	},
+	-- Unfortuately, this cannot be a user preference until the engine can handle custom hold judgments on its own. ~Sudo
+	SmartHoldJudgments =
+	{
+		UserPref = true,
+		OneInRow = true,
+		Default = THEME:GetMetric("Common","DefaultHoldJudgment"),
+		Choices = LoadModule("Options.SmartHoldChoices.lua")(),
+		Values = LoadModule("Options.SmartHoldChoices.lua")("Value"),
+	},
 	SmartTimings =
 	{
 		GenForOther = {"SmartJudgments",LoadModule("Options.SmartJudgeChoices.lua")},
