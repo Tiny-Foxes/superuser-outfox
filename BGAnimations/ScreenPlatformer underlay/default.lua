@@ -6,26 +6,64 @@ local SuperActor = LoadModule('Konko.SuperActor.lua')
 
 local FRAMERATE = 0
 
-local GRAVITY = 5
-local JUMP_HEIGHT = 1
-local MAX_VELOCITY = 1
-local FRICTION = 6
-local APEX_TIME = 0.75
-local ACCEL = 8
+local GRAVITY = {
+	P1 = 0.98,
+	P2 = 0.98,
+}
+local JUMP_HEIGHT = {
+	P1 = 1,
+	P2 = 1,
+}
+local MAX_VELOCITY = {
+	P1 = {
+		X = 0.75,
+		Y = 1,
+	},
+	P2 = {
+		X = 0.75,
+		Y = 1,
+	},
+}
+local FRICTION = {
+	P1 = 6,
+	P2 = 6,
+}
+local APEX_TIME = {
+	P1 = 0.75,
+	P2 = 0.75,
+}
+local ACCEL = {
+	P1 = 8,
+	P2 = 8,
+}
 
 local XMOVE = {
-	LEFT = 0,
-	RIGHT = 0,
+	P1 = {
+		LEFT = 0,
+		RIGHT = 0,
+	},
+	P2 = {
+		LEFT = 0,
+		RIGHT = 0,
+	},
 }
 
 local VELOCITY = {
-	X = 0,
-	Y = 0
+	P1 = {
+		X = 0,
+		Y = 0,
+	},
+	P2 = {
+		X = 0,
+		Y = 0,
+	},
 }
 
 local stage = SuperActor.new('ActorFrame')
 
-local player = SuperActor.new('Sprite')
+local player1 = SuperActor.new('ActorFrame')
+local player2 = SuperActor.new('ActorFrame')
+local karen = SuperActor.new('Sprite')
 local walls = SuperActor.new('ActorFrame')
 
 local floor = SuperActor.new('Quad')
@@ -46,7 +84,7 @@ do floor
 		self
 			:SetSize(SW, 128)
 			:xy(SCX, SB)
-			:diffuse(color('#000000'))
+			:diffuse(color('#202020'))
 	end)
 end
 
@@ -60,28 +98,60 @@ do platform
 	end)
 end
 
-do player
+do karen
 	:SetAttribute('Texture', THEME:GetPathB('ScreenPlatformer', 'underlay/karen'))
 	:SetCommand('Ready', function(self)
 		local w, h = self:GetTexture():GetImageWidth(), self:GetTexture():GetImageHeight()
 		self
-			--:SetSize(32, 64)
 			:SetSize(64 * (w / h), 64)
-			:Center()
+			:shadowlengthx(4)
+			:shadowlengthy(4)
+	end)
+end
+
+do player1
+	:SetCommand('Ready', function(self)
+		local enabled = GAMESTATE:IsPlayerEnabled(PlayerNumber[1])
+		local x, y = SCREEN_CENTER_X, SCREEN_CENTER_Y
+		if GAMESTATE:IsPlayerEnabled(PlayerNumber[2]) then
+			x = SCREEN_CENTER_X * 0.75
+		end
+		self
+			:xy(x, y)
+			:SetSize(64, 48)
 			:SetJumping(false)
+			:SetPlayer(PlayerNumber[1])
+			:visible(enabled)
+	end)
+	:AddChild(karen, 'PSprite')
+end
+do player2
+	:SetCommand('Ready', function(self)
+		local enabled = GAMESTATE:IsPlayerEnabled(PlayerNumber[2])
+		local x, y = SCREEN_CENTER_X, SCREEN_CENTER_Y
+		if GAMESTATE:IsPlayerEnabled(PlayerNumber[1]) then
+			x = SCREEN_CENTER_X * 1.25
+		end
+		self
+			:xy(x, y)
+			:SetJumping(false)
+			:SetPlayer(PlayerNumber[2])
 			:shadowlengthx(4)
 			:shadowlengthy(8)
+			:visible(enabled)
 	end)
+	:AddChild(karen, 'PSprite')
 end
 
 do walls
 	:AddChild(floor, 'Floor')
-	:AddChild(platform, 'Platform')
+	--:AddChild(platform, 'Platform')
 end
 
 do stage
 	:AddChild(walls, 'Walls')
-	:AddChild(player, 'Player')
+	:AddChild(player1, 'PlayerP1')
+	:AddChild(player2, 'PlayerP2')
 	:AddChild(box, 'Box')
 	:AddToTree('Stage')
 end
@@ -124,100 +194,130 @@ function ready()
 
 	local stage = SuperActor.GetTree().Stage
 
-	function stage.Player:Move(x, y)
-		local dir = XMOVE.RIGHT - XMOVE.LEFT
-		if dir ~= 0 then
-			self:zoomx(dir)
+	for i = 1, 2 do
+		local v = PlayerNumber[i]
+		local plr = stage['Player'..ToEnumShortString(v)]
+		function plr:SetPlayer(pn)
+			self.Player = pn
+			return self
 		end
-		return self:addx(x):addy(y)
-	end
-	function stage.Player:SetJumping(b)
-		self.jumping = b
-		return self
-	end
-	function stage.Player:IsJumping()
-		return self.jumping
+		function plr:GetPlayer()
+			return self.Player
+		end
+		function plr:Move(x, y)
+			local pn = ToEnumShortString(self.Player)
+			local dir = XMOVE[pn].RIGHT - XMOVE[pn].LEFT
+			if dir ~= 0 then
+				self:zoomx(dir)
+			end
+			return self:addx(x):addy(y)
+		end
+		function plr:SetJumping(b)
+			self.jumping = b
+			return self
+		end
+		function plr:IsJumping()
+			return self.jumping
+		end
 	end
 
 end
+
+local enabledPlrs = GAMESTATE:GetEnabledPlayers()
 
 function update(dt)
 
 	local stage = SuperActor.GetTree().Stage
 
 
-	-- X Movement
+	for v in ivalues(enabledPlrs) do
 
-	VELOCITY.X = VELOCITY.X + (MAX_VELOCITY * ACCEL * (XMOVE.RIGHT - XMOVE.LEFT) * dt)
-	if VELOCITY.X > MAX_VELOCITY then
-		VELOCITY.X = MAX_VELOCITY
-	end
+		local pn = ToEnumShortString(v)
+		local plr = stage['Player'..pn]
 
-	--
+		--
 
+		-- X Movement
 
-	-- Y Movement
-
-	VELOCITY.Y = VELOCITY.Y + (GRAVITY * dt)
-
-	local vel = math.sqrt(VELOCITY.X ^ 2, VELOCITY.Y ^ 2)
-	if vel > MAX_VELOCITY then
-		local vs = MAX_VELOCITY / vel
-		for v in ivalues(VELOCITY) do
-			v = v * vs
+		VELOCITY[pn].X = VELOCITY[pn].X + (MAX_VELOCITY[pn].X * ACCEL[pn] * (XMOVE[pn].RIGHT - XMOVE[pn].LEFT) * dt)
+		if VELOCITY[pn].X > MAX_VELOCITY[pn].X then
+			VELOCITY[pn].X = MAX_VELOCITY[pn].X
 		end
-	end
 
-	VELOCITY.X = VELOCITY.X / (1 + (FRICTION * dt))
 
-	local g = (JUMP_HEIGHT * 2) / (APEX_TIME ^ 2)
-	local initJump = math.sqrt(g * JUMP_HEIGHT * 2)
+		-- Y Movement
 
-	APEX_TIME = initJump / g
+		VELOCITY[pn].Y = VELOCITY[pn].Y + (GRAVITY[pn] * dt)
 
-	VELOCITY.Y = VELOCITY.Y + (g * dt)
+		---[[
+		local vel = {
+			x = math.sqrt(VELOCITY[pn].X ^ 2),
+			y = math.sqrt(VELOCITY[pn].Y ^ 2),
+		}
+		for k, v in pairs(vel) do
+			if v > MAX_VELOCITY[pn][k:upper()] then
+				local vs = MAX_VELOCITY[pn][k:upper()] / v
+				VELOCITY[pn][k:upper()] = VELOCITY[pn][k:upper()] * vs
+			end
+		end
+		--]]
 
-	for _, v in pairs(stage.Walls:GetChildren()) do
-		if collide(stage.Player, v) then
-			if stage.Player.jumping then
-				VELOCITY.Y = VELOCITY.Y - initJump
-				stage.Player:SetJumping(false)
-			else
-				VELOCITY.Y = 0
-				if stage.Player:GetY() < v:GetY() then
-					stage.Player:addy(-0.1)
-				elseif stage.Player:GetY() > v:GetY() then
-					stage.Player:addy(0.1)
+		VELOCITY[pn].X = VELOCITY[pn].X / (1 + (FRICTION[pn] * dt))
+
+		local g = (JUMP_HEIGHT[pn] * 2) / (APEX_TIME[pn] ^ 2)
+		local initJump = math.sqrt(g * JUMP_HEIGHT[pn] * 2)
+
+		APEX_TIME[pn] = initJump / g
+
+		VELOCITY[pn].Y = VELOCITY[pn].Y + (g * dt)
+
+		for _, v in pairs(stage.Walls:GetChildren()) do
+			if collide(plr, v) then
+				if plr:IsJumping() then
+					VELOCITY[pn].Y = VELOCITY[pn].Y - initJump
+					plr:SetJumping(false)
+				else
+					VELOCITY[pn].Y = 0
+					if plr:GetY() < v:GetY() then
+						plr:addy(-plr:GetHeight() * dt)
+					elseif plr:GetY() > v:GetY() then
+						plr:addy(plr:GetHeight() * dt)
+					end
 				end
 			end
 		end
+
+		--
+
+
+		plr:Move(VELOCITY[pn].X, VELOCITY[pn].Y)
+
 	end
-
-	--
-
-
-	stage.Player:Move(VELOCITY.X, VELOCITY.Y)
 
 end
 
 function input(event)
+	if event.type:find('Press') and event.GameButton == 'Back' then
+		SCREENMAN:GetTopScreen():Cancel()
+	end
+	if not event.PlayerNumber then return end
+	local pn = ToEnumShortString(event.PlayerNumber)
+	local plr = SuperActor.GetTree().Stage['Player'..pn]
 	if event.type:find('Press') then
-		if event.GameButton == 'Back' then
-			SCREENMAN:GetTopScreen():Cancel()
-		elseif event.GameButton == 'MenuUp' then
-			SuperActor.GetTree().Stage.Player:SetJumping(true)
+		if event.GameButton == 'MenuUp' then
+			plr:SetJumping(true)
 		elseif event.GameButton == 'MenuLeft' then
-			XMOVE.LEFT = 1
+			XMOVE[pn].LEFT = 1
 		elseif event.GameButton == 'MenuRight' then
-			XMOVE.RIGHT = 1
+			XMOVE[pn].RIGHT = 1
 		end
 	elseif event.type:find('Repeat') then
 	elseif event.type:find('Release') then
 		if event.GameButton == 'MenuUp' then
 		elseif event.GameButton == 'MenuLeft' then
-			XMOVE.LEFT = 0
+			XMOVE[pn].LEFT = 0
 		elseif event.GameButton == 'MenuRight' then
-			XMOVE.RIGHT = 0
+			XMOVE[pn].RIGHT = 0
 		end
 	end
 end
@@ -243,11 +343,10 @@ return Def.ActorFrame {
 		if ready then ready() end
 		local lastframe = 0
 		self:SetUpdateFunction(function(self)
-			local dt = self:GetEffectDelta()
 			if FRAMERATE and FRAMERATE ~= 0 then
 				lastframe = lastframe + self:GetEffectDelta()
-				if lastframe >= 1/FRAMERATE then
-					update(1/FRAMERATE)
+				if lastframe >= OFMath.oneoverx(FRAMERATE) then
+					update(OFMath.oneoverx(FRAMERATE))
 					lastframe = 0
 				end
 			else
@@ -293,6 +392,9 @@ return Def.ActorFrame {
 				0,
 				true
 			)
+		end,
+		StartTransitioningCommand = function(self)
+			SOUND:DimMusic(0, 5)
 		end,
 	}
 }

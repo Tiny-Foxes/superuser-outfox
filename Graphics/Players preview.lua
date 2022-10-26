@@ -55,10 +55,10 @@ local af = Def.ActorFrame {
 		local target = sample_end - songpos:GetMusicSeconds()
 		local dt = self:GetEffectDelta()
 
-		if target >= (0.5 - dt) and target <= (0.5 + dt) then
+		if target >= (0.5 - dt * 2) and target <= (0.5 + dt * 2) then
 			MESSAGEMAN:Broadcast('MusicLoopNearEnd')
 		end
-		if target >= (song:GetSampleLength() - dt) and target <= (song:GetSampleLength() + dt) then
+		if target >= (song:GetSampleLength() - dt * 2) and target <= (song:GetSampleLength() + dt * 2) then
 			MESSAGEMAN:Broadcast('MusicLoopEnd')
 		end
 	end,
@@ -158,14 +158,14 @@ for i, v in ipairs(GAMESTATE:GetEnabledPlayers()) do
 			end
 			self:luaeffect('UpdateMods')
 		end,
-		SpeedChoiceChangedMessageCommand = function(self, param)
+		SpeedChoiceChangedMessageCommand = function(self, params)
 			local poptions = self:GetChild('NoteField'):GetPlayerOptions('ModsLevel_Current')
-			if param.pn ~= v then return end
-			local speedmod = param.mode:upper()..'Mod'
+			if params.pn ~= v then return end
+			local speedmod = params.mode:upper()..'Mod'
 			if speedmod == 'XMod' then
-				poptions:XMod(param.speed * 0.01)
+				poptions:XMod(params.speed * 0.01)
 			else
-				poptions[speedmod](poptions, param.speed)
+				poptions[speedmod](poptions, params.speed)
 			end
 		end,
 		UpdateModsCommand = function(self, param)
@@ -240,7 +240,7 @@ end
 af[#af + 1] = Def.Sprite {
 	Name = 'PreviewSprite',
 	InitCommand = function(self)
-		self:Center()
+		self:Center():fadetop(0.25):fadebottom(0.25)
 	end,
 	OnCommand = function(self)
 		--self:queuecommand('SetPreviewColor')
@@ -265,10 +265,10 @@ af[#af + 1] = Def.Sprite {
 		self:stoptweening():diffusealpha(0)
 	end,
 	MusicLoopNearEndMessageCommand = function(self)
-		self:easeinoutcircle(0.25):diffusealpha(0)
+		self:stoptweening():diffusealpha(1):easeinoutcircle(0.25):diffusealpha(0)
 	end,
 	MusicLoopEndMessageCommand = function(self)
-		self:easeinoutcircle(0.25):diffusealpha(1)
+		self:stoptweening():diffusealpha(0):easeinoutcircle(0.25):diffusealpha(1)
 	end,
 }
 

@@ -146,7 +146,7 @@ function thified_curstage_index(on_eval)
 end
 
 Branch.GameplayScreen = function()
-	return "ScreenGameplay"
+	return "ScreenLoadGameplayElements"
 end
 
 Branch.AfterTitleMenu = function()

@@ -9,6 +9,7 @@ return Def.ActorFrame {
 				:xy(SCREEN_WIDTH - 80, SCREEN_HEIGHT - 120)
 				:zoom(0.5)
 				:diffusealpha(0)
+				:visible(false)
 		end,
 		OnCommand = function(self)
 			self

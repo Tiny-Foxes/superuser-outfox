@@ -126,10 +126,11 @@ local function GetHoldTexture()
 end
 
 local rev = GAMESTATE:GetIsFieldReversed(sPlayer)
-local ypos = rev and THEME:GetMetric('Player', 'HoldJudgmentYReverse') or THEME:GetMetric('Player', 'HoldJudgmentYStandard')
+local holdypos = rev and THEME:GetMetric('Player', 'HoldJudgmentYReverse') or THEME:GetMetric('Player', 'HoldJudgmentYStandard')
 local HoldJudgments = Def.ActorFrame {
+	Name = 'HoldJudgments',
 	InitCommand = function(self)
-		self:y(ypos)
+		self:y(holdypos)
 	end,
 }
 local po = GAMESTATE:GetPlayerState(PlayerNumber:Reverse()[sPlayer]):GetPlayerOptions('ModsLevel_Current')
@@ -181,6 +182,12 @@ end
 
 
 return Def.ActorFrame {
+	InitCommand = function(self)
+		function self:SetModfilePositioning()
+			self:GetChild('HoldJudgments'):y(holdypos * 0.5)
+			return self
+		end
+	end,
 	Def.Sprite{
 		Name="Judgment",
 		Texture=GetTexture(),

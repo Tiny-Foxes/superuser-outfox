@@ -23,6 +23,11 @@
 
 --]]
 
+-- Redirect input to Lua.
+for plr in ivalues(PlayerNumber) do
+	SCREENMAN:set_input_redirected(plr, true)
+end
+
 local ThemeColor = LoadModule('Theme.Colors.lua')
 local konko = LoadModule('Konko.Core.lua')
 konko()
@@ -145,9 +150,15 @@ if #AllSongs < 1 then
 			SCREENMAN:GetTopScreen():AddInputCallback(LoadModule('Lua.InputSystem.lua')(self))
 		end)
 		:SetCommand('Start', function(self)
+			for plr in ivalues(PlayerNumber) do
+				SCREENMAN:set_input_redirected(plr, false)
+			end
 			SCREENMAN:SetNewScreen('ScreenReloadSongs')
 		end)
 		:SetCommand('Back', function(self)
+			for plr in ivalues(PlayerNumber) do
+				SCREENMAN:set_input_redirected(plr, false)
+			end
 			SCREENMAN:GetTopScreen():Cancel()
 		end)
 	end
@@ -492,6 +503,9 @@ do songWheel
 	:SetCommand('Back', function(self)
 		if GAMESTATE:IsCourseMode() then
 			SCREENMAN:PlayCancelSound()
+			for plr in ivalues(PlayerNumber) do
+				SCREENMAN:set_input_redirected(plr, false)
+			end
 			SCREENMAN:GetTopScreen():Cancel()
 		elseif PlayersJoined[self.pn] then
 			MESSAGEMAN:Broadcast('GroupUnselect')
@@ -745,6 +759,9 @@ do groupWheel
 		-- Otherwise, if this player is still joined, cancel to the previous screen.
 		elseif PlayersJoined[self.pn] then
 			SCREENMAN:PlayCancelSound()
+			for plr in ivalues(PlayerNumber) do
+				SCREENMAN:set_input_redirected(plr, false)
+			end
 			SCREENMAN:GetTopScreen():Cancel()
 		end
 	end)
@@ -1022,6 +1039,9 @@ do varControl
 		self:sleep(0.25):queuecommand('BeginTransition')
 	end)
 	:SetCommand('BeginTransition', function(self)
+		for plr in ivalues(PlayerNumber) do
+			SCREENMAN:set_input_redirected(plr, false)
+		end
 		SCREENMAN:GetTopScreen()
 			:SetNextScreenName(wheel.NextScreen)
 			:StartTransitioningScreen('SM_GoToNextScreen')

@@ -11,6 +11,7 @@ local t = Def.ActorFrame {
 	FOV = 45,
 	OnCommand = function(self)
 		self:xy(-SCREEN_CENTER_X, -SCREEN_CENTER_Y)
+		if IsGame('be-mu') then self:addx(10) end
 	end,
 }
 local zoom = (LoadModule("Config.Load.lua")("MiniSelector",CheckIfUserOrMachineProfile(PlayerNumber:Reverse()[p]).."/OutFoxPrefs.ini") or 100)
@@ -66,6 +67,8 @@ if GAMESTATE:IsHumanPlayer(p) then
 				else
 					self:visible(false)
 				end
+			else
+				self:visible(false)
 			end
 			if p:find('P1') then self:cropright(0.5):faderight(0.25) else self:cropleft(0.5):fadeleft(0.25) end
 		end,

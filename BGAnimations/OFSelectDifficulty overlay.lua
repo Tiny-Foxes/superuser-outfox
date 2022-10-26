@@ -22,6 +22,8 @@ Index.Diff = Index.Diff or {
 	[PLAYER_2] = 1,
 }
 
+local focus = 'Difficulty'
+
 local CurSong = GAMESTATE:GetCurrentSong()
 if GAMESTATE:IsCourseMode() then
 	CurSong = GAMESTATE:GetCurrentCourse()
@@ -42,9 +44,30 @@ local function MoveDifficulty(self, offset, Diffs)
 		CurDiff[self.pn] = Diffs[Index.Diff[self.pn]]
 		self:queuecommand('SetDifficulty'..ToEnumShortString(self.pn))
 	end
+	for pn in ivalues(GAMESTATE:GetHumanPlayers()) do
+		if PROFILEMAN:GetProfile(pn) then PROFILEMAN:SaveProfile(pn) end
+		if  plrs[PLAYER_1] and plrs[PLAYER_2] then
+			GAMESTATE:SetCurrentStyle('versus')
+		elseif CurDiff[pn]:GetStepsType():lower():find('double') then
+			GAMESTATE:SetCurrentStyle('double')
+		else
+			local type = CurDiff[pn]:GetStepsType()
+			GAMESTATE:SetCurrentStyle(type:sub(1 - type:reverse():find('_'), -1))
+		end
+		if GAMESTATE:IsCourseMode() then
+			GAMESTATE:SetCurrentTrail(pn, CurDiff[pn])
+		else
+			GAMESTATE:SetCurrentSteps(pn, CurDiff[pn])
+		end
+	end
 end
 
+
+
 local af = SuperActor.new('ActorFrame')
+
+--af:AddChild(SuperActor.new(LoadActor(THEME:GetPathG('Players', 'preview'))), 'Preview')
+
 for k in pairs(plrs) do
 
 	local PN = ToEnumShortString(k)
@@ -343,9 +366,174 @@ for k in pairs(plrs) do
 	af:AddChild(diffAF, 'Difficulty'..PN)
 end
 
+local gameprefs = IniFile.ReadFile('/Save/OutFoxPrefs.ini')
+local optprefs = LoadModule('Options.Prefs.lua')
+for pn in ivalues(GAMESTATE:GetEnabledPlayers()) do
+	local x = PositionPerPlayer(pn, -SCX - 180, SCX + 180)
+	local addx = PositionPerPlayer(pn, 360, -360)
+
+	local profprefs = IniFile.ReadFile(CheckIfUserOrMachineProfile(0)..'/OutFoxPrefs.ini')
+
+	local po = GAMESTATE:GetPlayerState(pn):GetPlayerOptions('ModsLevel_Preferred')
+
+	local function GetSpeedType()
+		for v in ivalues {
+			'XMod',
+			'CMod',
+			'MMod',
+			'AMod',
+			'CAMod',
+			'AVMod',
+		} do
+			if po[v] and po[v](po) then return v end
+		end
+	end
+
+	local function GetIndex(t, v)
+		for i in ipairs(t) do
+			if t[i] == v then return i end
+		end
+		return 1
+	end
+
+	local spdtype = GetSpeedType()
+
+	local opts = {
+		Menu = 'Main',
+		Main = {
+			IsMenu = true,
+			Index = 1,
+			Modifiers = {
+				IsMenu = true,
+				SpeedType = {
+					Choices = {'XMod', 'CMod', 'MMod', 'AMod', 'CAMod', 'AVMod'},
+					Value = spdtype,
+				},
+				SpeedVal = {
+					Increment = 0.25,
+					Value = po[spdtype](po),
+				},
+				Zoom = {
+					Increment = 0.25,
+					Value = profprefs.MiniSelector,
+				},
+			},
+			Appearance = {
+				IsMenu = true,
+				Index = 1,
+				Judgment = {
+					Choices = LoadModule('Options.SmartJudgeChoices.lua')('Value'),
+					Value = profprefs.SmartJudgments,
+				},
+				HoldJudgment = {
+					Choices = LoadModule('Options.SmartHoldChoices.lua')('Value'),
+					Value = profprefs.SmartHoldJudgments,
+				},
+				NoteSkin = {
+					Choices = NOTESKIN:GetNoteSkinNames(),
+					Value = po:NoteSkin(),
+				},
+			},
+			Judgment = {
+				IsMenu = true,
+				Timing = {
+					Choices = TimingModes,
+					Value = gameprefs.SmartTimings
+				}
+			},
+			Song = {
+				IsMenu = true,
+				Haste = {
+					Toggle = true,
+					Value = gameprefs.Haste,
+				},
+				Rate = {
+					Toggle = true,
+					Value = gameprefs.Rate,
+				},
+			},
+		},
+	}
+	
+	local frame = SuperActor.new('ActorFrame')
+	local panel = SuperActor.new('Quad')
+	local title = SuperActor.new('BitmapText')
+	local mainScroll = SuperActor.new('ActorFrame')
+
+	do panel
+		:SetCommand('Init', function(self)
+			self:SetSize(360, SH):diffuse(0, 0, 0, 0.75)
+		end)
+	end
+	do title
+		:SetAttribute('Font', 'Common Normal')
+		:SetAttribute('Text', ToEnumShortString(pn)..' Options')
+		:SetCommand('Init', function(self)
+			self:valign(0):y(-SCY + 24)
+		end)
+	end
+	
+	--[[
+	for k, v in pairs(opts.Main) do
+		if type(v) == 'table' and v.IsMenu then
+			
+			local menu = SuperActor.new('ActorFrame')
+			local btn = SuperActor.new('Quad')
+			local text = SuperActor.new('BitmapText')
+
+			do btn
+				:SetCommand('Init', function(self)
+					self:SetSize(240, 96):diffuse(0.25, 0.25, 0.25, 1)
+				end)
+			end
+			do text
+				:SetAttribute('Font', 'Common Normal')
+				:SetAttribute('Text', k..' Options')
+			end
+			do menu
+				:SetCommand('Init', function(self)
+				end)
+				:AddChild(btn, 'Panel')
+				:AddChild(text, 'Title')
+			end
+
+			mainScroll:AddChild(menu, k)
+
+		end
+	end
+	--]]
+
+	do frame
+		:SetCommand('Init', function(self)
+			self:x(x)
+		end)
+		:SetMessage('EnterOptions'..ToEnumShortString(pn), function(self)
+			focus = 'Options'
+			opts.Menu = 'Main'
+			self:finishtweening():easeoutexpo(0.15):x(x + addx)
+		end)
+		:SetCommand('Back', function(self)
+			if SuperActor.GetTree().DifficultyFrame.pn ~= pn then return end
+			if focus ~= 'Options' then return end
+			if opts.Menu == 'Main' then
+				SCREENMAN:GetTopScreen():queuemessage('LeaveOptions'..ToEnumShortString(pn))
+			end
+		end)
+		:SetMessage('LeaveOptions'..ToEnumShortString(pn), function(self)
+			focus = 'Difficulty'
+			opts.Menu = 'None'
+			self:finishtweening():easeinexpo(0.15):x(x)
+		end)
+		:AddChild(panel, 'Panel')
+		:AddChild(title, 'Title')
+	end
+	af:AddChild(frame, 'OptionsFrame'..ToEnumShortString(pn))
+end
+
 do af
 	:SetCommand('Init', function(self)
 		self:Center():addy(SH)
+		self:GetChild('Preview'):GetChild('PreviewSprite'):xy(0, 0)
 	end)
 	:SetCommand('On', function(self)
 		self
@@ -363,22 +551,6 @@ do af
 		end
 	end)
 	:SetCommand('Off', function(self)
-		for pn in ivalues(GAMESTATE:GetHumanPlayers()) do
-			if PROFILEMAN:GetProfile(pn) then PROFILEMAN:SaveProfile(pn) end
-			if  plrs[PLAYER_1] and plrs[PLAYER_2] then
-				GAMESTATE:SetCurrentStyle('versus')
-			elseif CurDiff[pn]:GetStepsType():lower():find('double') then
-				GAMESTATE:SetCurrentStyle('double')
-			else
-				local type = CurDiff[pn]:GetStepsType()
-				GAMESTATE:SetCurrentStyle(type:sub(1 - type:reverse():find('_'), -1))
-			end
-			if GAMESTATE:IsCourseMode() then
-				GAMESTATE:SetCurrentTrail(pn, CurDiff[pn])
-			else
-				GAMESTATE:SetCurrentSteps(pn, CurDiff[pn])
-			end
-		end
 		if not PROFILEMAN:GetProfile(PLAYER_1) and not PROFILEMAN:GetProfile(PLAYER_2) then
 			PROFILEMAN:SaveMachineProfile()
 		end
@@ -396,21 +568,31 @@ do af
 		end
 	end)
 	:SetCommand('DiffCancel', function(self)
-		SCREENMAN:GetTopScreen():Cancel()
+		if focus == 'Difficulty' then
+			SCREENMAN:GetTopScreen():Cancel()
+		end
 	end)
 	:SetCommand('MenuLeft', function(self)
 		if PlayerReady[self.pn] then return end
-		MoveDifficulty(self, -1, AllDiffs)
+		if focus == 'Difficulty' then
+			MoveDifficulty(self, -1, AllDiffs)
+		end
 	end)
 	:SetCommand('MenuRight', function(self)
 		if PlayerReady[self.pn] then return end
-		MoveDifficulty(self, 1, AllDiffs)
+		if focus == 'Difficulty' then
+			MoveDifficulty(self, 1, AllDiffs)
+		end
 	end)
 	:SetCommand('MenuDown', function(self)
-		self:stoptweening():playcommand('Off')
-		SCREENMAN:GetTopScreen():queuemessage('EnterOptions', CurDiff)
+		if focus == 'Difficulty' then
+			self:stoptweening():playcommand('Off')
+			SCREENMAN:GetTopScreen():queuemessage('EnterOptions', CurDiff)
+			--SCREENMAN:GetTopScreen():queuemessage('EnterOptions'..ToEnumShortString(self.pn))
+		end
 	end)
 	:SetCommand('Back', function(self)
+		if focus ~= 'Difficulty' then return end
 		if (plrs[PLAYER_1] and plrs[PLAYER_2]) then
 			if PlayerReady[self.pn] then
 				PlayerReady[self.pn] = false
@@ -480,7 +662,7 @@ do diffControl
 				self:halign(0):y(-30)
 			end)
 	)
-	:AddToTree('DiffControl')
+	:AddToTree(1, 'DiffControl')
 end
 
 return SuperActor.GetTree()
