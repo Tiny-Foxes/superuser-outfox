@@ -2,7 +2,6 @@ local ThemeColor = LoadModule('Theme.Colors.lua')
 
 return Def.ActorFrame {
 	Name = 'EvalUnderlay',
-	-- TODO: Fill this with Discord RCP including scores. ~Sudo
 	OnCommand = function(self)
 		self:queuecommand('UpdateDiscordInfo')
 	end,
@@ -249,7 +248,7 @@ return Def.ActorFrame {
 			end,
 			Def.BitmapText {
 				Name = 'SongTitleM',
-				Font = '_xide/40px',
+				Font = 'Common Large',
 				InitCommand = function(self)
 					self
 						:horizalign('right')
@@ -269,7 +268,7 @@ return Def.ActorFrame {
 			},
 			Def.BitmapText {
 				Name = 'SongTitleS',
-				Font = '_xide/20px',
+				Font = 'Common Normal',
 				InitCommand = function(self)
 					self
 						:zoom(1.5)
@@ -283,7 +282,7 @@ return Def.ActorFrame {
 			},
 			Def.BitmapText {
 				Name = 'SongArtist',
-				Font = '_xide/20px',
+				Font = 'Common Normal',
 				InitCommand = function(self)
 					self
 						:horizalign('right')
@@ -299,7 +298,7 @@ return Def.ActorFrame {
 			},
 			Def.BitmapText {
 				Name = 'SongPack',
-				Font = '_xide/20px',
+				Font = 'Common Normal',
 				InitCommand = function(self)
 					self
 						:horizalign('right')

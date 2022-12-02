@@ -416,14 +416,14 @@ for i = 1, wheel.Song.Size do
 		:SetAttribute('Font', 'Common Large')
 		:SetAttribute('Text', (not GAMESTATE:IsCourseMode() and CurSongs[songIdx]:GetDisplayMainTitle()) or CurSongs[songIdx]:GetDisplayFullTitle())
 		:SetCommand('Init', function(self)
-			self:zoom(0.5):maxwidth(540):diffuse(ThemeColor.Text)
+			self:zoom(0.5):shadowlengthy(1):maxwidth(540):diffuse(ThemeColor.Text)
 		end)
 	end
 	do subtitle
 		:SetAttribute('Font', 'Common Normal')
 		:SetAttribute('Text', (not GAMESTATE:IsCourseMode() and CurSongs[songIdx]:GetDisplaySubTitle()) or '')
 		:SetCommand('Init', function(self)
-			self:zoom(0.5):maxwidth(540):diffuse(ThemeColor.Text)
+			self:zoom(0.5):shadowlengthy(1):maxwidth(540):diffuse(ThemeColor.Text)
 		end)
 	end
 	do song
@@ -614,7 +614,7 @@ do songSelect
 		SuperActor.new('BitmapText')
 			:SetAttribute('Font', 'Common Large')
 			:SetCommand('Init', function(self)
-				self:zoom(0.5):maxwidth(540)
+				self:zoom(0.5):shadowlengthy(1):maxwidth(540)
 			end)
 			:SetMessage('CurrentSongChanged', function(self)
 				if GAMESTATE:IsCourseMode() then
@@ -629,7 +629,7 @@ do songSelect
 		SuperActor.new('BitmapText')
 			:SetAttribute('Font', 'Common Normal')
 			:SetCommand('Init', function(self)
-				self:zoom(0.5):maxwidth(540)
+				self:zoom(0.5):shadowlengthy(1):maxwidth(540)
 			end)
 			:SetMessage('CurrentSongChanged', function(self)
 				if GAMESTATE:IsCourseMode() then
@@ -682,7 +682,7 @@ for i = 1, wheel.Group.Size do
 		:SetAttribute('Font', 'Common Large')
 		:SetAttribute('Text', AllGroups[groupIdx])
 		:SetCommand('Init', function(self)
-			self:zoom(0.5):maxwidth(540):diffuse(ThemeColor.Text)
+			self:zoom(0.5):shadowlengthy(1):maxwidth(540):diffuse(ThemeColor.Text)
 		end)
 	group
 		:AddChild(panel, 'Panel')
@@ -856,7 +856,7 @@ do groupSelect
 		SuperActor.new('BitmapText')
 			:SetAttribute('Font', 'Common Large')
 			:SetCommand('Init', function(self)
-				self:zoom(0.5):maxwidth(540):diffuse(ThemeColor.Text)
+				self:zoom(0.5):shadowlengthy(1):maxwidth(540):diffuse(ThemeColor.Text)
 			end)
 			:SetMessage('CurrentSongChanged', function(self)
 				self:settext(AllGroups[Index.Group])

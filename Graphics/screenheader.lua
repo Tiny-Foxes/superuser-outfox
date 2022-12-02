@@ -52,9 +52,10 @@ return Def.ActorFrame {
 		Font = 'Stylized Large',
 		OnCommand = function(self)
 			self
-				:xy(-SCREEN_CENTER_X + 20, 10)
+				:xy(-SCREEN_CENTER_X + 20, 8)
 				:skewx(0.5)
 				:zoom(0.5)
+				:shadowlengthy(1)
 				:horizalign('left')
 				:vertalign('bottom')
 				:settext(header)
@@ -64,12 +65,13 @@ return Def.ActorFrame {
 	},
 	Def.BitmapText {
 		Name = 'SubText',
-		Font = 'Stylized Normal',
+		Font = 'Common Normal',
 		OnCommand = function(self)
 			self
-				:xy(-SCREEN_CENTER_X + 20 + self:GetParent():GetChild('Text'):GetZoomedWidth() + 12, 10)
+				:xy(-SCREEN_CENTER_X + 20 + self:GetParent():GetChild('Text'):GetZoomedWidth() + 12, 8)
 				:skewx(0.5)
 				:zoom(0.5)
+				:shadowlengthy(1)
 				:horizalign('left')
 				:vertalign('bottom')
 				:settext(subheader)
@@ -81,14 +83,12 @@ return Def.ActorFrame {
 	-- ScreenSelectMusic specific stuff
 	Def.BitmapText {
 		Font = 'Stylized Large',
-		InitCommand = function(self)
+		OnCommand = function(self)
 			self
-				:halign(0)
-				:x(SCREEN_CENTER_X - 280)
+				:xy(SCREEN_CENTER_X - 280, 0)
 				:skewx(0.5)
 				:zoom(0.5)
-		end,
-		OnCommand = function(self)
+				:shadowlengthy(1)
 			self:queuecommand('ShowSort')
 		end,
 		CycleSortMessageCommand = function(self)
@@ -99,7 +99,7 @@ return Def.ActorFrame {
 				self
 					:settext(TF_WHEEL.PreferredSort)
 			else
-				self:settext('')
+				self:visible(false)
 			end
 			--[[
 			if GAMESTATE:GetSortOrder() and string.find(Var 'LoadingScreen', "SelectMusic") then
@@ -112,6 +112,24 @@ return Def.ActorFrame {
 			--]]
 		end,
 	},
-
 	-- TODO: Show what Song number we're on ~ -YOSEFU-
+	Def.BitmapText {
+		Font = 'Stylized Large',
+		OnCommand = function(self)
+			if not SCREENMAN:GetTopScreen():GetName():find('OFSelectMusic') then
+				self:visible(false)
+			else
+				self
+					:xy(0, 0)
+					:skewx(0.5)
+					:zoom(0.5)
+					:shadowlengthy(1)
+				if GAMESTATE:GetCurrentStage():find('Event') then
+					self:settext('Event Mode')
+				else
+					self:settext(GAMESTATE:GetCurrentStage():gsub('%d+'))
+				end
+			end
+		end,
+	}
 }

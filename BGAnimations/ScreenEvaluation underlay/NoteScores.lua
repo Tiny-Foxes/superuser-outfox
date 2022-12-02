@@ -110,7 +110,7 @@ t[#t + 1] = Def.ActorFrame {
 		end,
 		Def.BitmapText {
 			Name = 'Score',
-			Font = 'Common Large',
+			Font = 'Stylized Large',
 			Text = GetPlrScore(),
 			InitCommand = function(self)
 				self
@@ -145,7 +145,7 @@ t[#t + 1] = Def.ActorFrame {
 		},
 	},
 	GAMESTATE:IsSideJoined(plr) and Def.BitmapText {
-		Font = 'Common Normal',
+		Font = 'Stylized Normal',
 		InitCommand = function(self)
 			self
 				:skewx(0.25)

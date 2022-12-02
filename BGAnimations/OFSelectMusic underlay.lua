@@ -97,14 +97,8 @@ return Def.ActorFrame {
 			LoadTitleCommand = function(self)
 				local song = GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentCourse() or GAMESTATE:GetCurrentSong()
 				local title = song:GetDisplayFullTitle()
-				if not GAMESTATE:IsCourseMode() then
-					if song:GetDisplaySubTitle() and song:GetDisplaySubTitle() ~= '' then
-						title = song:GetDisplayMainTitle()..'\n'..song:GetDisplaySubTitle()
-						self:GetParent():y(450)
-					elseif song:GetDisplaySubTitle() == '' then
-						self:GetParent():y(425)
-					end
-				end
+				if not GAMESTATE:IsCourseMode() then title = song:GetDisplayMainTitle() end
+				self:GetParent():y(425)
 				self
 					:settext(title)
 					:easeinoutsine(0.2)
@@ -114,17 +108,28 @@ return Def.ActorFrame {
 		Def.BitmapText {
 			Font = 'Common Large',
 			Name = 'Separator',
-			Text = '--',
+			Text = '~',
 			InitCommand = function(self)
-				self
-					:maxwidth(488)
-					:diffusealpha(0)
+				self:maxwidth(488):diffusealpha(0)
 			end,
 			CurrentSongChangedMessageCommand = function(self)
 				self
 					:stoptweening()
 					:easeoutexpo(0.1)
 					:diffusealpha(0)
+					:queuecommand('LoadTitle')
+			end,
+			LoadTitleCommand = function(self)
+				local song = GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentCourse() or GAMESTATE:GetCurrentSong()
+				local subtitle = '~'
+				if not GAMESTATE:IsCourseMode() and song:GetDisplaySubTitle() ~= '' then
+					self:zoom(0.5)
+					subtitle = song:GetDisplaySubTitle()
+				else
+					self:zoom(1)
+				end
+				self
+					:settext(subtitle)
 					:easeinoutsine(0.2)
 					:diffusealpha(1)
 			end,

@@ -183,7 +183,8 @@ local subtext = {
 	'Play NUCLEAR-STAR from MRC2. Now.',
 	'GET THAT UPSCORE BOIIIIIIIIIII',
 	'And also select an XMod probably',
-	'Not Drugs'
+	'Not Drugs',
+	'And it BETTER not be Popstars by K/DA.',
 }
 
 function TF_WHEEL.RandomSubText()

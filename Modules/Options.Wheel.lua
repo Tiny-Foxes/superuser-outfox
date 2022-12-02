@@ -27,7 +27,8 @@ return function(t)
 		while Index > #t do Index = Index - #t end
 		local params = {Index = Index}
 		MESSAGEMAN:Broadcast('MoveOptions', params)
-		local aux = Index - 1
+		local aux = self:getaux() + offset
+		if not t.Loop then aux = Index - 1 end
 		if offset ~= 0 then
 			self:stoptweening():easeoutexpo(0.15):aux(aux)
 			if not t.Mute then

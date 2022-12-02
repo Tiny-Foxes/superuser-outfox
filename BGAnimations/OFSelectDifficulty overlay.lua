@@ -308,7 +308,7 @@ for k in pairs(plrs) do
 	end
 
 	do readyText
-		:SetAttribute('Font', 'Common Large')
+		:SetAttribute('Font', 'Stylized Large')
 		:SetAttribute('Text', 'Ready')
 		:SetCommand('Init', function(self)
 			self
@@ -533,7 +533,9 @@ end
 do af
 	:SetCommand('Init', function(self)
 		self:Center():addy(SH)
-		self:GetChild('Preview'):GetChild('PreviewSprite'):xy(0, 0)
+		if self:GetChild('Preview') and self:GetChild('Preview'):GetChild('PreviewSprite') then
+			self:GetChild('Preview'):GetChild('PreviewSprite'):xy(0, 0)
+		end
 	end)
 	:SetCommand('On', function(self)
 		self

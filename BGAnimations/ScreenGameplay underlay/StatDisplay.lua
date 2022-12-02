@@ -84,7 +84,7 @@ if GAMESTATE:IsHumanPlayer(p) then
 			OffCommand=function(self) self:decelerate(0.3):diffusealpha(0) end,
 			-- Numbers numbers numbers!
 			Def.BitmapText {
-				Font = "Common Large",
+				Font = "Stylized Large",
 				Text=0,
 				InitCommand=function(self)
 					self:diffuse(BoostColor(ThemeColor[v], 1.1))
