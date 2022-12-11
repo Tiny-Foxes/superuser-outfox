@@ -6,6 +6,7 @@ local ThemeColor = LoadModule('Theme.Colors.lua')
 
 local splash = false
 local hovered = false
+local force_mouse = false
 
 local id = ProductID()
 if not string.find(id, 'OutFox') then
@@ -27,7 +28,7 @@ end
 return Def.ActorFrame {
 	Name = gc:GetText(),
 	InitCommand = function(self)
-		if ProductVersion():find('0.5') then self:SetUpdateFunction(UpdateMouse) end
+		if ProductVersion():find('0.5') or force_mouse then self:SetUpdateFunction(UpdateMouse) end
 		self
 			:SetSize(item_width, item_height)
 			:diffusealpha(0.75)
