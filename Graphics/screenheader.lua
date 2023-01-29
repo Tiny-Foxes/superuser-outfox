@@ -82,7 +82,7 @@ return Def.ActorFrame {
 
 	-- ScreenSelectMusic specific stuff
 	Def.BitmapText {
-		Font = 'Stylized Large',
+		Font = 'Common Large',
 		OnCommand = function(self)
 			self
 				:xy(SCREEN_CENTER_X - 280, 0)
@@ -114,7 +114,7 @@ return Def.ActorFrame {
 	},
 	-- TODO: Show what Song number we're on ~ -YOSEFU-
 	Def.BitmapText {
-		Font = 'Stylized Large',
+		Font = 'Common Large',
 		OnCommand = function(self)
 			if not SCREENMAN:GetTopScreen():GetName():find('OFSelectMusic') then
 				self:visible(false)

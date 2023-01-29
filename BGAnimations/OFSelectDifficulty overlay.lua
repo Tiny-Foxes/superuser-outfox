@@ -196,6 +196,7 @@ for k in pairs(plrs) do
 	end
 
 	do diffAward
+		:SetAttribute('Font', 'Stylized Normal')
 		:SetCommand('Init', function(self)
 			self
 				:halign(1)
