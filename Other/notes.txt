@@ -1,0 +1,53 @@
+December 22, 2022 - 7:13am
+
+I'm currently making a skeleton for a puzzle game buried into the settings screen of the theme. Currently, not many ideas in place, but I want to start working on a story for this as soon as possible.
+
+Of the few ideas I have, one of them involves using the HOOKS object in OutFox to detect if the app has focus. Could be useful for some sort of puzzle aspect. I want this game to involve more than just the window it resides in.
+
+Something I wanna play with is the idea that you're waking up some sort of character, whether it be Sudo or some other person. As for story, I honestly have zero ideas at the moment. I also need to think about the puzzles that'll appear in the game.
+
+Voice acting is another thing I want to make prevalent in this, as well as art assets that are viewable as a popup kinda thing.
+
+One more idea: I have access to reading and writing files. This will not only come in handy for creating a save file, but could also make for good puzzle creation tools. I also have CRYPTMAN, which lets me do some basic encrypting that anyone with access to the internet can crack pretty quickly. I could even write my own encryption system if it needs to be even simpler.
+
+Let me bullet point some of the tools I could think of using:
+- File read and write
+- File encryption
+- App focus
+- Key input
+- Mouse input
+- Display specifications?
+- Gameplay screen??????
+- FAKE gameplay screen??????????
+- ConnectToServer?????????????????
+- Fake coding language??????????????????????
+- Date and time
+
+Those are a few ideas I could mess around with. For now, I need to complete these few initial screens to make sure everything even works.
+
+---
+
+December 22, 2022 - 10:11am
+
+Initial things are set in place. I'm sure I can get an actual thing done as long as I just stay motivated. I made a very simple dialog display that I'll work on enhancing with several features later. I also decided it would be a good idea to give the player a name. Right now, it draws from the first display name it can find in the local profiles or, if there are none, "PlayerP1". Really dumb default name to go with, but what do you expect, this is the StepMania community.
+
+I really need to think about this story. Making sure the basics work and the skeleton is in place is great and all, but a body has mind and matter. I'm not the story teller I used to be, but there might be something I can scrap together in the upcoming months. I'll get help when I need it, but I really want to try to do as much as I can on my own. We'll see how this goes.
+
+---
+
+December 22, 2022 - 6:53pm
+
+After a long conversation with my fiance (and a 3-hour nap) I've managed to write down a bit of backstory for this thing. I'm starting to look forward to this project. I really need something to keep myself busy and an easter egg like this feels perfect. I hope people will enjoy this. I really hope people will at least find this, to be honest.
+
+I had the idea to encrypt this notes file since I don't really intend this to be read, but I'm not really worried if it is. Why not make it a little challenge to read this?
+
+---
+
+December 23, 2022 - 2:12pm
+
+I'm writing down a few ideas I have here so I don't forget them, and this is the most convenient place to put them for now.
+
+- I want to include a prestigious school that the player goes to.
+- The instructor of the player's class will ultimately assist in finding the cardium stone.
+
+I can't focus right now so I'll have to write the rest later after I look through some messages that will remind me. I really hate my brain sometimes.

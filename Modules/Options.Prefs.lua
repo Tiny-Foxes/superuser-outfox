@@ -438,6 +438,12 @@ return {
 		Choices = { 1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0 },
 		Values = { 1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0 },
 	},
+	SuperuserMascot =
+	{
+		Default = 'Sudo',
+		Choices = LoadModule('Theme.Mascots.lua').Choices,
+		Values = LoadModule('Theme.Mascots.lua').Values,
+	},
 	LifeType =
 	{
 		Default = "Bar",
