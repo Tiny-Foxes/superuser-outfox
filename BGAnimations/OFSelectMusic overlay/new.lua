@@ -344,6 +344,46 @@ local function MoveGroup(self, offset, Groups, reset)
 	CurSongs = SongList[CurGroup]
 end
 
+local function SearchSongs(self)
+	SCREENMAN:AddNewScreenToTop('ScreenTextEntry')
+	local searchSettings = {
+		Question = 'Search Query:',
+		InitialAnswer = '',
+		MaxInputLength = 64,
+		OnOK = function(answer)
+			if answer == '' then
+				AllGroups = LoadModule('Wheel/Group.List.lua')(AllSongs, TF_WHEEL.PreferredSort)
+				SongList = LoadModule('Wheel/Group.Sort.lua')(AllSongs, TF_WHEEL.PreferredSort)
+				CurGroup = AllGroups[Index.Group]
+				CurSongs = SongList[CurGroup]
+				MoveGroup(SuperActor.GetTree().GroupWheel, 0, AllGroups, true)
+				MoveSong(SuperActor.GetTree().SongWheel, 0, CurSongs, true)
+			else
+				AllGroups = LoadModule('Wheel/Group.List.lua')(AllSongs, 'Search')
+				SongList = LoadModule('Wheel/Group.Sort.lua')(AllSongs, 'Search', answer)
+				CurGroup = AllGroups[1]
+				CurSongs = SongList[CurGroup]
+				MoveGroup(SuperActor.GetTree().GroupWheel, 0, AllGroups, true)
+				MoveSong(SuperActor.GetTree().SongWheel, 0, CurSongs, true)
+			end
+			for plr in ivalues(PlayerNumber) do
+				SCREENMAN:set_input_redirected(plr, true)
+			end
+			SCREENMAN:GetTopScreen():Cancel()
+		end,
+		OnCancel = function()
+			for plr in ivalues(PlayerNumber) do
+				SCREENMAN:set_input_redirected(plr, true)
+			end
+			SCREENMAN:GetTopScreen():Cancel()
+		end,
+	}
+	SCREENMAN:GetTopScreen():Load(searchSettings)
+	for plr in ivalues(PlayerNumber) do
+		SCREENMAN:set_input_redirected(plr, false)
+	end
+end
+
 
 local songWheel = SuperActor.new('ActorScroller')
 local songSelect = SuperActor.new('ActorFrame')
@@ -514,6 +554,11 @@ do songWheel
 	:SetCommand('Select', function(self)
 		if PlayersJoined[self.pn] then
 			MESSAGEMAN:Broadcast('CycleSort')
+		end
+	end)
+	:SetCommand('Search', function(self)
+		if PlayersJoined[self.pn] then
+			SearchSongs(self)
 		end
 	end)
 	:SetCommand('Start', function(self)

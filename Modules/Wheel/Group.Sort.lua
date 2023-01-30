@@ -9,12 +9,16 @@
 -- 				- Song 2
 -- 				- Song 3
 
-return function(Songs, Sort)
+return function(Songs, Sort, ...)
 
 	Sort = Sort or 'Group'
 
 	local Groups = LoadModule('Wheel/Group.List.lua')(Songs, Sort)
 	local GroupsAndSongs = {}
+
+	if Sort == 'Search' then
+		return {Results = LoadModule('Wheel/Songs.Search.lua')(Songs, ...)}
+	end
 
 	for v in ivalues(Groups) do
 		GroupsAndSongs[v] = GroupsAndSongs[v] or {}

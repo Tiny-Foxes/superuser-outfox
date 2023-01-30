@@ -111,6 +111,9 @@ TF_WHEEL.SortType = {
 		local upper = lower + 30
 		return SecondsToMSS(lower) .. '-' .. SecondsToMSS(upper)
 	end,
+	Search = function(a)
+		return 'Results'
+	end,
 }
 
 TF_WHEEL.PreferredSort = 'Group'
@@ -164,16 +167,30 @@ end
 -- Main Input Function.
 -- We use this so we can do ButtonCommand.
 -- Example: MenuLeftCommand=function(self) end.
+
+-- Extra keybinds other than the game buttons. The key queues a command called value.
+TF_WHEEL.Keybinds = {
+	backslash = {'Search', PlayerNumber[1]},
+}
+
 function TF_WHEEL.Input(self)
 	return function(event)
-		if not event.PlayerNumber then return end
-		self.pn = event.PlayerNumber
+		--if not event.PlayerNumber then return end
+		local button = event.GameButton
+		if button == '' then button = ToEnumShortString(event.DeviceInput.button) end
+		local command = event.GameButton
+		if TF_WHEEL.Keybinds[button] then
+			command = TF_WHEEL.Keybinds[button][1]
+		end
+		if command == '' then return end
+		self.pn = event.PlayerNumber or TF_WHEEL.Keybinds[button][2]
+		if not self.pn then return end
 		if ToEnumShortString(event.type) == "FirstPress" then
-			self:queuecommand(event.GameButton)
+			self:queuecommand(command)
 		elseif ToEnumShortString(event.type) == "Repeat" then
-			self:finishtweening():queuecommand(event.GameButton)
+			self:finishtweening():queuecommand(command)
 		else
-			self:queuecommand(event.GameButton.."Release")
+			self:queuecommand(command.."Release")
 		end
 	end
 end
