@@ -347,9 +347,16 @@ end
 local function SearchSongs(self)
 	SCREENMAN:AddNewScreenToTop('ScreenTextEntry')
 	local searchSettings = {
-		Question = 'Search Query:',
+		Question = 'Search',
 		InitialAnswer = '',
 		MaxInputLength = 64,
+		Validate = function(answer)
+			if #LoadModule('Wheel/Songs.Search.lua')(AllSongs, answer) < 1 then
+				return false, 'No results.'
+			else
+				return true, ''
+			end
+		end,
 		OnOK = function(answer)
 			if answer == '' then
 				AllGroups = LoadModule('Wheel/Group.List.lua')(AllSongs, TF_WHEEL.PreferredSort)
