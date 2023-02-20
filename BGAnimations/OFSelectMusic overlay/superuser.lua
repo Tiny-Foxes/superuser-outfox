@@ -1,28 +1,3 @@
---[[
-
-	ROADMAP:
-		X Use only 1 song wheel.
-		X Use only 12 ActorFrames on wheel.
-		X Switch out text for wheels rather than entire wheels.
-		X Add song preview.
-		X Add difficulty select subscreen.
-		X Allow dynamic player join and unjoin.
-		X Add song elements to music select screen.
-		X Pretty up music select screen.
-		X Allow sorting group wheel.
-		X Allow compatibility with course mode.
-		- Add difficulty pips to song wheel.
-		- Add chart preview on difficulty select screen.
-		- Add player option select subscreen.
-		- Preview player option modifiers.
-		- Add song and group search.
-		- Preview modcharts?
-		- SHIP IT.
-
-	NOTES:
-
---]]
-
 -- Redirect input to Lua.
 for plr in ivalues(PlayerNumber) do
 	SCREENMAN:set_input_redirected(plr, true)
@@ -745,7 +720,7 @@ end
 
 do groupWheel
 	:SetAttribute('UseScroller', true)
-	:SetAttribute('SecondsPerItem', true)
+	:SetAttribute('SecondsPerItem', 0)
 	:SetAttribute('NumItemsToDraw', 9)
 	:SetAttribute('ItemPaddingStart', 0)
 	:SetAttribute('ItemPaddingEnd', 0)

@@ -102,6 +102,9 @@ GameColor = {
         JudgmentLine_Held   = color("#FFFFFF"),
         JudgmentLine_Miss   = color("#F97E7E"),
         JudgmentLine_MaxCombo   = color("#f0dc9f")
+	},
+	Custom = {
+		MenuButtonBorder = color('#FFFFFF')
 	}
 }
 

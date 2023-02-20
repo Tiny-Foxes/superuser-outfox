@@ -34,6 +34,10 @@ local CurDiff = {
 	[PLAYER_1] = AllDiffs[1],
 	[PLAYER_2] = AllDiffs[1],
 }
+local POptions = {
+	[PLAYER_1] = GAMESTATE:GetPlayerState(PLAYER_1):GetPlayerOptions('ModsLevel_Preferred'),
+	[PLAYER_2] = GAMESTATE:GetPlayerState(PLAYER_2):GetPlayerOptions('ModsLevel_Preferred'),
+}
 
 local function MoveDifficulty(self, offset, Diffs)
 	local diffCount = #Diffs
@@ -372,6 +376,7 @@ local optprefs = LoadModule('Options.Prefs.lua')
 for pn in ivalues(GAMESTATE:GetEnabledPlayers()) do
 	local x = PositionPerPlayer(pn, -SCX - 180, SCX + 180)
 	local addx = PositionPerPlayer(pn, 360, -360)
+	local fadeside = PositionPerPlayer(pn, 'faderight', 'fadeleft')
 
 	local profprefs = IniFile.ReadFile(CheckIfUserOrMachineProfile(0)..'/OutFoxPrefs.ini')
 
@@ -404,66 +409,64 @@ for pn in ivalues(GAMESTATE:GetEnabledPlayers()) do
 		Main = {
 			IsMenu = true,
 			Index = 1,
+			NumItems = 3,
 			Modifiers = {
+				Title = 'Modifiers',
 				IsMenu = true,
+				Index = 1,
+				NumItems = 3,
 				SpeedType = {
+					Title = 'Speed Type',
 					Choices = {'XMod', 'CMod', 'MMod', 'AMod', 'CAMod', 'AVMod'},
 					Value = spdtype,
 				},
 				SpeedVal = {
+					Title = 'Speed',
 					Increment = 0.25,
 					Value = po[spdtype](po),
 				},
 				Zoom = {
+					Title = 'Zoom',
 					Increment = 0.25,
 					Value = profprefs.MiniSelector,
 				},
 			},
 			Appearance = {
+				Title = 'Appearance',
 				IsMenu = true,
 				Index = 1,
+				NumItems = 3,
+				NoteSkin = {
+					Title = 'NoteSkin',
+					Choices = NOTESKIN:GetNoteSkinNames(),
+					Value = po:NoteSkin(),
+				},
 				Judgment = {
+					Title = 'Judgment',
 					Choices = LoadModule('Options.SmartJudgeChoices.lua')('Value'),
 					Value = profprefs.SmartJudgments,
 				},
 				HoldJudgment = {
+					Title = 'Hold Judgment',
 					Choices = LoadModule('Options.SmartHoldChoices.lua')('Value'),
 					Value = profprefs.SmartHoldJudgments,
 				},
-				NoteSkin = {
-					Choices = NOTESKIN:GetNoteSkinNames(),
-					Value = po:NoteSkin(),
-				},
 			},
-			Judgment = {
-				IsMenu = true,
-				Timing = {
-					Choices = TimingModes,
-					Value = gameprefs.SmartTimings
-				}
-			},
-			Song = {
-				IsMenu = true,
-				Haste = {
-					Toggle = true,
-					Value = gameprefs.Haste,
-				},
-				Rate = {
-					Toggle = true,
-					Value = gameprefs.Rate,
-				},
+			More = {
+				Title = 'More Options',
+				IsButton = true,
 			},
 		},
 	}
-	
+
 	local frame = SuperActor.new('ActorFrame')
 	local panel = SuperActor.new('Quad')
 	local title = SuperActor.new('BitmapText')
-	local mainScroll = SuperActor.new('ActorFrame')
+	local preview = SuperActor.new('NoteField')
 
 	do panel
 		:SetCommand('Init', function(self)
-			self:SetSize(360, SH):diffuse(0, 0, 0, 0.75)
+			self:SetSize(360, SH):diffuse(0, 0, 0, 0.9)[fadeside](self, 0.05)
 		end)
 	end
 	do title
@@ -473,36 +476,110 @@ for pn in ivalues(GAMESTATE:GetEnabledPlayers()) do
 			self:valign(0):y(-SCY + 24)
 		end)
 	end
-	
-	--[[
-	for k, v in pairs(opts.Main) do
-		if type(v) == 'table' and v.IsMenu then
-			
-			local menu = SuperActor.new('ActorFrame')
-			local btn = SuperActor.new('Quad')
-			local text = SuperActor.new('BitmapText')
-
-			do btn
-				:SetCommand('Init', function(self)
-					self:SetSize(240, 96):diffuse(0.25, 0.25, 0.25, 1)
-				end)
-			end
-			do text
-				:SetAttribute('Font', 'Common Normal')
-				:SetAttribute('Text', k..' Options')
-			end
-			do menu
-				:SetCommand('Init', function(self)
-				end)
-				:AddChild(btn, 'Panel')
-				:AddChild(text, 'Title')
-			end
-
-			mainScroll:AddChild(menu, k)
-
-		end
+	do preview
+		:SetAttribute('Player', pn)
+		:SetAttribute('AutoPlay', true)
+		:SetAttribute('NoteSkin', POptions[pn]:NoteSkin())
+		:SetCommand('Init', function(self)
+			self:zoom(1.2):y(-60)
+			self:GetPlayerOptions('ModsLevel_Current'):DrawSize(0.25)
+		end)
+		:SetMessage('SetDifficulty'..ToEnumShortString(pn), function(self)
+			local nd = GAMESTATE:GetCurrentSong():GetNoteData(Index.Diff[pn])
+			if not nd then return end
+			self:AutoPlay(false)
+			self:SetNoteDataFromLua(nd)
+			self:AutoPlay(true)
+			local prefmods = GAMESTATE:GetPlayerState(pn):GetPlayerOptionsString('ModsLevel_Preferred')
+			self:ModsFromString(prefmods)
+		end)
 	end
-	--]]
+
+	local mainScroll = SuperActor.new('ActorScroller')
+
+	for v in ivalues {'Modifiers', 'Appearance', 'More'} do
+		local menu = SuperActor.new('ActorFrame')
+		local btn = SuperActor.new('Quad')
+		local text = SuperActor.new('BitmapText')
+
+		do btn
+			:SetCommand('Init', function(self)
+				self:SetSize(240, 48):diffuse(ThemeColor[ToEnumShortString(pn)])
+			end)
+		end
+		do text
+			:SetAttribute('Font', 'Common Normal')
+			:SetAttribute('Text', opts.Main[v].Title or v)
+		end
+		do menu
+			:AddChild(btn, 'Panel')
+			:AddChild(text, 'Title')
+		end
+		mainScroll:AddChild(menu, v)
+	end
+
+	do mainScroll
+		:SetAttribute('UseScroller', true)
+		:SetAttribute('SecondsPerItem', 0)
+		:SetAttribute('NumItemsToDraw', 9)
+		:SetAttribute('ItemPaddingStart', 0)
+		:SetAttribute('ItemPaddingEnd', 0)
+		:SetAttribute('TransformFunction', function(self, offset, itemIndex, numItems)
+			self:xy(0, 0)
+			if offset == 0 then
+				self:diffuse(0, 0, 0, 0)
+			else
+				self:diffuse(1, 1, 1, 1)
+			end
+		end)
+		:SetCommand('Init', function(self)
+			self
+				:SetLoop(true)
+				:SetFastCatchup(true)
+				:aux(0)
+				:addy(SCY * 0.5)
+		end)
+		:SetCommand('MenuUp', function(self)
+			if focus ~= 'Options' then return end
+			if opts.Menu ~= 'Main' then return end
+			opts.Main.Index = opts.Main.Index - 1
+			while opts.Main.Index > opts.Main.NumItems do
+				opts.Main.Index = opts.Main.Index - opts.Main.NumItems
+			end
+			while opts.Main.Index < 1 do
+				opts.Main.Index = opts.Main.Index + opts.Main.NumItems
+			end
+			self:stoptweening():easeoutexpo(0.15):aux(self:getaux() - 1)
+		end)
+		:SetCommand('MenuDown', function(self)
+			if focus ~= 'Options' then return end
+			if opts.Menu ~= 'Main' then return end
+			opts.Main.Index = opts.Main.Index + 1
+			while opts.Main.Index > opts.Main.NumItems do
+				opts.Main.Index = opts.Main.Index - opts.Main.NumItems
+			end
+			while opts.Main.Index < 1 do
+				opts.Main.Index = opts.Main.Index + opts.Main.NumItems
+			end
+			self:stoptweening():easeoutexpo(0.15):aux(self:getaux() + 1)
+		end)
+		:SetCommand('Update', function(self)
+			self:SetCurrentAndDestinationItem(self:getaux())
+		end)
+	end
+
+	local modsScroll = SuperActor.new('ActorScroller')
+	local appearScroll = SuperActor.new('ActorScroller')
+
+	local guides = SuperActor.new('BitmapText')
+
+	do guides
+		:SetAttribute('Font', 'Common Normal')
+		:SetAttribute('Text', '&UP;\n\n\n\n&DOWN;')
+		:SetCommand('Init', function(self)
+			self:addy(SCY * 0.5)
+		end)
+	end
 
 	do frame
 		:SetCommand('Init', function(self)
@@ -511,7 +588,11 @@ for pn in ivalues(GAMESTATE:GetEnabledPlayers()) do
 		:SetMessage('EnterOptions'..ToEnumShortString(pn), function(self)
 			focus = 'Options'
 			opts.Menu = 'Main'
+			opts.Main.Index = 1
+			self.MainScroll:aux(-1)
 			self:finishtweening():easeoutexpo(0.15):x(x + addx)
+		end)
+		:SetCommand('FocusOptions', function(self)
 		end)
 		:SetCommand('Back', function(self)
 			if SuperActor.GetTree().DifficultyFrame.pn ~= pn then return end
@@ -527,6 +608,9 @@ for pn in ivalues(GAMESTATE:GetEnabledPlayers()) do
 		end)
 		:AddChild(panel, 'Panel')
 		:AddChild(title, 'Title')
+		:AddChild(preview, 'Preview')
+		:AddChild(mainScroll, 'MainScroll')
+		:AddChild(guides, 'ArrowGuides')
 	end
 	af:AddChild(frame, 'OptionsFrame'..ToEnumShortString(pn))
 end
@@ -552,6 +636,7 @@ do af
 			self.pn = k
 			MoveDifficulty(self, 0, AllDiffs)
 		end
+		self:luaeffect('Update')
 	end)
 	:SetCommand('Off', function(self)
 		if not PROFILEMAN:GetProfile(PLAYER_1) and not PROFILEMAN:GetProfile(PLAYER_2) then
@@ -618,6 +703,7 @@ do af
 		end
 	end)
 	:SetCommand('Start', function(self)
+		if focus ~= 'Difficulty' then return end
 		if (plrs[PLAYER_1] and plrs[PLAYER_2]) then
 			if not PlayerReady[self.pn] then
 				PlayerReady[self.pn] = true

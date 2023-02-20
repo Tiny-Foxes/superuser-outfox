@@ -145,6 +145,9 @@ for i = 1, GAMESTATE:GetCurrentStyle():ColumnsPerPlayer() do
 		UpdateHideCommand = function(self)
 			self:visible(not po:HideHoldJudgments())
 		end,
+		OnCommand = function(self)
+			self:SetFakeParent(SCREENMAN:GetTopScreen():GetChild('Player'..ToEnumShortString(sPlayer)))
+		end,
 		LetGoCommand = function(self)
 			self
 				:setstate(1)
