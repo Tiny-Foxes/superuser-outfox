@@ -70,7 +70,7 @@ end
 
 local af = SuperActor.new('ActorFrame')
 
---af:AddChild(SuperActor.new(LoadActor(THEME:GetPathG('Players', 'preview'))), 'Preview')
+af:AddChild(SuperActor.new(LoadActor(THEME:GetPathG('Players', 'preview'))), 'Preview')
 
 for k in pairs(plrs) do
 
@@ -481,7 +481,7 @@ for pn in ivalues(GAMESTATE:GetEnabledPlayers()) do
 		:SetAttribute('AutoPlay', true)
 		:SetAttribute('NoteSkin', POptions[pn]:NoteSkin())
 		:SetCommand('Init', function(self)
-			self:zoom(1.2):y(-60)
+			self:zoom(1.2):xy(SCREEN_CENTER_X, -60)
 			self:GetPlayerOptions('ModsLevel_Current'):DrawSize(0.25)
 		end)
 		:SetMessage('SetDifficulty'..ToEnumShortString(pn), function(self)
@@ -608,7 +608,7 @@ for pn in ivalues(GAMESTATE:GetEnabledPlayers()) do
 		end)
 		:AddChild(panel, 'Panel')
 		:AddChild(title, 'Title')
-		:AddChild(preview, 'Preview')
+		--:AddChild(preview, 'Preview')
 		:AddChild(mainScroll, 'MainScroll')
 		:AddChild(guides, 'ArrowGuides')
 	end

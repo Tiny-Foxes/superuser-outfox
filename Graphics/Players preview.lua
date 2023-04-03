@@ -207,6 +207,7 @@ for i, v in ipairs(GAMESTATE:GetEnabledPlayers()) do
 			end,
 			SetPreviewChartCommand = function(self)
 				self:AutoPlay(false)
+				self:SetNoteDataFromLua({})
 				if not song then return end
 				local chart
 				for n, c in ipairs(song:GetAllSteps()) do
@@ -240,7 +241,7 @@ end
 af[#af + 1] = Def.Sprite {
 	Name = 'PreviewSprite',
 	InitCommand = function(self)
-		self:Center():fadetop(0.25):fadebottom(0.25)
+		self:Center():fadetop(0.25):fadebottom(0.25):glow(0, 0, 0, 0.5)
 	end,
 	OnCommand = function(self)
 		--self:queuecommand('SetPreviewColor')
@@ -262,13 +263,13 @@ af[#af + 1] = Def.Sprite {
 			:diffuse(0.5 + red, 1 - red, 0.5, 1)
 	end,
 	CurrentSongChangedMessageCommand = function(self)
-		self:stoptweening():diffusealpha(0)
+		self:stoptweening():diffusealpha(0):glow(0, 0, 0, 0)
 	end,
 	MusicLoopNearEndMessageCommand = function(self)
-		self:stoptweening():diffusealpha(1):easeinoutcircle(0.25):diffusealpha(0)
+		self:stoptweening():diffusealpha(1):easeinoutcircle(0.25):diffusealpha(0):glow(0, 0, 0, 0)
 	end,
 	MusicLoopEndMessageCommand = function(self)
-		self:stoptweening():diffusealpha(0):easeinoutcircle(0.25):diffusealpha(1)
+		self:stoptweening():diffusealpha(0):easeinoutcircle(0.25):diffusealpha(1):glow(0, 0, 0, 0.5)
 	end,
 }
 
