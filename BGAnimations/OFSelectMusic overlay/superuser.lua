@@ -155,6 +155,25 @@ while Index.Group < 1 do Index.Group = Index.Group + #AllGroups end
 local CurGroup = AllGroups[Index.Group]
 local CurSongs = SongList[CurGroup]
 
+if not GAMESTATE:Env().LastSong then
+	local LastViewedSong = GAMESTATE:IsCourseMode() and profiles[1]:GetLastPlayedCourse() or profiles[1]:GetLastPlayedSong()
+	if LastViewedSong then
+		for i = 1, #AllGroups do
+			if AllGroups[i] == LastViewedSong:GetGroupName() then
+				Index.Group = i
+				CurGroup = AllGroups[Index.Group]
+				CurSongs = SongList[CurGroup]
+			end
+		end
+		for i = 1, #CurSongs do
+			if CurSongs[i]:GetDisplayFullTitle() == LastViewedSong:GetDisplayFullTitle() then
+				Index.Song = i
+				GAMESTATE:Env().LastSong = CurSongs[i]
+			end
+		end
+	end
+end
+
 local RequestOptions = false
 
 -- Function for moving along the song wheel.
@@ -252,6 +271,7 @@ local function MoveSong(self, offset, Songs, reset)
 	else
 		GAMESTATE:SetCurrentSong(Songs[Index.Song])
 	end
+	GAMESTATE:Env().LastSong = Songs[Index.Song]
 end
 
 -- Function for moving along the group wheel.
@@ -317,6 +337,7 @@ local function MoveGroup(self, offset, Groups, reset)
 	end
 	CurGroup = AllGroups[Index.Group]
 	CurSongs = SongList[CurGroup]
+	GAMESTATE:Env().LastGroup = CurGroup
 end
 
 local function SearchSongs(self)
@@ -478,7 +499,6 @@ do songWheel
 			:SetLoop(true)
 			:SetFastCatchup(true)
 			:aux(0)
-		MoveSong(self, 0, CurSongs)
 	end)
 	:SetCommand('On', function(self)
 		SCREENMAN:GetTopScreen():AddInputCallback(function(event)
@@ -732,12 +752,13 @@ do groupWheel
 			:SetFastCatchup(true)
 			:aux(0)
 			:queuecommand('Setup')
-		MoveGroup(self, 0, AllGroups)
 	end)
 	:SetCommand('Setup', function(self)
 		self:addx(-640)
 	end)
 	:SetCommand('On', function(self)
+		MoveGroup(self, 0, AllGroups)
+		MoveSong(SuperActor.GetTree().SongWheel, 0, CurSongs)
 		SCREENMAN:GetTopScreen():AddInputCallback(function(event)
 			if wheel.Focus == 'Group' then
 				TF_WHEEL.Input(self)(event)

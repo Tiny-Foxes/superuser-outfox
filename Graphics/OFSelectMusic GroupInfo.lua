@@ -73,8 +73,8 @@ return Def.ActorFrame {
 			local song = GAMESTATE:GetCurrentSong()
 			self
 				:stoptweening()
-				:settext("SONGS IN GROUP: "..table.getn( SONGMAN:GetSongsInGroup(song:GetGroupName()) ))
-			if table.getn( SONGMAN:GetSongsInGroup(song:GetGroupName()) ) == 69 then
+				:settext("SONGS IN GROUP: "..#SONGMAN:GetSongsInGroup(song:GetGroupName()))
+			if #SONGMAN:GetSongsInGroup(song:GetGroupName()) == 69 then
 				self:rainbowscroll(true)
 					:settext(self:GetText()..' (nice)') -- alright, yosefu, how about this then. ~Sudo
 			else
