@@ -337,7 +337,6 @@ local function MoveGroup(self, offset, Groups, reset)
 	end
 	CurGroup = AllGroups[Index.Group]
 	CurSongs = SongList[CurGroup]
-	GAMESTATE:Env().LastGroup = CurGroup
 end
 
 local function SearchSongs(self)
