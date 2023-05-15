@@ -1,20 +1,5 @@
 local gs = LoadModule('GrooveStats.Handler.lua')
 
-local function ReportTable(t, ind)
-	ind = ind or 0
-	local indent = ''
-	for i = 1, ind do
-		indent = indent..' '
-	end
-	for k, v in pairs(t) do
-		local vtype = type(v)
-		local str = indent..k..': '..tostring(v)
-		if vtype == 'table' then str = str..' ('..#v..')' end
-		lua.ReportScriptError(str)
-		if vtype == 'table' then ReportTable(v, ind + 2) end
-	end
-end
-
 local function GetJLineValue(line, pl)
 	if line == "Held" then
 		return STATSMAN:GetCurStageStats():GetPlayerStageStats(pl):GetHoldNoteScores("HoldNoteScore_Held")

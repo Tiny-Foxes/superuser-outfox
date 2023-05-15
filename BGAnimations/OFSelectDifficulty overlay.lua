@@ -70,8 +70,6 @@ end
 
 local af = SuperActor.new('ActorFrame')
 
-af:AddChild(SuperActor.new(LoadActor(THEME:GetPathG('Players', 'preview'))), 'Preview')
-
 for k in pairs(plrs) do
 
 	local PN = ToEnumShortString(k)
@@ -462,7 +460,6 @@ for pn in ivalues(GAMESTATE:GetEnabledPlayers()) do
 	local frame = SuperActor.new('ActorFrame')
 	local panel = SuperActor.new('Quad')
 	local title = SuperActor.new('BitmapText')
-	local preview = SuperActor.new('NoteField')
 
 	do panel
 		:SetCommand('Init', function(self)
@@ -474,24 +471,6 @@ for pn in ivalues(GAMESTATE:GetEnabledPlayers()) do
 		:SetAttribute('Text', ToEnumShortString(pn)..' Options')
 		:SetCommand('Init', function(self)
 			self:valign(0):y(-SCY + 24)
-		end)
-	end
-	do preview
-		:SetAttribute('Player', pn)
-		:SetAttribute('AutoPlay', true)
-		:SetAttribute('NoteSkin', POptions[pn]:NoteSkin())
-		:SetCommand('Init', function(self)
-			self:zoom(1.2):xy(SCREEN_CENTER_X, -60)
-			self:GetPlayerOptions('ModsLevel_Current'):DrawSize(0.25)
-		end)
-		:SetMessage('SetDifficulty'..ToEnumShortString(pn), function(self)
-			local nd = GAMESTATE:GetCurrentSong():GetNoteData(Index.Diff[pn])
-			if not nd then return end
-			self:AutoPlay(false)
-			self:SetNoteDataFromLua(nd)
-			self:AutoPlay(true)
-			local prefmods = GAMESTATE:GetPlayerState(pn):GetPlayerOptionsString('ModsLevel_Preferred')
-			self:ModsFromString(prefmods)
 		end)
 	end
 
@@ -608,7 +587,6 @@ for pn in ivalues(GAMESTATE:GetEnabledPlayers()) do
 		end)
 		:AddChild(panel, 'Panel')
 		:AddChild(title, 'Title')
-		--:AddChild(preview, 'Preview')
 		:AddChild(mainScroll, 'MainScroll')
 		:AddChild(guides, 'ArrowGuides')
 	end
@@ -618,9 +596,6 @@ end
 do af
 	:SetCommand('Init', function(self)
 		self:Center():addy(SH)
-		if self:GetChild('Preview') and self:GetChild('Preview'):GetChild('PreviewSprite') then
-			self:GetChild('Preview'):GetChild('PreviewSprite'):xy(0, 0)
-		end
 	end)
 	:SetCommand('On', function(self)
 		self

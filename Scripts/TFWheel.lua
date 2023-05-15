@@ -202,6 +202,7 @@ local subtext = {
 	'And also select an XMod probably',
 	'Not Drugs',
 	'And it BETTER not be Popstars by K/DA.',
+	'hey check out https://sudospective.net'
 }
 
 function TF_WHEEL.RandomSubText()

@@ -4,7 +4,7 @@ konko()
 
 if not SetMeFree then SetMeFree = false end
 
-local subo_notes = false
+local subo_notes = true
 
 -- Load SuperActor module
 local SuperActor = LoadModule('Konko.SuperActor.lua')
@@ -44,13 +44,6 @@ local function initAFT(self, recursive)
 end
 local function mapAFT(aft, sprite)
 	sprite:Center():SetTexture(aft:GetTexture())
-end
-local function blurAFT(self, scale)
-	scale = scale or 2
-	self:SetSize(SW / scale, SH / scale)
-end
-local function blurSprite(self, scale)
-	self:Center():basezoom(scale)
 end
 
 -- Define SuperActors
@@ -648,7 +641,10 @@ do uiDetails
 		text = text..'\n'..songstats
 		local notes = {
 			'subo notes:',
-			'- u did the it :)'
+			'- get rid of the poop',
+			'- refactor code!',
+			'- make sure theme is stable',
+			'- prepare for split between lts and a5',
 		}
 		if subo_notes then text = text..'\n'..table.concat(notes, '\n') end
 		self

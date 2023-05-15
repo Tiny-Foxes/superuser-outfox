@@ -1,10 +1,6 @@
 local ThemeColor = LoadModule('Theme.Colors.lua')
 
-local function CallSongFunc(func)
-	local song = GAMESTATE:GetCurrentSong()
-	if song then return song[func](song) end
-	return ''
-end
+local InputHandler
 
 return Def.ActorFrame {
 	InitCommand = function(self)
@@ -114,7 +110,7 @@ return Def.ActorFrame {
 			end,
 			OnCommand = function(self)
 				-- You may now admire your glorious artwork, Chegg. You better use my theme now. ~Sudo
-				local InputHandler = function(event)
+				InputHandler = function(event)
 					if event.button ~= 'Up' and event.button ~= 'Down' then return end
 					local children = {
 						self:GetChild('BannerFade'),
@@ -174,7 +170,9 @@ return Def.ActorFrame {
 					:diffusealpha(1)
 			end,
 			OffCommand = function(self)
-				--SCREENMAN:GetTopScreen():RemoveInputCallback(InputHandler)
+				if InputHandler then
+					SCREENMAN:GetTopScreen():RemoveInputCallback(InputHandler)
+				end
 				self
 					:sleep(0.25)
 					:easeinexpo(0.5)

@@ -1,133 +1,140 @@
 -- This was shamelessly stolen from the default Soundwaves theme.
 -- It's pretty goddamn horrible and I have to do it from scracth anyway. ~Sudo
-local ThemeColor = LoadModule('Theme.Colors.lua')
-
 function GetLocalProfiles()
-	local t = {};
+	local t = {}
 
 	function GetSongsPlayedString(numSongs)
 		return numSongs == 1 and Screen.String("SingularSongPlayed") or Screen.String("SeveralSongsPlayed")
 	end
 
 	for p = 0, PROFILEMAN:GetNumLocalProfiles() - 1 do
-		local profile=PROFILEMAN:GetLocalProfileFromIndex(p);
+		local profile = PROFILEMAN:GetLocalProfileFromIndex(p);
 		local ProfileCard = Def.ActorFrame {
-			Def.Sprite{
-				Texture=LoadModule("Options.GetProfileData.lua")(p,true)["Image"];
-				InitCommand=function(self)
-					self:setsize(52,52):y(-3):x(80):fadeleft(1):faderight(1):ztest(true):skewx(0.5)
-				end;
-				OffCommand=function(self) self:linear(0.1):diffusealpha(0) end;
-			};
+			Def.Sprite {
+				Texture = LoadModule("Options.GetProfileData.lua")(p, true)["Image"],
+				InitCommand = function(self)
+					self:setsize(52, 52):y(-3):x(80):fadeleft(1):faderight(1):ztest(true):skewx(0.5)
+				end,
+				OffCommand = function(self) self:linear(0.1):diffusealpha(0) end,
+			},
 			Def.BitmapText {
-				Font="Common Normal";
-				Text=LoadModule("Options.GetProfileData.lua")(p,true)["Name"];
-				InitCommand=function(self) self:horizalign(left):shadowlength(1):xy(-110,-12):zoom(1):ztest(true):skewx(0.5) end;
-				OffCommand=function(self) self:linear(0.1):diffusealpha(0) end;
-			};
+				Font = "Common Normal",
+				Text = LoadModule("Options.GetProfileData.lua")(p, true)["Name"],
+				InitCommand = function(self) self:horizalign(left):shadowlength(1):xy(-110, -12):zoom(1):ztest(true)
+						:skewx(0.5) end,
+				OffCommand = function(self) self:linear(0.1):diffusealpha(0) end,
+			},
 			Def.BitmapText {
-				Font="Common Normal";
-				InitCommand=function(self) self:horizalign(left):shadowlength(1):xy(-110,12):zoom(0.6):vertspacing(-8):ztest(true):skewx(0.5) end;
-				BeginCommand=function(self)
+				Font = "Common Normal",
+				InitCommand = function(self) self:horizalign(left):shadowlength(1):xy(-110, 12):zoom(0.6):vertspacing(-8)
+						:ztest(true):skewx(0.5) end,
+				BeginCommand = function(self)
 					local numSongsPlayed = profile:GetNumTotalSongsPlayed();
-					self:settext( string.format( GetSongsPlayedString( numSongsPlayed ), numSongsPlayed ) )
-				end;
-				OffCommand=function(self) self:linear(0.1):diffusealpha(0) end;
-			};
-		};
-		t[#t+1]=ProfileCard;
-	end;
+					self:settext(string.format(GetSongsPlayedString(numSongsPlayed), numSongsPlayed))
+				end,
+				OffCommand = function(self) self:linear(0.1):diffusealpha(0) end,
+			}
+		}
+		t[#t + 1] = ProfileCard
+	end
+	;
 
 	return t;
-end;
+end
+
+;
 
 function LoadCard(cColor)
 	local t = Def.ActorFrame {
 		Def.Quad {
-			InitCommand=function(self) self:vertalign(middle):zoomto(270,0):diffuse(cColor):diffusealpha(0.75) end;
-			OnCommand=function(self) self:easeinoutexpo(0.25):zoomto(270,400) end;
-			OffCommand=function(self) self:easeinoutexpo(0.5):zoomto(270,0):sleep(0.5):diffusealpha(0) end;
-		};
+			InitCommand = function(self) self:vertalign(middle):zoomto(270, 0):diffuse(cColor):diffusealpha(0.75) end,
+			OnCommand = function(self) self:easeinoutexpo(0.25):zoomto(270, 400) end,
+			OffCommand = function(self) self:easeinoutexpo(0.5):zoomto(270, 0):sleep(0.5):diffusealpha(0) end,
+		},
 	};
 	return t
 end
+
 function LoadPlayerStuff(Player)
 	local t = {};
 
 	local pn = (Player == PLAYER_1) and 1 or 2;
 
---[[ 	local t = LoadActor(THEME:GetPathB('', '_frame 3x3'), 'metal', 200, 230) .. {
+	--[[ 	local t = LoadActor(THEME:GetPathB('', '_frame 3x3'), 'metal', 200, 230) .. {
 		Name = 'BigFrame';
 	}; --]]
-		
-	t[#t+1] = Def.ActorFrame {
-		Name = 'JoinFrame';
-		LoadCard(color("0,0,0,0.5"));
+	t[#t + 1] = Def.ActorFrame {
+		Name = 'JoinFrame',
+		LoadCard(color("0,0,0,0.5")),
 		Def.BitmapText {
-			Font="Common Normal";
-			InitCommand=function(self) self:shadowlength(1):zoom(1):skewx(0.5) end;
-			OnCommand=function(self) 
-			self:settext(Screen.String("PressStart"));
-			self:diffuseshift():effectcolor1(Color('White')):effectcolor2(color("0.5,0.5,0.5")) end;
-		};
-	};
-	
-	t[#t+1] = Def.ActorFrame {
-		Name = 'BigFrame';
-		LoadCard(ColorDarkTone(PlayerDarkColor(Player)));
-	};
-	t[#t+1] = Def.ActorFrame {
-		Name = 'SmallFrame';
-		InitCommand=function(self) self:y(-2) end;
-		OnCommand=function(self) self:diffusealpha(0):sleep(0.14):linear(0.2):diffusealpha(1) end;
-		Def.Quad {
-			InitCommand=function(self) self:zoomto(270,64) end;
-			OnCommand=function(self) self:diffuse(ColorLightTone(PlayerColor(Player))):diffuserightedge(ColorDarkTone(PlayerColor(Player))) end;
-		};
-		Def.Quad {
-			InitCommand=function(self) self:zoomto(270,6):vertalign(top):y(-32) end;
-			OnCommand=function(self) self:diffuse(PlayerColor(Player)):diffusealpha(0.6)  end;
-		};			
-		Def.Quad {
-			InitCommand=function(self) self:zoomto(270,6):vertalign(bottom):y(32) end;
-			OnCommand=function(self) self:diffuse(PlayerColor(Player)):diffusealpha(0.6)  end;
-		};		
+			Font = "Common Normal",
+			InitCommand = function(self) self:shadowlength(1):zoom(1):skewx(0.5) end,
+			OnCommand = function(self)
+				self:settext(Screen.String("PressStart"));
+				self:diffuseshift():effectcolor1(Color('White')):effectcolor2(color("0.5,0.5,0.5"))
+			end,
+		},
 	};
 
-	t[#t+1] = Def.ActorScroller{
-		Name = 'Scroller';
-		NumItemsToDraw=6;
-		OnCommand=function(self) 
-			self:y(1):SetFastCatchup(true):SetMask(300,58):SetSecondsPerItem(0.15) 
+	t[#t + 1] = Def.ActorFrame {
+		Name = 'BigFrame',
+		LoadCard(ColorDarkTone(PlayerDarkColor(Player))),
+	};
+	t[#t + 1] = Def.ActorFrame {
+		Name = 'SmallFrame',
+		InitCommand = function(self) self:y(-2) end,
+		OnCommand = function(self) self:diffusealpha(0):sleep(0.14):linear(0.2):diffusealpha(1) end,
+		Def.Quad {
+			InitCommand = function(self) self:zoomto(270, 64) end,
+			OnCommand = function(self) self:diffuse(ColorLightTone(PlayerColor(Player))):diffuserightedge(ColorDarkTone(
+				PlayerColor(Player))) end,
+		},
+		Def.Quad {
+			InitCommand = function(self) self:zoomto(270, 6):vertalign(top):y(-32) end,
+			OnCommand = function(self) self:diffuse(PlayerColor(Player)):diffusealpha(0.6) end,
+		},
+		Def.Quad {
+			InitCommand = function(self) self:zoomto(270, 6):vertalign(bottom):y(32) end,
+			OnCommand = function(self) self:diffuse(PlayerColor(Player)):diffusealpha(0.6) end,
+		},
+	};
+
+	t[#t + 1] = Def.ActorScroller {
+		Name = 'Scroller',
+		NumItemsToDraw = 6,
+		OnCommand = function(self)
+			self:y(1):SetFastCatchup(true):SetMask(300, 58):SetSecondsPerItem(0.15)
 			self:diffusealpha(0):sleep(0.14):linear(0.2):diffusealpha(1)
-		end;
-		TransformFunction=function(self, offset, itemIndex, numItems)
-			local focus = scale(math.abs(offset),0,2,1,0);
+		end,
+		TransformFunction = function(self, offset, itemIndex, numItems)
+			local focus = scale(math.abs(offset), 0, 2, 1, 0);
 			self:visible(false);
-			self:y(math.floor( offset*64 ));
--- 			self:zoomy( focus );
--- 			self:z(-math.abs(offset));
--- 			self:zoom(focus);
-		end;
-		OffCommand=function(self) self:linear(0.1):diffusealpha(0) end;
-		children = GetLocalProfiles();
+			self:y(math.floor(offset * 64));
+			-- 			self:zoomy( focus );
+			-- 			self:z(-math.abs(offset));
+			-- 			self:zoom(focus);
+		end,
+		OffCommand = function(self) self:linear(0.1):diffusealpha(0) end,
+		children = GetLocalProfiles(),
 	};
-	
-	t[#t+1] = Def.ActorFrame {
-		Name = "EffectFrame";
+
+	t[#t + 1] = Def.ActorFrame {
+		Name = "EffectFrame",
 	};
-	t[#t+1] = Def.BitmapText {
-		Font="Common Normal";
-		Name = 'SelectedProfileText';
-		InitCommand=function(self) 
+	t[#t + 1] = Def.BitmapText {
+		Font = "Common Normal",
+		Name = 'SelectedProfileText',
+		InitCommand = function(self)
 			self:y(240):zoom(1):skewx(0.5)
 			self:diffuse(ColorLightTone(PlayerColor(Player))):diffusetopedge(ColorDarkTone(PlayerColor(Player)))
-		end;
-		OnCommand=function(self) self:diffusealpha(0):sleep(0.14):linear(0.2):diffusealpha(1) end;
+		end,
+		OnCommand = function(self) self:diffusealpha(0):sleep(0.14):linear(0.2):diffusealpha(1) end,
 	};
 
 	return t;
-end;
+end
+
+;
 
 function UpdateInternal3(self, Player)
 	local pn = (Player == PLAYER_1) and 1 or 2;
@@ -149,8 +156,8 @@ function UpdateInternal3(self, Player)
 			scroller:visible(true);
 			local ind = SCREENMAN:GetTopScreen():GetProfileIndex(Player);
 			if ind > 0 then
-				scroller:SetDestinationItem(ind-1);
-				seltext:settext(PROFILEMAN:GetLocalProfileFromIndex(ind-1):GetDisplayName());
+				scroller:SetDestinationItem(ind - 1);
+				seltext:settext(PROFILEMAN:GetLocalProfileFromIndex(ind - 1):GetDisplayName());
 			else
 				if SCREENMAN:GetTopScreen():SetProfileIndex(Player, 1) then
 					scroller:SetDestinationItem(0);
@@ -161,23 +168,29 @@ function UpdateInternal3(self, Player)
 					bigframe:visible(false);
 					scroller:visible(false);
 					seltext:settext('No profile');
-				end;
-			end;
+				end
+				;
+			end
+			;
 		else
 			--using card
 			smallframe:visible(false);
 			scroller:visible(false);
 			seltext:settext('CARD');
 			SCREENMAN:GetTopScreen():SetProfileIndex(Player, 0);
-		end;
+		end
+		;
 	else
 		joinframe:visible(true);
 		scroller:visible(false);
 		seltext:visible(false);
 		smallframe:visible(false);
 		bigframe:visible(false);
-	end;
-end;
+	end
+	;
+end
+
+;
 
 -- here's a (messy) fix for one player's selection ending the screen,
 -- at least until this whole thing is rewritten to be... Not this
@@ -194,9 +207,9 @@ end
 
 local t = Def.ActorFrame {
 
-	StorageDevicesChangedMessageCommand=function(self, params)
+	StorageDevicesChangedMessageCommand = function(self, params)
 		self:queuecommand('UpdateInternal2');
-	end;
+	end,
 
 	CodeMessageCommand = function(self, params)
 		if params.Name == 'Start' or params.Name == 'Center' then
@@ -208,34 +221,44 @@ local t = Def.ActorFrame {
 				if AllPlayersReady() then
 					SCREENMAN:GetTopScreen():Finish();
 				end
-			end;
-		end;
+			end
+			;
+		end
+		;
 		if params.Name == 'Up' or params.Name == 'Up2' or params.Name == 'Up3' or params.Name == 'Up4' or params.Name == 'DownLeft' then
 			-- Added a line to make sure the player can't fiddle around in the menu
 			-- after they've already made a selection.
 			if GAMESTATE:IsHumanPlayer(params.PlayerNumber) and not ready[params.PlayerNumber] then
 				local ind = SCREENMAN:GetTopScreen():GetProfileIndex(params.PlayerNumber);
 				if ind > 1 then
-					if SCREENMAN:GetTopScreen():SetProfileIndex(params.PlayerNumber, ind - 1 ) then
+					if SCREENMAN:GetTopScreen():SetProfileIndex(params.PlayerNumber, ind - 1) then
 						MESSAGEMAN:Broadcast("DirectionButton");
 						self:queuecommand('UpdateInternal2');
-					end;
-				end;
-			end;
-		end;
+					end
+					;
+				end
+				;
+			end
+			;
+		end
+		;
 		if params.Name == 'Down' or params.Name == 'Down2' or params.Name == 'Down3' or params.Name == 'Down4' or params.Name == 'DownRight' then
 			if GAMESTATE:IsHumanPlayer(params.PlayerNumber) and not ready[params.PlayerNumber] then
 				local ind = SCREENMAN:GetTopScreen():GetProfileIndex(params.PlayerNumber);
 				if ind > 0 then
-					if SCREENMAN:GetTopScreen():SetProfileIndex(params.PlayerNumber, ind + 1 ) then
+					if SCREENMAN:GetTopScreen():SetProfileIndex(params.PlayerNumber, ind + 1) then
 						MESSAGEMAN:Broadcast("DirectionButton");
 						self:queuecommand('UpdateInternal2');
-					end;
-				end;
-			end;
-		end;
+					end
+					;
+				end
+				;
+			end
+			;
+		end
+		;
 		if params.Name == 'Back' then
-			if GAMESTATE:GetNumPlayersEnabled()==0 then
+			if GAMESTATE:GetNumPlayersEnabled() == 0 then
 				SCREENMAN:GetTopScreen():Cancel();
 			else
 				MESSAGEMAN:Broadcast("BackButton")
@@ -245,52 +268,54 @@ local t = Def.ActorFrame {
 				else
 					SCREENMAN:GetTopScreen():SetProfileIndex(params.PlayerNumber, -2);
 				end
-			end;
-		end;
-	end;
+			end
+			;
+		end
+		;
+	end,
 
-	PlayerJoinedMessageCommand=function(self, params)
+	PlayerJoinedMessageCommand = function(self, params)
 		self:queuecommand('UpdateInternal2');
-	end;
+	end,
 
-	PlayerUnjoinedMessageCommand=function(self, params)
+	PlayerUnjoinedMessageCommand = function(self, params)
 		self:queuecommand('UpdateInternal2');
-	end;
+	end,
 
-	OnCommand=function(self, params)
+	OnCommand = function(self, params)
 		self:queuecommand('UpdateInternal2');
-	end;
+	end,
 
-	UpdateInternal2Command=function(self)
+	UpdateInternal2Command = function(self)
 		UpdateInternal3(self, PLAYER_1);
 		UpdateInternal3(self, PLAYER_2);
-	end;
+	end,
 
 	children = {
 		LoadActorWithParams(THEME:GetPathG('', 'screenheader'), {}),
 		Def.ActorFrame {
-			Name = 'P1Frame';
-			InitCommand=function(self) self:xy(SCREEN_CENTER_X-160,SCREEN_CENTER_Y):skewx(-0.5) end;
-			OffCommand=function(self) self:easeinoutexpo(0.5):diffusealpha(0) end;
-			children = LoadPlayerStuff(PLAYER_1);
-		};
+			Name = 'P1Frame',
+			InitCommand = function(self) self:xy(SCREEN_CENTER_X - 160, SCREEN_CENTER_Y):skewx(-0.5) end,
+			OffCommand = function(self) self:easeinoutexpo(0.5):diffusealpha(0) end,
+			children = LoadPlayerStuff(PLAYER_1),
+		},
 		Def.ActorFrame {
-			Name = 'P2Frame';
-			InitCommand=function(self) self:xy(SCREEN_CENTER_X+160,SCREEN_CENTER_Y):skewx(-0.5) end;
-			OffCommand=function(self) self:easeinoutexpo(0.5):diffusealpha(0) end;
-			children = LoadPlayerStuff(PLAYER_2);
-		};
+			Name = 'P2Frame',
+			InitCommand = function(self) self:xy(SCREEN_CENTER_X + 160, SCREEN_CENTER_Y):skewx(-0.5) end,
+			OffCommand = function(self) self:easeinoutexpo(0.5):diffusealpha(0) end,
+			children = LoadPlayerStuff(PLAYER_2),
+		},
 		-- sounds
-		LoadActor( THEME:GetPathS("Common","start") )..{
-			StartButtonMessageCommand=function(self) self:play() end;
-		};
-		LoadActor( THEME:GetPathS("Common","cancel") )..{
-			BackButtonMessageCommand=function(self) self:play() end;
-		};
-		LoadActor( THEME:GetPathS("Common","value") )..{
-			DirectionButtonMessageCommand=function(self) self:play() end;
-		};
-	};
+		LoadActor(THEME:GetPathS("Common", "start")) .. {
+			StartButtonMessageCommand = function(self) self:play() end,
+		},
+		LoadActor(THEME:GetPathS("Common", "cancel")) .. {
+			BackButtonMessageCommand = function(self) self:play() end,
+		},
+		LoadActor(THEME:GetPathS("Common", "value")) .. {
+			DirectionButtonMessageCommand = function(self) self:play() end,
+		},
+	},
 };
 
 

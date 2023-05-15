@@ -7,7 +7,7 @@ return Def.ActorFrame {
         self:draworder(100)
 	end,
 	Def.BitmapText {
-		Font = "_xide/20px",
+		Font = "Common Normal",
         Text = "Something's gone very wrong!",
         InitCommand = function(self)
             self:zoom(1):vertalign(middle):diffuse(color("#EEF1FF")):diffusealpha(0)

@@ -28,9 +28,6 @@ return Def.ActorFrame {
 		end,
 		MusicLoopEndMessageCommand = function(self)
 			songpos = GAMESTATE:GetSongPosition()
-			--print(2 - (math.mod(GAMESTATE:GetSongPosition():GetSongBeat(), 2)))
-			--local pos = GAMESTATE:GetSongPosition():GetMusicSeconds() / GAMESTATE:GetCurrentSong():GetLastSecond()
-			--print(pos)
 			self
 				:position(0)
 				:linear(0.5)

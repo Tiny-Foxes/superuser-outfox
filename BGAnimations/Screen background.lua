@@ -14,18 +14,6 @@ return Def.ActorFrame {
 				:zoom((sh / 1080) * 1.1)
 		end,
 	},
-	--[[
-	Def.ActorFrame {
-		Name = 'Starfield',
-		Def.Sprite {
-			Texture = THEME:GetPathG('', 'better-starfield'),
-			OnCommand = function(self)
-				self:FullScreen():diffusealpha(0.5)
-			end,
-		},
-	},
-	--]]
-	---[[
 	Def.ActorFrame {
 		Name = 'Starfield',
 		OnCommand = function(self)
@@ -92,7 +80,6 @@ return Def.ActorFrame {
 			end
 		},
 	},
-	--]]
 	-- Tint
 	Def.Quad {
 		OnCommand = function(self)

@@ -91,5 +91,4 @@ return Def.ActorFrame {
 			end,
 		},
 	},
-
 }

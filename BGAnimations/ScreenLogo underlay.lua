@@ -32,22 +32,8 @@ local function aftR(self)
 		:EnablePreserveTexture(true)
 		:Create()
 end
-local function aftblur(self, scale)
-	self
-		:SetSize(sw / scale, sh / scale)
-		:EnableFloat(false)
-		:EnableDepthBuffer(true)
-		:EnableAlphaBuffer(true)
-		:EnablePreserveTexture(false)
-		:Create()
-end
 local function sprite(self)
 	self:Center()
-end
-local function spriteblur(self, scale)
-	self
-		:Center()
-		:basezoom(scale)
 end
 local function aftsprite(aft, sprite)
 	sprite:SetTexture(aft:GetTexture())
